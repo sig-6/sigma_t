@@ -1,0 +1,2832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>SIGMA SIX | Income Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00ffcc;
+            --secondary: #9d4edd;
+            --bg: #0a0b10;
+            --card: #161821;
+            --text: #ffffff;
+            --border: #2d2f3e;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff4d4d;
+            --gradient: linear-gradient(90deg, #00ffcc, #9d4edd, #ff2a6d, #00ffcc);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Rainbow Border Top */
+        .rainbow-border {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+            background-size: 400% 400%;
+            animation: rainbow 8s ease infinite;
+            z-index: 1000;
+        }
+        
+        /* Crypto Live Animation Background */
+        .crypto-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            opacity: 0.15;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 204, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(157, 78, 221, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 40% 80%, rgba(255, 42, 109, 0.15) 0%, transparent 40%);
+        }
+        
+        /* Floating Crypto Icons Animation */
+        .floating-icons {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .floating-icon {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(0, 255, 204, 0.3);
+            animation: float 20s infinite linear;
+        }
+        
+        .floating-icon:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .floating-icon:nth-child(2) { top: 20%; left: 85%; animation-delay: 2s; color: rgba(157, 78, 221, 0.3); }
+        .floating-icon:nth-child(3) { top: 40%; left: 15%; animation-delay: 4s; color: rgba(255, 42, 109, 0.3); }
+        .floating-icon:nth-child(4) { top: 60%; left: 90%; animation-delay: 6s; }
+        .floating-icon:nth-child(5) { top: 80%; left: 10%; animation-delay: 8s; color: rgba(157, 78, 221, 0.3); }
+        .floating-icon:nth-child(6) { top: 30%; left: 70%; animation-delay: 10s; }
+        .floating-icon:nth-child(7) { top: 70%; left: 50%; animation-delay: 12s; color: rgba(255, 42, 109, 0.3); }
+        
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg); 
+                opacity: 0.3;
+            }
+            25% { 
+                transform: translateY(-20px) rotate(90deg); 
+                opacity: 0.6;
+            }
+            50% { 
+                transform: translateY(0) rotate(180deg); 
+                opacity: 0.3;
+            }
+            75% { 
+                transform: translateY(20px) rotate(270deg); 
+                opacity: 0.6;
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        .header h1 {
+            background: var(--gradient);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            animation: rainbow 8s ease infinite;
+            line-height: 1.2;
+        }
+        
+        .header p {
+            color: #aaa;
+            font-size: clamp(14px, 3vw, 16px);
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+        
+        /* Connect Button */
+        .connect-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 800;
+            font-size: clamp(12px, 3vw, 14px);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.3);
+            z-index: 1001;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+        
+        .connect-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 204, 0.5);
+        }
+        
+        .connect-btn.connected {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        /* Wallet Selector Modal */
+        .wallet-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .wallet-modal.active {
+            display: flex;
+        }
+        
+        .wallet-modal-content {
+            background: var(--card);
+            border: 2px solid transparent;
+            border-radius: 32px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+        }
+        
+        .wallet-modal-content::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--gradient);
+            background-size: 400% 400%;
+            border-radius: 32px;
+            z-index: -2;
+            animation: rainbow 8s ease infinite;
+        }
+        
+        .wallet-modal-content::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--card);
+            border-radius: 30px;
+            z-index: -1;
+            margin: 2px;
+        }
+        
+        .wallet-modal-content h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+        
+        .wallet-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .wallet-option:hover {
+            border-color: var(--primary);
+            background: rgba(0, 255, 204, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+        }
+        
+        .wallet-option img {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: white;
+            padding: 6px;
+        }
+        
+        .wallet-option span {
+            font-size: 18px;
+            font-weight: 700;
+            background: var(--gradient);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .close-modal {
+            margin-top: 15px;
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 10px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        
+        .close-modal:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.5);
+        }
+        
+        /* Chain Warning */
+        .chain-warning {
+            position: fixed;
+            top: 80px;
+            right: 15px;
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 12px;
+            padding: 10px 15px;
+            color: var(--warning);
+            font-size: 13px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .chain-warning.show {
+            display: block;
+        }
+        
+        .filters-section {
+            background: rgba(22, 24, 33, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .filters-title {
+            color: var(--secondary);
+            font-size: clamp(16px, 4vw, 20px);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-label {
+            color: #aaa;
+            font-size: clamp(12px, 3vw, 14px);
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .date-input, .type-select, .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .date-input:focus, .type-select:focus, .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .apply-btn {
+            background: linear-gradient(90deg, var(--secondary), #7b2cbf);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: clamp(12px, 3vw, 14px);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            margin-top: 20px;
+        }
+        
+        .apply-btn:hover {
+            background: linear-gradient(90deg, #7b2cbf, var(--secondary));
+            transform: translateY(-2px);
+        }
+        
+        .reset-btn {
+            background: rgba(255, 77, 77, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: clamp(12px, 3vw, 14px);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            margin-top: 20px;
+        }
+        
+        .reset-btn:hover {
+            background: rgba(255, 77, 77, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .main-card {
+            background: rgba(22, 24, 33, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+            background-size: 400% 400%;
+            animation: rainbow 8s ease infinite;
+        }
+        
+        .card-title {
+            color: var(--primary);
+            font-size: clamp(18px, 4vw, 24px);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(45, 47, 62, 0.5);
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-box:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .stat-label {
+            font-size: clamp(12px, 3vw, 14px);
+            color: #888;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-value {
+            font-size: clamp(20px, 4vw, 28px);
+            font-weight: 700;
+            color: var(--primary);
+            word-break: break-word;
+        }
+        
+        .stat-value.positive {
+            color: var(--success);
+        }
+        
+        .stat-value.negative {
+            color: var(--danger);
+        }
+        
+        /* Mobile-Optimized Table Styles */
+        .table-container {
+            overflow-x: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Desktop Table */
+        .desktop-table {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        /* Mobile Cards */
+        .mobile-cards {
+            display: none;
+        }
+        
+        .mobile-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0, 255, 204, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mobile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient);
+            background-size: 400% 400%;
+            animation: rainbow 8s ease infinite;
+        }
+        
+        .mobile-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .mobile-card-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        
+        .mobile-card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .mobile-card-row:last-child {
+            border-bottom: none;
+        }
+        
+        .mobile-card-label {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .mobile-card-value {
+            font-size: 13px;
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        .mobile-wallet-address {
+            font-family: monospace;
+            background: rgba(0, 255, 204, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            display: inline-block;
+        }
+        
+        .mobile-amount {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .mobile-amount.positive {
+            color: var(--success);
+        }
+        
+        .mobile-amount.negative {
+            color: var(--danger);
+        }
+        
+        .mobile-token-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--primary);
+        }
+        
+        th {
+            background: rgba(157, 78, 221, 0.1);
+            color: var(--secondary);
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 700;
+            font-size: clamp(11px, 2.5vw, 14px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(45, 47, 62, 0.5);
+            font-size: clamp(12px, 3vw, 14px);
+            vertical-align: top;
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: clamp(10px, 2.5vw, 12px);
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-active {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--success);
+        }
+        
+        .status-lapsed {
+            background: rgba(255, 77, 77, 0.1);
+            color: var(--danger);
+        }
+        
+        .amount-positive {
+            color: var(--success);
+            font-weight: 700;
+            font-size: clamp(12px, 3vw, 14px);
+        }
+        
+        .amount-negative {
+            color: var(--danger);
+            font-weight: 700;
+            font-size: clamp(12px, 3vw, 14px);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--primary);
+            font-size: clamp(14px, 3vw, 16px);
+        }
+        
+        .loading i {
+            font-size: clamp(20px, 4vw, 24px);
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 30px 20px;
+            color: #888;
+            font-size: clamp(14px, 3vw, 16px);
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            transition: all 0.3s;
+            font-size: clamp(12px, 3vw, 14px);
+        }
+        
+        .back-btn:hover {
+            background: rgba(0, 255, 204, 0.2);
+            transform: translateX(-5px);
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(90deg, var(--secondary), #7b2cbf);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-weight: 600;
+            font-size: clamp(12px, 3vw, 14px);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .refresh-btn:hover {
+            background: linear-gradient(90deg, #7b2cbf, var(--secondary));
+            transform: translateY(-2px);
+        }
+        
+        .header-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        @media (min-width: 480px) {
+            .header-actions {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        .token-badge {
+            display: inline-block;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: clamp(10px, 2.5vw, 11px);
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .badge-sig6 {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+        }
+        
+        .badge-usdt {
+            background: rgba(157, 78, 221, 0.1);
+            color: var(--secondary);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+        }
+        
+        .wallet-address {
+            font-family: monospace;
+            font-size: 11px;
+            background: rgba(0, 255, 204, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-top: 3px;
+            display: inline-block;
+            cursor: pointer;
+            color: var(--primary);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .multi-line-stat {
+            line-height: 1.3;
+        }
+        
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .connect-btn {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 0 auto 15px auto;
+                width: 100%;
+                max-width: 100%;
+                justify-content: center;
+            }
+            
+            .chain-warning {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            
+            .main-card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .filters-section {
+                padding: 12px;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .filter-group {
+                width: 100%;
+                min-width: 100%;
+            }
+            
+            .filter-buttons {
+                flex-direction: column;
+            }
+            
+            .apply-btn, .reset-btn {
+                width: 100%;
+                justify-content: center;
+                margin-top: 5px;
+            }
+            
+            /* Hide desktop table on mobile */
+            .desktop-table {
+                display: none;
+            }
+            
+            /* Show mobile cards on mobile */
+            .mobile-cards {
+                display: block;
+            }
+            
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .wallet-modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            .wallet-option {
+                padding: 12px;
+            }
+            
+            .wallet-option img {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .wallet-option span {
+                font-size: 16px;
+            }
+            
+            .close-modal {
+                padding: 8px 20px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Small phones */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 26px;
+            }
+            
+            .header p {
+                font-size: 13px;
+            }
+            
+            .card-title {
+                font-size: 18px;
+            }
+            
+            .stat-box {
+                padding: 12px;
+            }
+            
+            .stat-value {
+                font-size: 22px;
+            }
+            
+            .mobile-card {
+                padding: 12px;
+            }
+            
+            .mobile-card-title {
+                font-size: 14px;
+            }
+            
+            .mobile-card-value {
+                font-size: 12px;
+            }
+            
+            .mobile-wallet-address {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Rainbow Border -->
+    <div class="rainbow-border"></div>
+    
+    <!-- Crypto Background Animation -->
+    <div class="crypto-bg"></div>
+    
+    <!-- Floating Crypto Icons -->
+    <div class="floating-icons">
+        <div class="floating-icon">₿</div>
+        <div class="floating-icon">Ξ</div>
+        <div class="floating-icon">S</div>
+        <div class="floating-icon">Σ</div>
+        <div class="floating-icon">$</div>
+        <div class="floating-icon">◈</div>
+        <div class="floating-icon">✦</div>
+    </div>
+    
+    <!-- Chain Warning -->
+    <div class="chain-warning" id="chainWarning">
+        <i class="fas fa-exclamation-triangle"></i> Please switch to Polygon network
+    </div>
+    
+    <!-- Wallet Selector Modal -->
+    <div class="wallet-modal" id="walletModal">
+        <div class="wallet-modal-content">
+            <h2><i class="fas fa-wallet"></i> Connect Wallet</h2>
+            
+            <!-- MetaMask -->
+            <div class="wallet-option" onclick="connectWallet('metamask')">
+                <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect width=%2240%22 height=%2240%22 fill=%22%23f6851b%22 rx=%228%22/><text x=%225%22 y=%2228%22 fill=%22white%22 font-size=%2224%22>M</text></svg>'">
+                <span>MetaMask</span>
+            </div>
+            
+            <!-- Trust Wallet -->
+            <div class="wallet-option" onclick="connectWallet('trust')">
+                <img src="https://trustwallet.com/assets/images/favicon.png" alt="Trust Wallet" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect width=%2240%22 height=%2240%22 fill=%22%230050ef%22 rx=%228%22/><text x=%225%22 y=%2228%22 fill=%22white%22 font-size=%2224%22>T</text></svg>'">
+                <span>Trust Wallet</span>
+            </div>
+            
+            <!-- BitGet Wallet -->
+            <div class="wallet-option" onclick="connectWallet('bitget')">
+                <img src="https://cdn.prod.website-files.com/64449f9b1fa7be3e7e9aa001/65acd9d3a66cc56a38d4b9c3_favicon%20(1).png" alt="BitGet Wallet" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect width=%2240%22 height=%2240%22 fill=%22%2300b2ff%22 rx=%228%22/><text x=%225%22 y=%2228%22 fill=%22white%22 font-size=%2224%22>B</text></svg>'">
+                <span>BitGet Wallet</span>
+            </div>
+            
+            <button class="close-modal" onclick="closeWalletModal()">Cancel</button>
+        </div>
+    </div>
+    
+    <!-- Connect Button -->
+    <button class="connect-btn" id="connectBtn" onclick="showWalletModal()">
+        <i class="fas fa-wallet"></i> <span id="btn-text">Connect Wallet</span>
+    </button>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <div class="header-actions">
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <button class="refresh-btn" onclick="loadIncomeData()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+        
+        <div class="header">
+            <h1>INCOME REPORT</h1>
+            <p>Track your rewards & commissions from SIGMA SIX</p>
+        </div>
+        
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <h2 class="filters-title"><i class="fas fa-filter"></i> Filter Income Data</h2>
+            
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label"><i class="far fa-calendar"></i> Start Date</label>
+                    <input type="date" id="startDate" class="date-input">
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label"><i class="far fa-calendar"></i> End Date</label>
+                    <input type="date" id="endDate" class="date-input">
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-tag"></i> Income Type</label>
+                    <select id="incomeType" class="type-select">
+                        <option value="all">All Types</option>
+                        <option value="ICO_REWARD">ICO Bonus</option>
+                        <option value="REFERRAL">Team Referral</option>
+                        <option value="INELIGIBLE">Lapsed Income</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-search"></i> Search Wallet</label>
+                    <input type="text" id="searchWallet" class="search-input" placeholder="Enter wallet address...">
+                </div>
+            </div>
+            
+            <div class="filter-buttons">
+                <button class="apply-btn" onclick="applyFilters()">
+                    <i class="fas fa-check"></i> Apply Filters
+                </button>
+                <button class="reset-btn" onclick="resetFilters()">
+                    <i class="fas fa-times"></i> Reset Filters
+                </button>
+            </div>
+        </div>
+        
+        <!-- Stats Overview -->
+        <div class="main-card">
+            <h2 class="card-title"><i class="fas fa-chart-line"></i> Income Overview</h2>
+            
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-label"><i class="fas fa-coins"></i> Total SIG6 Income</div>
+                    <div id="total-sig6" class="stat-value positive">0.0000 SIG6</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Lapsed Income</div>
+                    <div id="lapsed-income" class="stat-value negative multi-line-stat">0.00 USDT</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label"><i class="fas fa-history"></i> Total Transactions</div>
+                    <div id="total-transactions" class="stat-value">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Active Rewards Table -->
+        <div class="main-card">
+            <h2 class="card-title"><i class="fas fa-check-circle"></i> Active Rewards History</h2>
+            
+            <div class="table-container">
+                <!-- Desktop Table View -->
+                <table class="desktop-table" id="rewards-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Income</th>
+                            <th>Details</th>
+                            <th>From Wallet</th>
+                            <th>Level</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rewards-body-desktop"></tbody>
+                </table>
+                
+                <!-- Mobile Cards View -->
+                <div class="mobile-cards" id="rewards-body-mobile"></div>
+            </div>
+        </div>
+        
+        <!-- Lapsed Income Table -->
+        <div class="main-card">
+            <h2 class="card-title"><i class="fas fa-exclamation-triangle"></i> Lapsed Income History</h2>
+            
+            <div class="table-container">
+                <!-- Desktop Table View -->
+                <table class="desktop-table" id="lapsed-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Income</th>
+                            <th>Details</th>
+                            <th>From Wallet</th>
+                            <th>Amount</th>
+                            <th>Reason</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lapsed-body-desktop"></tbody>
+                </table>
+                
+                <!-- Mobile Cards View -->
+                <div class="mobile-cards" id="lapsed-body-mobile"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== UPDATED CONTRACT CONFIGURATION =====
+        const SIGMA_CONTRACT_ADDRESS = "0xeA0a8150c5B368ec026ffB094FCfCdB3FaBFa479";
+        
+        let provider, userAddress, sigmaContract, signer;
+        
+        // Global variables to store filtered data
+        let allRewardEvents = [];
+        let allLapsedEvents = [];
+        
+        // ===== UPDATED ABI =====
+        const sigmaABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "sigmaAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_upline",
+				"type": "address"
+			}
+		],
+		"name": "buySigma",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "emergencyWithdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_usdt",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "allowance",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "needed",
+				"type": "uint256"
+			}
+		],
+		"name": "ERC20InsufficientAllowance",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "balance",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "needed",
+				"type": "uint256"
+			}
+		],
+		"name": "ERC20InsufficientBalance",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "approver",
+				"type": "address"
+			}
+		],
+		"name": "ERC20InvalidApprover",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "receiver",
+				"type": "address"
+			}
+		],
+		"name": "ERC20InvalidReceiver",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			}
+		],
+		"name": "ERC20InvalidSender",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "spender",
+				"type": "address"
+			}
+		],
+		"name": "ERC20InvalidSpender",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "OwnableInvalidOwner",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "OwnableUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "Approval",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "reason",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "IncomeLapsed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "referrer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "MemberJoined",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address[]",
+				"name": "_users",
+				"type": "address[]"
+			},
+			{
+				"internalType": "address[]",
+				"name": "_ups",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "_bals",
+				"type": "uint256[]"
+			}
+		],
+		"name": "migrateData",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "level",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "rewardType",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "RewardReport",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "sigmaAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "sellSigma",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "tradeType",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "sigmaAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "rate",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "taxUsdt",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "TradeReport",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "transfer",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "UserTransfer",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_u",
+				"type": "address"
+			}
+		],
+		"name": "_checkEligibility",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "spender",
+				"type": "address"
+			}
+		],
+		"name": "allowance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "balanceOf",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "buyRate",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "creatorWallet",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "decimals",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSellRate",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "hasBoughtBefore",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "last30DaysBuyVolume",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "lastBuyTimestamp",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "myDirects",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "name",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "rateStep",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "symbol",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "totalLapsedReferral",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "totalReceivedReferral",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalSupply",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "upline",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "usdt",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+        
+        // Check if correct chain (Polygon)
+        async function checkChain() {
+            if (!provider) return false;
+            
+            try {
+                const network = await provider.getNetwork();
+                const chainId = Number(network.chainId);
+                
+                if (chainId !== 137 && chainId !== 80001) {
+                    document.getElementById('chainWarning').classList.add('show');
+                    return false;
+                } else {
+                    document.getElementById('chainWarning').classList.remove('show');
+                    return true;
+                }
+            } catch (e) {
+                console.error("Chain check error:", e);
+                return false;
+            }
+        }
+        
+        // Show wallet modal
+        function showWalletModal() {
+            document.getElementById('walletModal').classList.add('active');
+        }
+        
+        // Close wallet modal
+        function closeWalletModal() {
+            document.getElementById('walletModal').classList.remove('active');
+        }
+        
+        // Universal provider detection
+        function getProvider(walletType) {
+            if (walletType === 'metamask' || walletType === 'trust' || walletType === 'bitget') {
+                if (typeof window.ethereum !== 'undefined') {
+                    if (walletType === 'trust' && window.ethereum.isTrust) {
+                        return window.ethereum;
+                    } else if (walletType === 'bitget' && (window.ethereum.isBitGet || window.ethereum.isBitkeep)) {
+                        return window.ethereum;
+                    } else if (walletType === 'metamask' && window.ethereum.isMetaMask) {
+                        return window.ethereum;
+                    } else if (walletType === 'trust' || walletType === 'bitget') {
+                        return window.ethereum;
+                    } else {
+                        return window.ethereum;
+                    }
+                }
+                
+                if (walletType === 'trust' && window.trustWallet) {
+                    return window.trustWallet;
+                }
+                
+                if (walletType === 'bitget') {
+                    if (window.bitkeep && window.bitkeep.ethereum) {
+                        return window.bitkeep.ethereum;
+                    }
+                    if (window.bitget && window.bitget.ethereum) {
+                        return window.bitget.ethereum;
+                    }
+                }
+            }
+            
+            return null;
+        }
+        
+        // Connect Wallet Function
+        async function connectWallet(walletType) {
+            closeWalletModal();
+            
+            let ethProvider = null;
+            
+            try {
+                ethProvider = getProvider(walletType);
+                
+                if (!ethProvider) {
+                    if (walletType === 'metamask') {
+                        if (confirm("MetaMask not found! Would you like to install it?")) {
+                            window.open("https://metamask.io/download/", "_blank");
+                        }
+                    } else if (walletType === 'trust') {
+                        if (confirm("Trust Wallet not found! Please install Trust Wallet browser extension or use in-app browser.")) {
+                            window.open("https://trustwallet.com/browser-extension", "_blank");
+                        }
+                    } else if (walletType === 'bitget') {
+                        if (confirm("BitGet Wallet not found! Please install BitGet Wallet extension or use in-app browser.")) {
+                            window.open("https://web3.bitget.com/en/wallet-download", "_blank");
+                        }
+                    }
+                    return;
+                }
+                
+                if (walletType === 'trust' && ethProvider.providers) {
+                    const trustProvider = ethProvider.providers.find(p => p.isTrust || p.isTrustWallet);
+                    if (trustProvider) {
+                        ethProvider = trustProvider;
+                    }
+                }
+                
+                if (walletType === 'bitget' && ethProvider.providers) {
+                    const bitgetProvider = ethProvider.providers.find(p => p.isBitGet || p.isBitkeep);
+                    if (bitgetProvider) {
+                        ethProvider = bitgetProvider;
+                    }
+                }
+                
+                provider = new ethers.BrowserProvider(ethProvider);
+                
+                let accounts;
+                try {
+                    accounts = await provider.send("eth_requestAccounts", []);
+                } catch (error) {
+                    if (error.message.includes("wallet_requestPermissions")) {
+                        await provider.send("wallet_requestPermissions", [{ eth_accounts: {} }]);
+                        accounts = await provider.send("eth_accounts", []);
+                    } else {
+                        throw error;
+                    }
+                }
+                
+                if (!accounts || accounts.length === 0) {
+                    throw new Error("No accounts found");
+                }
+                
+                userAddress = accounts[0];
+                signer = await provider.getSigner();
+                
+                sigmaContract = new ethers.Contract(SIGMA_CONTRACT_ADDRESS, sigmaABI, provider);
+                
+                // Check chain
+                await checkChain();
+                
+                // Update connect button
+                const connectBtn = document.getElementById('connectBtn');
+                let walletIcon = '';
+                if (walletType === 'metamask') walletIcon = '🦊';
+                else if (walletType === 'trust') walletIcon = '🔵';
+                else if (walletType === 'bitget') walletIcon = '⚡';
+                
+                const shortAddress = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
+                document.getElementById('btn-text').textContent = walletIcon + " " + shortAddress;
+                connectBtn.classList.add('connected');
+                
+                // Load income data
+                loadIncomeData();
+                
+                // Listen for account changes
+                ethProvider.on('accountsChanged', async (accounts) => {
+                    if (accounts && accounts.length > 0) {
+                        userAddress = accounts[0];
+                        signer = await provider.getSigner();
+                        document.getElementById('btn-text').textContent = walletIcon + " " + userAddress.slice(0,6) + "..." + userAddress.slice(-4);
+                        await loadIncomeData();
+                    } else {
+                        userAddress = null;
+                        document.getElementById('btn-text').textContent = "Connect Wallet";
+                        connectBtn.classList.remove('connected');
+                        resetData();
+                    }
+                });
+                
+                ethProvider.on('chainChanged', (chainId) => {
+                    window.location.reload();
+                });
+                
+                ethProvider.on('disconnect', (error) => {
+                    console.log("Wallet disconnected:", error);
+                    userAddress = null;
+                    document.getElementById('btn-text').textContent = "Connect Wallet";
+                    connectBtn.classList.remove('connected');
+                    resetData();
+                });
+                
+            } catch (error) {
+                console.error("Connection error:", error);
+                alert("Failed to connect wallet: " + error.message);
+            }
+        }
+        
+        function resetData() {
+            allRewardEvents = [];
+            allLapsedEvents = [];
+            displayRewardsData([]);
+            displayLapsedData([]);
+            updateStats([], []);
+        }
+        
+        async function loadIncomeData() {
+            if (!userAddress) {
+                showWalletModal();
+                return;
+            }
+            
+            try {
+                // Check chain first
+                const isCorrectChain = await checkChain();
+                if (!isCorrectChain) {
+                    return;
+                }
+                
+                // Show loading state
+                document.getElementById('rewards-body-desktop').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading rewards data...
+                        </td>
+                    </tr>
+                `;
+                
+                document.getElementById('rewards-body-mobile').innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading rewards data...
+                    </div>
+                `;
+                
+                document.getElementById('lapsed-body-desktop').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading lapsed income data...
+                        </td>
+                    </tr>
+                `;
+                
+                document.getElementById('lapsed-body-mobile').innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading lapsed income data...
+                    </div>
+                `;
+                
+                // Get current block number
+                const currentBlock = await provider.getBlockNumber();
+                const fromBlock = Math.max(currentBlock - 1000000, 0);
+                
+                // Fetch RewardReport events
+                const rewardFilter = sigmaContract.filters.RewardReport(userAddress);
+                const rewardEvents = await sigmaContract.queryFilter(rewardFilter, fromBlock, currentBlock);
+                
+                allRewardEvents = rewardEvents;
+                
+                // Fetch IncomeLapsed events
+                const lapsedFilter = sigmaContract.filters.IncomeLapsed(userAddress);
+                const lapsedEvents = await sigmaContract.queryFilter(lapsedFilter, fromBlock, currentBlock);
+                
+                allLapsedEvents = lapsedEvents;
+                
+                // Process and display data
+                displayRewardsData(allRewardEvents);
+                displayLapsedData(allLapsedEvents);
+                updateStats(allRewardEvents, allLapsedEvents);
+                
+            } catch (error) {
+                console.error("Error loading income data:", error);
+                
+                const errorHtml = `
+                    <tr>
+                        <td colspan="8" class="no-data">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Error loading data: ${error.message}
+                        </td>
+                    </tr>
+                `;
+                
+                document.getElementById('rewards-body-desktop').innerHTML = errorHtml;
+                document.getElementById('lapsed-body-desktop').innerHTML = errorHtml;
+                
+                document.getElementById('rewards-body-mobile').innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Error loading data: ${error.message}
+                    </div>
+                `;
+                
+                document.getElementById('lapsed-body-mobile').innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Error loading data: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function displayRewardsData(events) {
+            const desktopBody = document.getElementById('rewards-body-desktop');
+            const mobileContainer = document.getElementById('rewards-body-mobile');
+            
+            if (!events || events.length === 0) {
+                const noDataHtml = `
+                    <tr>
+                        <td colspan="8" class="no-data">
+                            <i class="fas fa-inbox"></i>
+                            No rewards found
+                        </td>
+                    </tr>
+                `;
+                desktopBody.innerHTML = noDataHtml;
+                
+                mobileContainer.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        No rewards found
+                    </div>
+                `;
+                return;
+            }
+            
+            let desktopHtml = '';
+            let mobileHtml = '';
+            let totalSIG6 = 0;
+            
+            events.sort((a, b) => Number(b.args.timestamp) - Number(a.args.timestamp));
+            
+            const uniqueEvents = [];
+            const seenHashes = new Set();
+            
+            events.forEach(event => {
+                if (!seenHashes.has(event.transactionHash)) {
+                    seenHashes.add(event.transactionHash);
+                    uniqueEvents.push(event);
+                }
+            });
+            
+            uniqueEvents.forEach((event, index) => {
+                const args = event.args;
+                let amount, tokenType, displayAmount, tokenBadge;
+                
+                const timestamp = Number(args.timestamp);
+                const amountBigInt = BigInt(args.amount);
+                
+                if (args.rewardType === "ICO_REWARD" || 
+                    args.rewardType === "REFERRAL") {
+                    amount = parseFloat(ethers.formatUnits(amountBigInt.toString(), 18));
+                    tokenType = "SIG6";
+                    displayAmount = amount.toFixed(4);
+                    tokenBadge = '<span class="token-badge badge-sig6">SIG6</span>';
+                    totalSIG6 += amount;
+                } else {
+                    amount = parseFloat(ethers.formatUnits(amountBigInt.toString(), 6));
+                    tokenType = "USDT";
+                    displayAmount = amount.toFixed(2);
+                    tokenBadge = '<span class="token-badge badge-usdt">USDT</span>';
+                }
+                
+                let incomeName = "Commission";
+                let description = "Referral commission";
+                let badgeColor = "status-active";
+                
+                if (args.rewardType === "ICO_REWARD") {
+                    incomeName = "ICO Bonus";
+                    description = "10% first purchase bonus";
+                } else if (args.rewardType === "REFERRAL") {
+                    incomeName = `Level ${args.level}`;
+                    description = `Level ${args.level} team commission`;
+                }
+                
+                const date = new Date(timestamp * 1000);
+                // DD/MM/YYYY format
+                const dateStr = date.toLocaleDateString('en-IN', { 
+                    day: '2-digit', 
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                // HH:MM:SS format
+                const timeStr = date.toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
+                let fromAddress = args.from || "System";
+                let fromDisplay = "System";
+                let fullAddress = fromAddress;
+                if (fromAddress !== "System" && fromAddress !== "0x0000000000000000000000000000000000000000") {
+                    fromDisplay = fromAddress.slice(0,6) + "..." + fromAddress.slice(-4);
+                }
+                
+                // Desktop HTML
+                desktopHtml += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>
+                            <div style="font-weight:600; color:var(--primary); font-size: 14px;">
+                                ${incomeName}
+                            </div>
+                            <div style="font-size:11px; color:#888; margin-top:3px">
+                                ${tokenBadge}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size:12px;">${description}</div>
+                            <div style="font-size:11px; color:#888; margin-top:3px">${args.rewardType}</div>
+                        </td>
+                        <td style="font-family:monospace; font-size:12px">
+                            <div style="color:var(--primary)">${fromDisplay}</div>
+                            <div class="wallet-address" title="Click to copy" onclick="copyToClipboard('${fullAddress}')">
+                                ${fullAddress !== "System" ? fullAddress.slice(0,12) + "..." : "System"}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge ${badgeColor}">${args.level}</span>
+                        </td>
+                        <td class="amount-positive">
+                            <div><i class="fas fa-plus-circle"></i> ${displayAmount}</div>
+                            <div style="font-size:10px; color:#888">${tokenType}</div>
+                        </td>
+                        <td style="font-size:12px; color:#aaa">
+                            <div style="font-weight:600;">${dateStr}</div>
+                        </td>
+                        <td style="font-size:12px; color:#aaa">
+                            <div>${timeStr}</div>
+                        </td>
+                    </tr>
+                `;
+                
+                // Mobile HTML - Card format
+                mobileHtml += `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">
+                                <i class="fas fa-trophy" style="color:var(--primary)"></i>
+                                ${incomeName}
+                                ${tokenBadge}
+                            </div>
+                            <span class="status-badge ${badgeColor}" style="font-size:11px">#${index + 1}</span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-info-circle" style="color:var(--primary)"></i> Details</span>
+                            <span class="mobile-card-value">${description}</span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-user" style="color:var(--primary)"></i> From</span>
+                            <span class="mobile-card-value">
+                                <span class="mobile-wallet-address" onclick="copyToClipboard('${fullAddress}')">
+                                    ${fullAddress !== "System" ? fullAddress.slice(0,8) + "..." + fullAddress.slice(-6) : "System"}
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-layer-group" style="color:var(--primary)"></i> Level</span>
+                            <span class="mobile-card-value"><span class="status-badge ${badgeColor}">${args.level}</span></span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-coins" style="color:var(--primary)"></i> Amount</span>
+                            <span class="mobile-card-value mobile-amount positive">
+                                <i class="fas fa-plus-circle"></i> ${displayAmount} ${tokenType}
+                            </span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-calendar" style="color:var(--primary)"></i> Date & Time</span>
+                            <span class="mobile-card-value" style="font-size:11px">
+                                ${dateStr} ${timeStr}
+                            </span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-tag" style="color:var(--primary)"></i> Type</span>
+                            <span class="mobile-card-value" style="font-size:11px; color:#888">${args.rewardType}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            desktopBody.innerHTML = desktopHtml;
+            mobileContainer.innerHTML = mobileHtml;
+            
+            document.getElementById('total-sig6').textContent = totalSIG6.toFixed(4) + " SIG6";
+        }
+        
+        function displayLapsedData(events) {
+            const desktopBody = document.getElementById('lapsed-body-desktop');
+            const mobileContainer = document.getElementById('lapsed-body-mobile');
+            
+            if (!events || events.length === 0) {
+                const noDataHtml = `
+                    <tr>
+                        <td colspan="8" class="no-data">
+                            <i class="fas fa-inbox"></i>
+                            No lapsed income found
+                        </td>
+                    </tr>
+                `;
+                desktopBody.innerHTML = noDataHtml;
+                
+                mobileContainer.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        No lapsed income found
+                    </div>
+                `;
+                return;
+            }
+            
+            let desktopHtml = '';
+            let mobileHtml = '';
+            let totalLapsedSIG6 = 0;
+            let totalLapsedUSDT = 0;
+            
+            events.sort((a, b) => Number(b.args.timestamp) - Number(a.args.timestamp));
+            
+            events.forEach((event, index) => {
+                const args = event.args;
+                const amountBigInt = BigInt(args.amount);
+                
+                let amount, displayAmount, tokenType, tokenBadge;
+                
+                if (args.reason.includes("SIG6") || args.reason.includes("LOW_BALANCE_SKIP") || 
+                    args.reason.includes("BALANCE_CHECK") || args.reason.toLowerCase().includes("low_balance") ||
+                    args.reason.includes("4X_LIMIT")) {
+                    amount = parseFloat(ethers.formatUnits(amountBigInt.toString(), 18));
+                    tokenType = "SIG6";
+                    displayAmount = amount.toFixed(4);
+                    tokenBadge = '<span class="token-badge badge-sig6">SIG6</span>';
+                    totalLapsedSIG6 += amount;
+                } else {
+                    amount = parseFloat(ethers.formatUnits(amountBigInt.toString(), 6));
+                    tokenType = "USDT";
+                    displayAmount = amount.toFixed(2);
+                    tokenBadge = '<span class="token-badge badge-usdt">USDT</span>';
+                    totalLapsedUSDT += amount;
+                }
+                
+                let incomeName = "Commission";
+                let description = "Income lapsed";
+                
+                if (args.reason.includes("LOW_BALANCE_SKIP") || args.reason.toLowerCase().includes("low_balance")) {
+                    incomeName = "Low Balance";
+                    description = "Upline < 10 SIG6";
+                } else if (args.reason.includes("4X_LIMIT")) {
+                    incomeName = "Capped";
+                    description = "Exceeded 4x cap";
+                } else if (args.reason.includes("BALANCE_CHECK")) {
+                    incomeName = "Balance Check";
+                    description = "Insufficient SIG6 balance";
+                } else if (args.reason.includes("INELIGIBLE")) {
+                    incomeName = "Ineligible";
+                    description = "Upline not eligible";
+                }
+                
+                const timestamp = Number(args.timestamp);
+                const date = new Date(timestamp * 1000);
+                // DD/MM/YYYY format
+                const dateStr = date.toLocaleDateString('en-IN', { 
+                    day: '2-digit', 
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                // HH:MM:SS format
+                const timeStr = date.toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
+                let fromAddress = args.from || "System";
+                let fromDisplay = "System";
+                let fullAddress = fromAddress;
+                if (fromAddress !== "System" && fromAddress !== "0x0000000000000000000000000000000000000000") {
+                    fromDisplay = fromAddress.slice(0,6) + "..." + fromAddress.slice(-4);
+                }
+                
+                // Desktop HTML
+                desktopHtml += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>
+                            <div style="font-weight:600; color:var(--danger); font-size: 14px;">
+                                ${incomeName}
+                            </div>
+                            ${tokenBadge}
+                        </td>
+                        <td>
+                            <div style="font-size:12px;">${description}</div>
+                            <div style="font-size:11px; color:#888; margin-top:3px">${args.reason}</div>
+                        </td>
+                        <td style="font-family:monospace; font-size:12px">
+                            <div style="color:var(--primary)">${fromDisplay}</div>
+                            <div class="wallet-address" title="Click to copy" onclick="copyToClipboard('${fullAddress}')">
+                                ${fullAddress !== "System" ? fullAddress.slice(0,12) + "..." : "System"}
+                            </div>
+                        </td>
+                        <td class="amount-negative">
+                            <div><i class="fas fa-minus-circle"></i> ${displayAmount}</div>
+                            <div style="font-size:10px; color:#888">${tokenType}</div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-lapsed" style="font-size:11px">${args.reason}</span>
+                        </td>
+                        <td style="font-size:12px; color:#aaa">
+                            <div style="font-weight:600;">${dateStr}</div>
+                        </td>
+                        <td style="font-size:12px; color:#aaa">
+                            <div>${timeStr}</div>
+                        </td>
+                    </tr>
+                `;
+                
+                // Mobile HTML - Card format
+                mobileHtml += `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">
+                                <i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i>
+                                ${incomeName}
+                                ${tokenBadge}
+                            </div>
+                            <span class="status-badge status-lapsed" style="font-size:11px">#${index + 1}</span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-info-circle" style="color:var(--danger)"></i> Details</span>
+                            <span class="mobile-card-value">${description}</span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-user" style="color:var(--danger)"></i> From</span>
+                            <span class="mobile-card-value">
+                                <span class="mobile-wallet-address" onclick="copyToClipboard('${fullAddress}')">
+                                    ${fullAddress !== "System" ? fullAddress.slice(0,8) + "..." + fullAddress.slice(-6) : "System"}
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-coins" style="color:var(--danger)"></i> Amount</span>
+                            <span class="mobile-card-value mobile-amount negative">
+                                <i class="fas fa-minus-circle"></i> ${displayAmount} ${tokenType}
+                            </span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-calendar" style="color:var(--danger)"></i> Date & Time</span>
+                            <span class="mobile-card-value" style="font-size:11px">
+                                ${dateStr} ${timeStr}
+                            </span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label"><i class="fas fa-tag" style="color:var(--danger)"></i> Reason</span>
+                            <span class="mobile-card-value" style="font-size:11px; color:#888">${args.reason}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            desktopBody.innerHTML = desktopHtml;
+            mobileContainer.innerHTML = mobileHtml;
+            
+            updateLapsedStats(totalLapsedSIG6, totalLapsedUSDT);
+        }
+        
+        function updateStats(rewardEvents, lapsedEvents) {
+            let totalSIG6 = 0;
+            let totalLapsedSIG6 = 0;
+            let totalLapsedUSDT = 0;
+            
+            rewardEvents.forEach(event => {
+                const args = event.args;
+                const amountBigInt = BigInt(args.amount);
+                
+                if (args.rewardType === "ICO_REWARD" || 
+                    args.rewardType === "REFERRAL") {
+                    totalSIG6 += parseFloat(ethers.formatUnits(amountBigInt.toString(), 18));
+                }
+            });
+            
+            lapsedEvents.forEach(event => {
+                const amountBigInt = BigInt(event.args.amount);
+                const reason = event.args.reason;
+                
+                if (reason.includes("SIG6") || reason.includes("LOW_BALANCE_SKIP") || 
+                    reason.includes("BALANCE_CHECK") || reason.toLowerCase().includes("low_balance") ||
+                    reason.includes("4X_LIMIT")) {
+                    totalLapsedSIG6 += parseFloat(ethers.formatUnits(amountBigInt.toString(), 18));
+                } else {
+                    totalLapsedUSDT += parseFloat(ethers.formatUnits(amountBigInt.toString(), 6));
+                }
+            });
+            
+            document.getElementById('total-sig6').textContent = totalSIG6.toFixed(4) + " SIG6";
+            updateLapsedStats(totalLapsedSIG6, totalLapsedUSDT);
+            document.getElementById('total-transactions').textContent = 
+                (rewardEvents.length + lapsedEvents.length);
+        }
+        
+        function updateLapsedStats(sig6Amount, usdtAmount) {
+            const lapsedIncomeElement = document.getElementById('lapsed-income');
+            
+            if (usdtAmount > 0 && sig6Amount > 0) {
+                lapsedIncomeElement.innerHTML = `
+                    <div>${usdtAmount.toFixed(2)} USDT</div>
+                    <div style="font-size:16px; margin-top:5px">${sig6Amount.toFixed(4)} SIG6</div>
+                `;
+            } else if (usdtAmount > 0) {
+                lapsedIncomeElement.textContent = usdtAmount.toFixed(2) + " USDT";
+            } else if (sig6Amount > 0) {
+                lapsedIncomeElement.textContent = sig6Amount.toFixed(4) + " SIG6";
+            } else {
+                lapsedIncomeElement.textContent = "0.00";
+            }
+        }
+        
+        function applyFilters() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const incomeType = document.getElementById('incomeType').value;
+            const searchWallet = document.getElementById('searchWallet').value.toLowerCase().trim();
+            
+            let filteredRewards = [...allRewardEvents];
+            let filteredLapsed = [...allLapsedEvents];
+            
+            if (startDate) {
+                const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000);
+                filteredRewards = filteredRewards.filter(event => 
+                    Number(event.args.timestamp) >= startTimestamp
+                );
+                filteredLapsed = filteredLapsed.filter(event => 
+                    Number(event.args.timestamp) >= startTimestamp
+                );
+            }
+            
+            if (endDate) {
+                const endTimestamp = Math.floor(new Date(endDate).getTime() / 1000) + 86400;
+                filteredRewards = filteredRewards.filter(event => 
+                    Number(event.args.timestamp) <= endTimestamp
+                );
+                filteredLapsed = filteredLapsed.filter(event => 
+                    Number(event.args.timestamp) <= endTimestamp
+                );
+            }
+            
+            if (incomeType !== 'all') {
+                if (incomeType === 'INELIGIBLE') {
+                    filteredRewards = [];
+                } else {
+                    filteredRewards = filteredRewards.filter(event => 
+                        event.args.rewardType === incomeType
+                    );
+                    filteredLapsed = [];
+                }
+            }
+            
+            if (searchWallet) {
+                filteredRewards = filteredRewards.filter(event => {
+                    const fromAddr = event.args.from ? event.args.from.toLowerCase() : '';
+                    return fromAddr.includes(searchWallet);
+                });
+                
+                filteredLapsed = filteredLapsed.filter(event => {
+                    const fromAddr = event.args.from ? event.args.from.toLowerCase() : '';
+                    return fromAddr.includes(searchWallet);
+                });
+            }
+            
+            displayRewardsData(filteredRewards);
+            displayLapsedData(filteredLapsed);
+            updateStats(filteredRewards, filteredLapsed);
+        }
+        
+        function resetFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('incomeType').value = 'all';
+            document.getElementById('searchWallet').value = '';
+            
+            displayRewardsData(allRewardEvents);
+            displayLapsedData(allLapsedEvents);
+            updateStats(allRewardEvents, allLapsedEvents);
+        }
+        
+        function copyToClipboard(text) {
+            if (text === "System") return;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Wallet address copied to clipboard!");
+            });
+        }
+        
+        // Initialize when page loads
+        window.onload = function() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+            
+            document.getElementById('startDate').valueAsDate = startDate;
+            document.getElementById('endDate').valueAsDate = endDate;
+            
+            if (window.ethereum) {
+                try {
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    provider.send("eth_accounts", []).then(accounts => {
+                        if (accounts.length > 0) {
+                            userAddress = accounts[0];
+                            
+                            let walletIcon = '';
+                            if (window.ethereum.isMetaMask) walletIcon = '🦊';
+                            else if (window.ethereum.isTrust) walletIcon = '🔵';
+                            else if (window.ethereum.isBitGet) walletIcon = '⚡';
+                            
+                            const connectBtn = document.getElementById('connectBtn');
+                            const shortAddress = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
+                            document.getElementById('btn-text').textContent = walletIcon + " " + shortAddress;
+                            connectBtn.classList.add('connected');
+                            
+                            sigmaContract = new ethers.Contract(SIGMA_CONTRACT_ADDRESS, sigmaABI, provider);
+                            loadIncomeData();
+                        }
+                    });
+                } catch (error) {
+                    console.error("Auto-connect error:", error);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
