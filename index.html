@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGMA SIX | Premium DApp</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -472,6 +473,15 @@
             border-radius: 16px;
             border: 1px solid var(--border);
             margin-top: 25px;
+            transition: all 0.3s;
+        }
+        
+        .ref-box.hidden {
+            display: none;
+        }
+        
+        .ref-box.visible {
+            display: block;
         }
         
         .contract-box {
@@ -611,6 +621,48 @@
             transform: translateX(5px);
         }
         
+        .chart-card {
+            background: rgba(22, 24, 33, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            margin-top: 20px;
+            grid-column: 1 / -1;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-interval {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: var(--secondary);
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid var(--secondary);
+        }
+        
+        .chart-container {
+            height: 300px;
+            width: 100%;
+            position: relative;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -641,6 +693,10 @@
             .copy-btn {
                 width: 100%;
                 justify-content: center;
+            }
+            
+            .chart-container {
+                height: 250px;
             }
         }
     </style>
@@ -751,12 +807,12 @@
                     <div class="stat-box">
                         <div class="stat-label"><i class="fas fa-arrow-up"></i> BUY RATE</div>
                         <div id="brate" class="stat-value">0.0316 USDT</div>
-                        <div id="brate-inr" class="stat-value-inr">≈ ₹2.84 INR</div>
+                        <div id="brate-inr" class="stat-value-inr">≈ ₹3.00 INR</div>
                     </div>
                     <div class="stat-box">
                         <div class="stat-label"><i class="fas fa-arrow-down"></i> SELL RATE</div>
                         <div id="srate" class="stat-value">0.0300 USDT</div>
-                        <div id="srate-inr" class="stat-value-inr">≈ ₹2.70 INR</div>
+                        <div id="srate-inr" class="stat-value-inr">≈ ₹2.85 INR</div>
                     </div>
                 </div>
                 
@@ -776,7 +832,7 @@
                             <i class="fas fa-maximize"></i> MAX
                         </span>
                     </div>
-                    <input type="number" id="amt" placeholder="0" value="1" oninput="calc()">
+                    <input type="number" id="amt" placeholder="0" value="1" oninput="calc()" onkeyup="calc()">
                 </div>
                 
                 <div class="calc-box">
@@ -790,7 +846,7 @@
                     </div>
                     <div class="row">
                         <span>Equivalent INR:</span> 
-                        <span id="inr-amt" style="color:#ffaa00">2.87 INR</span>
+                        <span id="inr-amt" style="color:#ffaa00">3.03 INR</span>
                     </div>
                     <div class="row" id="upline-display">
                         <span style="color:#888;">Upline Address:</span> 
@@ -818,8 +874,8 @@
                     </button>
                 </div>
                 
-                <!-- Referral Box -->
-                <div class="ref-box" id="ref-ui" style="display:none">
+                <!-- Referral Box - Hidden by default, shows only after first buy -->
+                <div class="ref-box hidden" id="ref-ui">
                     <div class="row">
                         <span style="font-size:12px; color:#888;">
                             <i class="fas fa-link"></i> YOUR REFERRAL LINK
@@ -898,6 +954,21 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Price Chart Card - Full Width -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <i class="fas fa-chart-line"></i> SIG6 Price Chart (5min Candles)
+                </div>
+                <div class="chart-interval">
+                    <i class="far fa-clock"></i> Live Updates
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -907,866 +978,23 @@
         const CREATOR_WALLET = "0xb579377DDe2C03b2b46B5b12453F4dbAddB06f2E";
         
         // SigmaSix Contract ABI (your provided ABI)
-        const SIGMA_SIX_ABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "sigmaAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "_upline",
-				"type": "address"
-			}
-		],
-		"name": "buySigma",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "emergencyWithdraw",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_usdt",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "allowance",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "needed",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC20InsufficientAllowance",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "balance",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "needed",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC20InsufficientBalance",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "approver",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidApprover",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "receiver",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidReceiver",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidSender",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidSpender",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "OwnableInvalidOwner",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "OwnableUnauthorizedAccount",
-		"type": "error"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Approval",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "reason",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "IncomeLapsed",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "referrer",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "MemberJoined",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address[]",
-				"name": "_users",
-				"type": "address[]"
-			},
-			{
-				"internalType": "address[]",
-				"name": "_ups",
-				"type": "address[]"
-			},
-			{
-				"internalType": "uint256[]",
-				"name": "_bals",
-				"type": "uint256[]"
-			}
-		],
-		"name": "migrateData",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "previousOwner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferred",
-		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "level",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "rewardType",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "RewardReport",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "sigmaAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "sellSigma",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "tradeType",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "sigmaAmount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "rate",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "taxUsdt",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "TradeReport",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "transfer",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Transfer",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "transferFrom",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "UserTransfer",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_u",
-				"type": "address"
-			}
-		],
-		"name": "_checkEligibility",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "allowance",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "balanceOf",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "buyRate",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "creatorWallet",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "decimals",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getSellRate",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "hasBoughtBefore",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "last30DaysBuyVolume",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "lastBuyTimestamp",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "myDirects",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "name",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "rateStep",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "symbol",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "totalLapsedReferral",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "totalReceivedReferral",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalSupply",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "upline",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "usdt",
-		"outputs": [
-			{
-				"internalType": "contract IERC20",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-];
+        const SIGMA_SIX_ABI = [{"inputs":[{"internalType":"uint256","name":"sigmaAmount","type":"uint256"},{"internalType":"address","name":"_upline","type":"address"}],"name":"buySigma","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"emergencyWithdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_usdt","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"string","name":"reason","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"IncomeLapsed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"MemberJoined","type":"event"},{"inputs":[{"internalType":"address[]","name":"_users","type":"address[]"},{"internalType":"address[]","name":"_ups","type":"address[]"},{"internalType":"uint256[]","name":"_bals","type":"uint256[]"}],"name":"migrateData","outputs":[],"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"level","type":"uint256"},{"indexed":false,"internalType":"string","name":"rewardType","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"RewardReport","type":"event"},{"inputs":[{"internalType":"uint256","name":"sigmaAmount","type":"uint256"}],"name":"sellSigma","outputs":[],"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"string","name":"tradeType","type":"string"},{"indexed":false,"internalType":"uint256","name":"sigmaAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rate","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"taxUsdt","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"TradeReport","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"UserTransfer","type":"event"},{"inputs":[{"internalType":"address","name":"_u","type":"address"}],"name":"_checkEligibility","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"creatorWallet","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getSellRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"hasBoughtBefore","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"last30DaysBuyVolume","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastBuyTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"myDirects","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rateStep","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalLapsedReferral","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalReceivedReferral","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"upline","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
 
         let mode = 'buy', buyR = 0.0316, sellR = 0.0300, signer, addr, provider;
-        const USDT_TO_INR = 90.0;
+        const USDT_TO_INR = 95.0; // Updated to 95 INR per USDT
+        let hasUserBoughtBefore = false;
+        
+        // Chart variables
+        let priceChart;
+        let candleData = [];
+        let currentCandle = {
+            open: 0,
+            high: 0,
+            low: 0,
+            close: 0,
+            time: new Date()
+        };
+        let lastCandleTime = new Date();
         
         // Create floating particles
         function createParticles() {
@@ -1781,6 +1009,123 @@
                                                 i % 3 === 1 ? 'var(--secondary)' : 
                                                 '#ff2a6d';
                 particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Initialize chart
+        function initChart() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            
+            // Generate initial dummy data
+            for (let i = 0; i < 20; i++) {
+                const time = new Date(Date.now() - (19 - i) * 5 * 60 * 1000);
+                const basePrice = 0.0316;
+                const random = (Math.random() * 0.002) - 0.001;
+                candleData.push({
+                    x: time,
+                    o: basePrice + (Math.random() * 0.001),
+                    h: basePrice + 0.001 + (Math.random() * 0.001),
+                    l: basePrice - 0.001 - (Math.random() * 0.001),
+                    c: basePrice + random
+                });
+            }
+            
+            priceChart = new Chart(ctx, {
+                type: 'candlestick',
+                data: {
+                    datasets: [{
+                        label: 'SIG6 Price',
+                        data: candleData,
+                        color: {
+                            up: '#00ff88',
+                            down: '#ff4d4d',
+                            unchanged: '#888',
+                        },
+                        borderColor: {
+                            up: '#00ff88',
+                            down: '#ff4d4d',
+                            unchanged: '#888',
+                        },
+                        backgroundColor: {
+                            up: 'rgba(0, 255, 136, 0.3)',
+                            down: 'rgba(255, 77, 77, 0.3)',
+                            unchanged: 'rgba(136, 136, 136, 0.3)',
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: 'minute', displayFormats: { minute: 'HH:mm' } },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#aaa' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#aaa', callback: (v) => '$' + v.toFixed(4) }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update chart with new price
+        function updateChart(price) {
+            const now = new Date();
+            const minutesSinceLastCandle = Math.floor((now - lastCandleTime) / (5 * 60 * 1000));
+            
+            if (minutesSinceLastCandle >= 1 || candleData.length === 0) {
+                // Start new candle
+                if (currentCandle.open > 0) {
+                    candleData.push({
+                        x: currentCandle.time,
+                        o: currentCandle.open,
+                        h: currentCandle.high,
+                        l: currentCandle.low,
+                        c: currentCandle.close
+                    });
+                    
+                    // Keep last 50 candles only
+                    if (candleData.length > 50) {
+                        candleData.shift();
+                    }
+                }
+                
+                currentCandle = {
+                    open: price,
+                    high: price,
+                    low: price,
+                    close: price,
+                    time: now
+                };
+                lastCandleTime = now;
+            } else {
+                // Update current candle
+                currentCandle.high = Math.max(currentCandle.high, price);
+                currentCandle.low = Math.min(currentCandle.low, price);
+                currentCandle.close = price;
+            }
+            
+            // Update chart data
+            if (priceChart) {
+                priceChart.data.datasets[0].data = [...candleData];
+                if (currentCandle.open > 0) {
+                    priceChart.data.datasets[0].data.push({
+                        x: currentCandle.time,
+                        o: currentCandle.open,
+                        h: currentCandle.high,
+                        l: currentCandle.low,
+                        c: currentCandle.close
+                    });
+                }
+                priceChart.update();
             }
         }
         
@@ -1826,7 +1171,7 @@
         }
 
         function updateTickers() {
-            const changePercent = 0.89;
+            const changePercent = ((buyR - 0.0316) / 0.0316 * 100).toFixed(2);
             const sig6Price = buyR.toFixed(4);
             
             document.querySelectorAll('[id^="ticker-sig6-price"]').forEach(el => {
@@ -1834,7 +1179,9 @@
             });
             
             document.querySelectorAll('[id^="ticker-sig6-change"]').forEach(el => {
-                el.innerText = `+${changePercent.toFixed(2)}%`;
+                const changeClass = parseFloat(changePercent) >= 0 ? 'positive' : 'negative';
+                el.className = `ticker-change ${changeClass}`;
+                el.innerText = `${parseFloat(changePercent) >= 0 ? '+' : ''}${changePercent}%`;
             });
         }
 
@@ -1879,9 +1226,6 @@
                 connectBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${addr.slice(0,6)}...${addr.slice(-4)}`;
                 connectBtn.classList.add('connected');
                 
-                document.getElementById('ref-ui').style.display = 'block';
-                updateRefLink();
-                
                 document.getElementById('status-msg').innerText = "Wallet Connected Successfully!";
                 document.getElementById('status-msg').style.color = "#00ff88";
                 
@@ -1892,12 +1236,11 @@
                         addr = accounts[0];
                         signer = await provider.getSigner();
                         connectBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${addr.slice(0,6)}...${addr.slice(-4)}`;
-                        updateRefLink();
                         await sync();
                     } else {
                         connectBtn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
                         connectBtn.classList.remove('connected');
-                        document.getElementById('ref-ui').style.display = 'none';
+                        document.getElementById('ref-ui').classList.add('hidden');
                         document.getElementById('status-msg').innerText = "Wallet Disconnected";
                         document.getElementById('status-msg').style.color = "#ffaa00";
                     }
@@ -1925,13 +1268,14 @@
                 
                 const sc = new ethers.Contract(S_ADDR, SIGMA_SIX_ABI, provider);
                 
-                const [pb, ub, sb, br, sr, alw] = await Promise.all([
+                const [pb, ub, sb, br, sr, alw, hasBought] = await Promise.all([
                     provider.getBalance(addr),
                     uc.balanceOf(addr),
                     sc.balanceOf(addr),
                     sc.buyRate(),
                     sc.getSellRate(),
-                    uc.allowance(addr, S_ADDR)
+                    uc.allowance(addr, S_ADDR),
+                    sc.hasBoughtBefore(addr)
                 ]);
 
                 const polBalance = parseFloat(ethers.formatEther(pb)).toFixed(3);
@@ -1941,6 +1285,17 @@
                 document.getElementById('bal-pol').innerText = polBalance + " POL";
                 document.getElementById('bal-usdt').innerText = usdtBalance + " USDT";
                 document.getElementById('bal-sig').innerText = sigBalance + " SIG6";
+                
+                // Check if user has bought before
+                hasUserBoughtBefore = hasBought;
+                if (hasUserBoughtBefore) {
+                    document.getElementById('ref-ui').classList.remove('hidden');
+                    document.getElementById('ref-ui').classList.add('visible');
+                    updateRefLink();
+                } else {
+                    document.getElementById('ref-ui').classList.add('hidden');
+                    document.getElementById('ref-ui').classList.remove('visible');
+                }
                 
                 // Convert rates from contract (6 decimals) to human readable
                 const newBuyR = parseFloat(ethers.formatUnits(br, 6));
@@ -1954,6 +1309,7 @@
                 
                 updateAllINRValues();
                 updateTickers();
+                updateChart(buyR);
                 
                 const v = parseFloat(document.getElementById('amt').value) || 1;
                 const sigmaAmount = ethers.parseEther(v.toString());
@@ -1983,8 +1339,15 @@
         }
 
         function calc() {
-            const v = parseFloat(document.getElementById('amt').value) || 1;
+            const v = parseFloat(document.getElementById('amt').value) || 0;
             let tax = 0, final = 0;
+            
+            if (v <= 0) {
+                document.getElementById('out-amt').innerText = "0.0000 USDT";
+                document.getElementById('tax-amt').innerText = "0.0000 USDT";
+                document.getElementById('inr-amt').innerText = "0.00 INR";
+                return;
+            }
             
             if (mode === 'buy') {
                 // Contract uses: (sigmaAmount * buyRate) / 10**18
@@ -2103,6 +1466,13 @@
                         
                         msg.innerText = "Purchase Successful!";
                         msg.style.color = "#00ff88";
+                        
+                        // After successful buy, show referral link
+                        hasUserBoughtBefore = true;
+                        document.getElementById('ref-ui').classList.remove('hidden');
+                        document.getElementById('ref-ui').classList.add('visible');
+                        updateRefLink();
+                        
                         sync();
                     }
                 } else {
@@ -2167,10 +1537,14 @@
             
             createParticles();
             handleUpline();
+            initChart();
             updateINRValues();
             updateTickers();
             updateSigmaINRValue();
             calc();
+            
+            // Hide referral link initially
+            document.getElementById('ref-ui').classList.add('hidden');
             
             if (window.ethereum) {
                 try {
@@ -2185,9 +1559,6 @@
                         connectBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${addr.slice(0,6)}...${addr.slice(-4)}`;
                         connectBtn.classList.add('connected');
                         
-                        document.getElementById('ref-ui').style.display = 'block';
-                        updateRefLink();
-                        
                         await sync();
                     }
                 } catch (error) {
@@ -2201,7 +1572,11 @@
                 }
             }, 30000);
             
-            setInterval(updateTickers, 30000);
+            setInterval(() => {
+                if (buyR) {
+                    updateChart(buyR);
+                }
+            }, 5000); // Update chart every 5 seconds
         };
     </script>
 </body>
