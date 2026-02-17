@@ -1145,16 +1145,17 @@
                 // Fetch RewardReport events (ICO and Referrals)
                 const rewardFilter = sigmaContract.filters.RewardReport(userAddress);
                 const rewardEvents = await sigmaContract.queryFilter(rewardFilter, fromBlock, currentBlock);
-                console.log("✅ Reward Events Found:", rewardEvents.length);
+                console.log("✅ Total Reward Events Found:", rewardEvents.length);
                 
                 // Log each event for debugging
                 rewardEvents.forEach((event, i) => {
                     console.log(`Event ${i}:`, {
                         type: event.args.rewardType,
                         amount: event.args.amount.toString(),
+                        amountFormatted: ethers.formatUnits(event.args.amount, 18),
                         level: event.args.level.toString(),
                         from: event.args.from,
-                        timestamp: event.args.timestamp.toString()
+                        timestamp: new Date(Number(event.args.timestamp) * 1000).toLocaleString()
                     });
                 });
                 
@@ -1198,7 +1199,7 @@
             const desktopBody = document.getElementById('rewards-body-desktop');
             const mobileContainer = document.getElementById('rewards-body-mobile');
             
-            console.log("Displaying rewards events:", events.length);
+            console.log("Displaying rewards events count:", events.length);
             
             if (!events || events.length === 0) {
                 desktopBody.innerHTML = `<tr><td colspan="8" class="no-data"><i class="fas fa-inbox"></i> No rewards found</td></tr>`;
@@ -1210,6 +1211,7 @@
             let mobileHtml = '';
             let totalSIG6 = 0;
             
+            // Sort by timestamp (newest first)
             events.sort((a, b) => Number(b.args.timestamp) - Number(a.args.timestamp));
             
             events.forEach((event, index) => {
@@ -1286,6 +1288,7 @@
             desktopBody.innerHTML = desktopHtml;
             mobileContainer.innerHTML = mobileHtml;
             document.getElementById('total-sig6').textContent = totalSIG6.toFixed(4) + " SIG6";
+            document.getElementById('total-transactions').textContent = events.length + allLapsedEvents.length;
         }
         
         function displayLapsedData(events) {
