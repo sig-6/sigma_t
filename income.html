@@ -1227,6 +1227,9 @@
                 let incomeName = args.rewardType === "ICO_REWARD" ? "ICO Bonus" : `Level ${args.level} Referral`;
                 let description = args.rewardType === "ICO_REWARD" ? "10% first purchase bonus" : `Level ${args.level} team commission`;
                 
+                // For ICO, level is 0, so show "N/A" or keep as is
+                const levelDisplay = args.rewardType === "ICO_REWARD" ? "N/A" : args.level;
+                
                 const date = new Date(timestamp * 1000);
                 const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -1248,7 +1251,7 @@
                             <div style="color:var(--primary)">${fromDisplay}</div>
                             <div class="wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,10)}...</div>
                         </td>
-                        <td><span class="status-badge status-active">Level ${args.level}</span></td>
+                        <td><span class="status-badge status-active">${args.rewardType === "ICO_REWARD" ? "ICO" : `Level ${args.level}`}</span></td>
                         <td class="amount-positive">${displayAmount} SIG6</td>
                         <td>${dateStr}</td>
                         <td>${timeStr}</td>
@@ -1271,7 +1274,7 @@
                         </div>
                         <div class="mobile-card-row">
                             <span class="mobile-card-label">Level</span>
-                            <span class="mobile-card-value"><span class="status-badge status-active">${args.level}</span></span>
+                            <span class="mobile-card-value"><span class="status-badge status-active">${args.rewardType === "ICO_REWARD" ? "ICO" : args.level}</span></span>
                         </div>
                         <div class="mobile-card-row">
                             <span class="mobile-card-label">Amount</span>
