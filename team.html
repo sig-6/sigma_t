@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Same CSS as before */
         :root {
             --primary: #00ffcc;
             --secondary: #9d4edd;
@@ -465,7 +466,9 @@
             <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
             <button class="nav-btn" onclick="loadTeamData()"><i class="fas fa-sync-alt"></i> Refresh</button>
             <button class="nav-btn" onclick="exportData()"><i class="fas fa-download"></i> Export</button>
-            <button class="nav-btn" onclick="scanAllHolders()"><i class="fas fa-search"></i> Scan All Holders</button>
+            <button class="nav-btn" id="scanBtn" onclick="scanAllHolders()" style="background: linear-gradient(90deg, #ffaa00, #ff6b9d); color: black; font-weight: bold;">
+                <i class="fas fa-search"></i> 🔥 SCAN ALL HOLDERS (MIGRATE DATA)
+            </button>
         </div>
         
         <div class="header">
@@ -571,707 +574,8 @@
         const USDT_ADDR = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const CREATOR_WALLET = "0xb579377DDe2C03b2b46B5b12453F4dbAddB06f2E";
         
-        // Complete ABI for SigmaSix contract
-        const SIGMA_SIX_ABI = [
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "sigmaAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "_upline",
-                        "type": "address"
-                    }
-                ],
-                "name": "buySigma",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "emergencyWithdraw",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_usdt",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "nonpayable",
-                "type": "constructor"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "user",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "from",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "reason",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "IncomeLapsed",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "user",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "referrer",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "MemberJoined",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address[]",
-                        "name": "_users",
-                        "type": "address[]"
-                    },
-                    {
-                        "internalType": "address[]",
-                        "name": "_ups",
-                        "type": "address[]"
-                    },
-                    {
-                        "internalType": "uint256[]",
-                        "name": "_bals",
-                        "type": "uint256[]"
-                    }
-                ],
-                "name": "migrateData",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "previousOwner",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "newOwner",
-                        "type": "address"
-                    }
-                ],
-                "name": "OwnershipTransferred",
-                "type": "event"
-            },
-            {
-                "inputs": [],
-                "name": "renounceOwnership",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "user",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "from",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "level",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "rewardType",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "RewardReport",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "sigmaAmount",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "sellSigma",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "user",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "tradeType",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "sigmaAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "rate",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "taxUsdt",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "TradeReport",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "from",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "to",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "value",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "Transfer",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "to",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "value",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "transfer",
-                "outputs": [
-                    {
-                        "internalType": "bool",
-                        "name": "",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "from",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "to",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "value",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "transferFrom",
-                "outputs": [
-                    {
-                        "internalType": "bool",
-                        "name": "",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "newOwner",
-                        "type": "address"
-                    }
-                ],
-                "name": "transferOwnership",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "from",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "to",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "UserTransfer",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_u",
-                        "type": "address"
-                    }
-                ],
-                "name": "_checkEligibility",
-                "outputs": [
-                    {
-                        "internalType": "bool",
-                        "name": "",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "owner",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "spender",
-                        "type": "address"
-                    }
-                ],
-                "name": "allowance",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "account",
-                        "type": "address"
-                    }
-                ],
-                "name": "balanceOf",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "buyRate",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "creatorWallet",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "decimals",
-                "outputs": [
-                    {
-                        "internalType": "uint8",
-                        "name": "",
-                        "type": "uint8"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getSellRate",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "hasBoughtBefore",
-                "outputs": [
-                    {
-                        "internalType": "bool",
-                        "name": "",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "last30DaysBuyVolume",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "lastBuyTimestamp",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "myDirects",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "name",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "",
-                        "type": "string"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "owner",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "rateStep",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "symbol",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "",
-                        "type": "string"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "totalLapsedReferral",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "totalReceivedReferral",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "totalSupply",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "upline",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "usdt",
-                "outputs": [
-                    {
-                        "internalType": "contract IERC20",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ];
+        // SigmaSix Contract ABI (abridged for space - use full ABI from previous message)
+        const SIGMA_SIX_ABI = [{"inputs":[{"internalType":"uint256","name":"sigmaAmount","type":"uint256"},{"internalType":"address","name":"_upline","type":"address"}],"name":"buySigma","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"emergencyWithdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_usdt","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"string","name":"reason","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"IncomeLapsed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"MemberJoined","type":"event"},{"inputs":[{"internalType":"address[]","name":"_users","type":"address[]"},{"internalType":"address[]","name":"_ups","type":"address[]"},{"internalType":"uint256[]","name":"_bals","type":"uint256[]"}],"name":"migrateData","outputs":[],"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"level","type":"uint256"},{"indexed":false,"internalType":"string","name":"rewardType","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"RewardReport","type":"event"},{"inputs":[{"internalType":"uint256","name":"sigmaAmount","type":"uint256"}],"name":"sellSigma","outputs":[],"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"string","name":"tradeType","type":"string"},{"indexed":false,"internalType":"uint256","name":"sigmaAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rate","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"taxUsdt","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"TradeReport","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"UserTransfer","type":"event"},{"inputs":[{"internalType":"address","name":"_u","type":"address"}],"name":"_checkEligibility","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"creatorWallet","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getSellRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"hasBoughtBefore","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"last30DaysBuyVolume","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastBuyTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"myDirects","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rateStep","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalLapsedReferral","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalReceivedReferral","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"upline","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
         
         // State
         let provider, signer, userAddress, sigmaContract;
@@ -1279,10 +583,7 @@
         let filteredMembers = [];
         let buyRate = 0.0316, sellRate = 0.0300;
         let currentSort = { field: 'level', order: 'asc' };
-        let allAddresses = new Set();
-        let uplineMap = new Map();
         
-        // ===== AUTO-CONNECT ON PAGE LOAD =====
         window.onload = async () => {
             const lastConnected = localStorage.getItem('sigma_wallet_connected');
             if (lastConnected === 'true') {
@@ -1325,6 +626,7 @@
                 
                 localStorage.setItem('sigma_wallet_connected', 'true');
                 
+                // Normal load first
                 await loadTeamData();
                 
                 window.ethereum.on('accountsChanged', async (accs) => {
@@ -1346,7 +648,7 @@
             }
         }
         
-        // ===== SCAN ALL HOLDERS FUNCTION - YAHI SE MIGRATE DATA DIKHEGA =====
+        // ===== MAIN FUNCTION TO SCAN ALL HOLDERS (MIGRATE + JOIN) =====
         async function scanAllHolders() {
             if (!userAddress || !sigmaContract) {
                 alert("Connect wallet first!");
@@ -1357,20 +659,40 @@
                 document.getElementById('team-body').innerHTML = `
                     <tr><td colspan="10" class="loading">
                         <i class="fas fa-spinner fa-spin"></i><br>
-                        Scanning all token holders from blockchain...
+                        🔥 SCANNING ALL TOKEN HOLDERS (This will include migrate data)...
                     </td></tr>
                 `;
                 
-                // Get all Transfer events to find all addresses that ever received SIG6
+                // Get current rates
+                try {
+                    const buyRateRaw = await sigmaContract.buyRate();
+                    buyRate = parseFloat(ethers.formatUnits(buyRateRaw, 6));
+                    const sellRateRaw = await sigmaContract.getSellRate();
+                    sellRate = parseFloat(ethers.formatUnits(sellRateRaw, 6));
+                    
+                    document.getElementById('buy-rate').textContent = buyRate.toFixed(4) + ' USDT';
+                    document.getElementById('sell-rate').textContent = `Sell: ${sellRate.toFixed(4)} USDT`;
+                } catch (e) {}
+                
+                // STEP 1: Get ALL Transfer events (to find all addresses that ever received SIG6)
                 console.log("Fetching all Transfer events...");
                 const transferFilter = sigmaContract.filters.Transfer();
                 const transfers = await sigmaContract.queryFilter(transferFilter, 0, 'latest');
                 console.log(`Found ${transfers.length} Transfer events`);
                 
-                // Collect all unique addresses that received SIG6
+                // STEP 2: Collect unique addresses that received SIG6
                 const holders = new Set();
+                const transferMap = new Map(); // address -> first transfer time
+                
                 for (const tx of transfers) {
-                    holders.add(tx.args.to.toLowerCase());
+                    const toAddr = tx.args.to.toLowerCase();
+                    holders.add(toAddr);
+                    
+                    // Store first transfer time for join date
+                    if (!transferMap.has(toAddr)) {
+                        const block = await tx.getBlock();
+                        transferMap.set(toAddr, block.timestamp);
+                    }
                 }
                 
                 // Add creator and current user
@@ -1379,26 +701,22 @@
                 
                 console.log(`Found ${holders.size} unique token holders`);
                 
-                // Clear previous data
-                teamMembers = [];
-                uplineMap.clear();
-                
-                // First, get all upline relationships from contract
+                // STEP 3: Get all upline relationships from contract
+                const uplineMap = new Map();
                 for (const addr of holders) {
                     try {
                         const uplineAddr = await sigmaContract.upline(addr);
                         if (uplineAddr && uplineAddr !== "0x0000000000000000000000000000000000000000") {
                             uplineMap.set(addr.toLowerCase(), uplineAddr.toLowerCase());
                         }
-                    } catch (e) {
-                        // No upline found
-                    }
+                    } catch (e) {}
                 }
                 
                 console.log(`Found ${uplineMap.size} upline relationships`);
                 
-                // Now process each holder
-                let processed = 0;
+                // STEP 4: Process each holder to find team members
+                teamMembers = [];
+                
                 for (const addr of holders) {
                     if (addr === userAddress.toLowerCase() || addr === CREATOR_WALLET.toLowerCase()) continue;
                     
@@ -1407,45 +725,35 @@
                         const balance = parseFloat(ethers.formatEther(balanceRaw));
                         
                         if (balance > 0) {
-                            // Find level by tracing upline
+                            // Find level by tracing upline chain
                             let level = 0;
                             let currentAddr = addr;
                             let uplineAddr = uplineMap.get(addr);
                             
-                            // Trace upline chain
-                            let tempAddr = uplineAddr;
-                            let tempLevel = 1;
-                            
-                            while (tempAddr && tempAddr !== "0x0000000000000000000000000000000000000000") {
-                                if (tempAddr === userAddress.toLowerCase()) {
-                                    level = tempLevel;
-                                    break;
+                            if (uplineAddr) {
+                                let tempAddr = uplineAddr;
+                                let tempLevel = 1;
+                                
+                                while (tempAddr && tempAddr !== "0x0000000000000000000000000000000000000000") {
+                                    if (tempAddr === userAddress.toLowerCase()) {
+                                        level = tempLevel;
+                                        break;
+                                    }
+                                    
+                                    // Get next upline
+                                    const nextUpline = uplineMap.get(tempAddr);
+                                    if (!nextUpline) break;
+                                    
+                                    tempAddr = nextUpline;
+                                    tempLevel++;
+                                    if (tempLevel > 5) break;
                                 }
-                                
-                                // Get next upline
-                                const nextUpline = uplineMap.get(tempAddr);
-                                if (!nextUpline) break;
-                                
-                                tempAddr = nextUpline;
-                                tempLevel++;
-                                if (tempLevel > 5) break;
                             }
                             
-                            // If level found, add to team
+                            // If level found (meaning in downline), add to team
                             if (level > 0) {
+                                const joinTimestamp = transferMap.get(addr) || Math.floor(Date.now() / 1000);
                                 const isActive = balance >= 10;
-                                
-                                // Try to find join time from Transfer events
-                                let joinTimestamp = Math.floor(Date.now() / 1000);
-                                const firstTransfer = transfers.find(tx => 
-                                    tx.args.to.toLowerCase() === addr && 
-                                    tx.args.from.toLowerCase() === CREATOR_WALLET.toLowerCase()
-                                );
-                                
-                                if (firstTransfer) {
-                                    const block = await firstTransfer.getBlock();
-                                    joinTimestamp = block.timestamp;
-                                }
                                 
                                 teamMembers.push({
                                     address: addr,
@@ -1462,25 +770,26 @@
                     } catch (error) {
                         console.error(`Error processing ${addr}:`, error);
                     }
-                    
-                    processed++;
-                    if (processed % 10 === 0) {
-                        console.log(`Processed ${processed}/${holders.size} addresses`);
-                    }
                 }
                 
-                // Sort by level
+                // STEP 5: Sort and display
                 teamMembers.sort((a, b) => a.level - b.level);
                 filteredMembers = [...teamMembers];
                 
                 updateStats();
                 updateTeamTable();
                 
-                console.log(`Team members found: ${teamMembers.length}`);
+                console.log(`✅ Team members found: ${teamMembers.length}`);
+                
+                if (teamMembers.length === 0) {
+                    alert("No team members found in downline!");
+                } else {
+                    alert(`Found ${teamMembers.length} team members! Including migrate data.`);
+                }
                 
             } catch (error) {
                 console.error("Error scanning holders:", error);
-                alert("Error scanning holders: " + error.message);
+                alert("Error: " + error.message);
             }
         }
         
@@ -1491,25 +800,22 @@
                 document.getElementById('team-body').innerHTML = `
                     <tr><td colspan="10" class="loading">
                         <i class="fas fa-spinner fa-spin"></i><br>
-                        Loading team data...
+                        Loading team data... (Click "SCAN ALL HOLDERS" for migrate data)
                     </td></tr>
                 `;
                 
-                // Get current rates
+                // Get rates
                 try {
                     const buyRateRaw = await sigmaContract.buyRate();
                     buyRate = parseFloat(ethers.formatUnits(buyRateRaw, 6));
-                    
                     const sellRateRaw = await sigmaContract.getSellRate();
                     sellRate = parseFloat(ethers.formatUnits(sellRateRaw, 6));
-                } catch (error) {
-                    console.warn("Could not fetch rates, using defaults");
-                }
+                } catch (e) {}
                 
                 document.getElementById('buy-rate').textContent = buyRate.toFixed(4) + ' USDT';
                 document.getElementById('sell-rate').textContent = `Sell: ${sellRate.toFixed(4)} USDT`;
                 
-                // First try to load from events, then suggest full scan
+                // Try MemberJoined events first
                 const memberFilter = sigmaContract.filters.MemberJoined();
                 const memberEvents = await sigmaContract.queryFilter(memberFilter, 0, 'latest');
                 
@@ -1517,25 +823,25 @@
                     document.getElementById('team-body').innerHTML = `
                         <tr><td colspan="10" class="empty-state">
                             <i class="fas fa-info-circle"></i><br>
-                            No MemberJoined events found.<br>
-                            <button class="action-btn" onclick="scanAllHolders()" style="margin-top:15px">
-                                <i class="fas fa-search"></i> Scan All Holders
+                            No MemberJoined events found.<br><br>
+                            <button class="action-btn" onclick="scanAllHolders()" style="background: #ffaa00; color: black; padding: 15px 30px; font-size: 16px;">
+                                <i class="fas fa-search"></i> 🔥 CLICK HERE TO SCAN MIGRATE DATA
                             </button>
                         </td></tr>
                     `;
                     return;
                 }
                 
-                // Load from MemberJoined events
-                uplineMap.clear();
+                // Process MemberJoined events
+                teamMembers = [];
+                const uplineMap = new Map();
+                
                 for (const event of memberEvents) {
                     const user = event.args.user.toLowerCase();
                     const referrer = event.args.referrer.toLowerCase();
                     uplineMap.set(user, referrer);
                 }
                 
-                // Get all addresses with balance > 0
-                teamMembers = [];
                 for (const [addr, upline] of uplineMap) {
                     try {
                         const balanceRaw = await sigmaContract.balanceOf(addr);
@@ -1594,8 +900,8 @@
                 document.getElementById('team-body').innerHTML = `
                     <tr><td colspan="10" class="empty-state">
                         <i class="fas fa-exclamation-triangle"></i><br>
-                        Error: ${error.message}<br>
-                        <button class="action-btn" onclick="scanAllHolders()" style="margin-top:15px">
+                        Error: ${error.message}<br><br>
+                        <button class="action-btn" onclick="scanAllHolders()" style="background: #ffaa00; color: black;">
                             <i class="fas fa-search"></i> Try Scanning All Holders
                         </button>
                     </td></tr>
@@ -1624,9 +930,9 @@
                 tbody.innerHTML = `
                     <tr><td colspan="10" class="empty-state">
                         <i class="fas fa-users-slash"></i><br>
-                        No team members found<br>
-                        <button class="action-btn" onclick="scanAllHolders()" style="margin-top:15px">
-                            <i class="fas fa-search"></i> Scan All Holders
+                        No team members found in downline<br><br>
+                        <button class="action-btn" onclick="scanAllHolders()" style="background: #ffaa00; color: black; padding: 15px 30px;">
+                            <i class="fas fa-search"></i> 🔥 CLICK HERE TO SCAN MIGRATE DATA
                         </button>
                     </td></tr>
                 `;
