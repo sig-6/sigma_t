@@ -516,7 +516,7 @@
                     <div class="filter-label"><i class="fas fa-toggle-on"></i> Status</div>
                     <select id="status-filter" class="filter-select">
                         <option value="all">All</option>
-                        <option value="active">Active (≥10 SIG6)</option>
+                        <option value="active">Active (≥10 USDT)</option>
                         <option value="inactive">Inactive</option>
                     </select>
                 </div>
@@ -570,13 +570,12 @@
         const USDT_ADDR = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const CREATOR_WALLET = "0xb579377DDe2C03b2b46B5b12453F4dbAddB06f2E";
         
-        // SigmaSix Contract ABI (minimal for speed)
+        // Minimal ABI for speed
         const SIGMA_SIX_ABI = [
             "function balanceOf(address) view returns (uint256)",
             "function upline(address) view returns (address)",
             "function buyRate() view returns (uint256)",
             "function getSellRate() view returns (uint256)",
-            "function myDirects(address,uint256) view returns (address)",
             {
                 "anonymous": false,
                 "inputs": [
@@ -607,7 +606,7 @@
         let currentSort = { field: 'level', order: 'asc' };
         let isLoading = false;
         
-        // Auto-connect on page load
+        // Auto-connect
         window.onload = async () => {
             const lastConnected = localStorage.getItem('sigma_wallet_connected');
             if (lastConnected === 'true') {
@@ -650,7 +649,6 @@
                 
                 localStorage.setItem('sigma_wallet_connected', 'true');
                 
-                // Load data
                 await loadTeamData();
                 
                 window.ethereum.on('accountsChanged', async (accs) => {
@@ -672,7 +670,7 @@
             }
         }
         
-        // ===== OPTIMIZED LOAD FUNCTION =====
+        // ===== MAIN LOAD FUNCTION WITH CORRECT ACTIVE CONDITION =====
         async function loadTeamData() {
             if (!userAddress || !sigmaContract || isLoading) return;
             
@@ -686,7 +684,7 @@
                     </td></tr>
                 `;
                 
-                // Get rates quickly
+                // Get current rates - SELL RATE is important for active status
                 try {
                     const [buyRateRaw, sellRateRaw] = await Promise.all([
                         sigmaContract.buyRate(),
@@ -699,38 +697,35 @@
                     document.getElementById('sell-rate').textContent = `Sell: ${sellRate.toFixed(4)} USDT`;
                 } catch (e) {}
                 
+                // Calculate minimum SIG6 needed for ACTIVE status (10 USDT)
+                const minSIG6ForActive = 10 / sellRate; // ~321.5 at 0.0311
+                
                 // Get MemberJoined events for join dates
                 const memberFilter = sigmaContract.filters.MemberJoined();
                 const memberEvents = await sigmaContract.queryFilter(memberFilter, 0, 'latest');
                 
-                // Create map of join dates
                 const joinDateMap = new Map();
                 for (const event of memberEvents) {
                     joinDateMap.set(event.args.user.toLowerCase(), Number(event.args.timestamp));
                 }
                 
-                // Get all Transfer events to find holders
+                // Get Transfer events to find holders
                 const transferFilter = sigmaContract.filters.Transfer();
                 const transfers = await sigmaContract.queryFilter(transferFilter, 0, 'latest');
                 
                 // Collect unique addresses
                 const addresses = new Set();
-                const addressPromises = [];
-                
                 for (let i = Math.max(0, transfers.length - 1000); i < transfers.length; i++) {
                     addresses.add(transfers[i].args.to.toLowerCase());
                 }
-                
-                // Add creator
                 addresses.add(CREATOR_WALLET.toLowerCase());
                 
-                // Process in batches for speed
+                // Process in batches
                 const addrArray = Array.from(addresses);
-                const batchSize = 50;
                 teamMembers = [];
                 
-                for (let i = 0; i < addrArray.length; i += batchSize) {
-                    const batch = addrArray.slice(i, i + batchSize);
+                for (let i = 0; i < addrArray.length; i += 50) {
+                    const batch = addrArray.slice(i, i + 50);
                     const batchPromises = batch.map(async (addr) => {
                         if (addr === userAddress.toLowerCase() || addr === CREATOR_WALLET.toLowerCase()) return null;
                         
@@ -768,13 +763,16 @@
                             
                             if (level > 0) {
                                 const joinTimestamp = joinDateMap.get(addr) || 0;
-                                const isActive = balance >= 10;
+                                
+                                // ===== FIXED ACTIVE CONDITION =====
+                                // Active only if SIG6 balance >= minimum required for 10 USDT
+                                const isActive = balance >= minSIG6ForActive;
                                 
                                 return {
                                     address: addr,
                                     level: level,
                                     balance: balance,
-                                    usdtValue: balance * buyRate,
+                                    usdtValue: balance * sellRate, // Use SELL rate for value
                                     upline: uplineAddr ? uplineAddr.toLowerCase() : "0x0000000000000000000000000000000000000000",
                                     joinTime: joinTimestamp > 0 ? new Date(joinTimestamp * 1000) : null,
                                     joinTimestamp: joinTimestamp,
@@ -787,16 +785,6 @@
                     
                     const results = await Promise.all(batchPromises);
                     teamMembers.push(...results.filter(r => r !== null));
-                    
-                    // Update progress
-                    if (i % 200 === 0) {
-                        document.getElementById('team-body').innerHTML = `
-                            <tr><td colspan="10" class="loading">
-                                <i class="fas fa-spinner fa-spin"></i><br>
-                                Loading... ${Math.min(100, Math.round((i/addrArray.length)*100))}%
-                            </td></tr>
-                        `;
-                    }
                 }
                 
                 // Sort and display
@@ -847,14 +835,16 @@
                 return;
             }
             
+            // Count active members for display
+            const activeCount = filteredMembers.filter(m => m.isActive).length;
+            
             resultsDiv.style.display = 'block';
-            resultsText.textContent = `${filteredMembers.length} members found`;
+            resultsText.textContent = `${filteredMembers.length} members found (${activeCount} active)`;
             
             let html = '';
             filteredMembers.forEach((member, i) => {
                 const uplineShort = member.upline.slice(0,6) + '...' + member.upline.slice(-4);
                 
-                // Format join date - blank for migrated
                 let dateDisplay = '—';
                 let timeDisplay = '—';
                 if (member.joinTimestamp > 0) {
