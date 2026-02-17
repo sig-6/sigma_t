@@ -947,8 +947,8 @@
                     <div id="total-sig6" class="stat-value positive">0.0000 SIG6</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Lapsed Income</div>
-                    <div id="lapsed-income" class="stat-value negative multi-line-stat">0.00</div>
+                    <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Lapsed Income (SIG6)</div>
+                    <div id="lapsed-income" class="stat-value negative multi-line-stat">0.0000 SIG6</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label"><i class="fas fa-history"></i> Total Transactions</div>
@@ -982,7 +982,7 @@
         </div>
         
         <div class="main-card">
-            <h2 class="card-title"><i class="fas fa-exclamation-triangle"></i> Lapsed Income History</h2>
+            <h2 class="card-title"><i class="fas fa-exclamation-triangle"></i> Lapsed Income History (SIG6)</h2>
             
             <div class="table-container">
                 <table class="desktop-table" id="lapsed-table">
@@ -992,7 +992,7 @@
                             <th>Income</th>
                             <th>Details</th>
                             <th>From Wallet</th>
-                            <th>Amount</th>
+                            <th>Amount (SIG6)</th>
                             <th>Reason</th>
                             <th>Date</th>
                             <th>Time</th>
@@ -1134,7 +1134,6 @@
                 const isCorrectChain = await checkChain();
                 if (!isCorrectChain) return;
                 
-                // Show loading states
                 document.getElementById('rewards-body-desktop').innerHTML = `<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading rewards...</td></tr>`;
                 document.getElementById('rewards-body-mobile').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading rewards...</div>`;
                 document.getElementById('lapsed-body-desktop').innerHTML = `<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading lapsed...</td></tr>`;
@@ -1143,14 +1142,16 @@
                 const currentBlock = await provider.getBlockNumber();
                 const fromBlock = Math.max(currentBlock - 1000000, 0);
                 
-                // Fetch RewardReport events
+                // Fetch RewardReport events (ICO and Referrals)
                 const rewardFilter = sigmaContract.filters.RewardReport(userAddress);
                 const rewardEvents = await sigmaContract.queryFilter(rewardFilter, fromBlock, currentBlock);
+                console.log("Reward Events Found:", rewardEvents.length);
                 allRewardEvents = rewardEvents;
                 
                 // Fetch IncomeLapsed events
                 const lapsedFilter = sigmaContract.filters.IncomeLapsed(userAddress);
                 const lapsedEvents = await sigmaContract.queryFilter(lapsedFilter, fromBlock, currentBlock);
+                console.log("Lapsed Events Found:", lapsedEvents.length);
                 allLapsedEvents = lapsedEvents;
                 
                 displayRewardsData(allRewardEvents);
@@ -1171,12 +1172,11 @@
             if (reason.includes("4X_LIMIT")) return "4X Cap Exceeded";
             if (reason.includes("INELIGIBLE")) return "Insufficient Balance (<10 USDT) or Inactive >30 Days";
             if (reason.includes("LOW_BALANCE_SKIP")) return "Upline Balance <10 SIG6";
-            if (reason.includes("2X_CAP")) return "2X Cap Exceeded";
             return reason;
         }
         
         function getReasonClass(reason) {
-            if (reason.includes("4X_LIMIT") || reason.includes("2X_CAP")) return "reason-4x-cap";
+            if (reason.includes("4X_LIMIT")) return "reason-4x-cap";
             if (reason.includes("INELIGIBLE")) return "reason-ineligible";
             if (reason.includes("LOW_BALANCE_SKIP")) return "reason-low-balance";
             return "";
@@ -1198,6 +1198,7 @@
             
             events.sort((a, b) => Number(b.args.timestamp) - Number(a.args.timestamp));
             
+            // Remove duplicates
             const uniqueEvents = [];
             const seenHashes = new Set();
             
@@ -1213,23 +1214,13 @@
                 const timestamp = Number(args.timestamp);
                 const amountBigInt = BigInt(args.amount);
                 
-                let amount, tokenType, displayAmount, tokenBadge;
+                // All rewards are SIG6 (18 decimals)
+                const amount = parseFloat(ethers.formatUnits(amountBigInt, 18));
+                const displayAmount = amount.toFixed(4);
+                totalSIG6 += amount;
                 
-                if (args.rewardType === "ICO_REWARD" || args.rewardType === "REFERRAL") {
-                    amount = parseFloat(ethers.formatUnits(amountBigInt, 18));
-                    tokenType = "SIG6";
-                    displayAmount = amount.toFixed(4);
-                    tokenBadge = '<span class="token-badge badge-sig6">SIG6</span>';
-                    totalSIG6 += amount;
-                } else {
-                    amount = parseFloat(ethers.formatUnits(amountBigInt, 6));
-                    tokenType = "USDT";
-                    displayAmount = amount.toFixed(2);
-                    tokenBadge = '<span class="token-badge badge-usdt">USDT</span>';
-                }
-                
-                let incomeName = args.rewardType === "ICO_REWARD" ? "ICO Bonus" : `Level ${args.level}`;
-                let description = args.rewardType === "ICO_REWARD" ? "10% first purchase bonus" : `Level ${args.level} commission`;
+                let incomeName = args.rewardType === "ICO_REWARD" ? "ICO Bonus" : `Level ${args.level} Referral`;
+                let description = args.rewardType === "ICO_REWARD" ? "10% first purchase bonus" : `Level ${args.level} team commission`;
                 
                 const date = new Date(timestamp * 1000);
                 const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -1245,7 +1236,7 @@
                         <td>${index + 1}</td>
                         <td>
                             <div style="font-weight:600; color:var(--primary);">${incomeName}</div>
-                            ${tokenBadge}
+                            <span class="token-badge badge-sig6">SIG6</span>
                         </td>
                         <td><div style="font-size:12px;">${description}</div></td>
                         <td>
@@ -1253,7 +1244,7 @@
                             <div class="wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,10)}...</div>
                         </td>
                         <td><span class="status-badge status-active">Level ${args.level}</span></td>
-                        <td class="amount-positive">${displayAmount} ${tokenType}</td>
+                        <td class="amount-positive">${displayAmount} SIG6</td>
                         <td>${dateStr}</td>
                         <td>${timeStr}</td>
                     </tr>
@@ -1262,7 +1253,7 @@
                 mobileHtml += `
                     <div class="mobile-card">
                         <div class="mobile-card-header">
-                            <div class="mobile-card-title">${incomeName} ${tokenBadge}</div>
+                            <div class="mobile-card-title">${incomeName} <span class="token-badge badge-sig6">SIG6</span></div>
                             <span class="status-badge status-active">#${index + 1}</span>
                         </div>
                         <div class="mobile-card-row">
@@ -1279,7 +1270,7 @@
                         </div>
                         <div class="mobile-card-row">
                             <span class="mobile-card-label">Amount</span>
-                            <span class="mobile-card-value mobile-amount positive">${displayAmount} ${tokenType}</span>
+                            <span class="mobile-card-value mobile-amount positive">${displayAmount} SIG6</span>
                         </div>
                         <div class="mobile-card-row">
                             <span class="mobile-card-label">Date</span>
@@ -1307,7 +1298,6 @@
             let desktopHtml = '';
             let mobileHtml = '';
             let totalLapsedSIG6 = 0;
-            let totalLapsedUSDT = 0;
             
             events.sort((a, b) => Number(b.args.timestamp) - Number(a.args.timestamp));
             
@@ -1316,22 +1306,10 @@
                 const amountBigInt = BigInt(args.amount);
                 const reason = args.reason;
                 
-                let amount, displayAmount, tokenType, tokenBadge;
-                
-                // Determine token type based on amount magnitude or reason
-                if (reason.includes("4X_LIMIT") || reason.includes("LOW_BALANCE_SKIP") || amountBigInt < 1e12) {
-                    amount = parseFloat(ethers.formatUnits(amountBigInt, 18));
-                    tokenType = "SIG6";
-                    displayAmount = amount.toFixed(4);
-                    tokenBadge = '<span class="token-badge badge-sig6">SIG6</span>';
-                    totalLapsedSIG6 += amount;
-                } else {
-                    amount = parseFloat(ethers.formatUnits(amountBigInt, 6));
-                    tokenType = "USDT";
-                    displayAmount = amount.toFixed(2);
-                    tokenBadge = '<span class="token-badge badge-usdt">USDT</span>';
-                    totalLapsedUSDT += amount;
-                }
+                // ALL lapsed income is SIG6 (18 decimals)
+                const amount = parseFloat(ethers.formatUnits(amountBigInt, 18));
+                const displayAmount = amount.toFixed(4);
+                totalLapsedSIG6 += amount;
                 
                 let incomeName = "Lapsed Income";
                 if (reason.includes("4X_LIMIT")) incomeName = "4X Cap Lapsed";
@@ -1356,14 +1334,14 @@
                         <td>${index + 1}</td>
                         <td>
                             <div style="font-weight:600; color:var(--danger);">${incomeName}</div>
-                            ${tokenBadge}
+                            <span class="token-badge badge-sig6">SIG6</span>
                         </td>
                         <td><div style="font-size:12px;">${formattedReason}</div></td>
                         <td>
                             <div style="color:var(--primary)">${fromDisplay}</div>
                             <div class="wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,10)}...</div>
                         </td>
-                        <td class="amount-negative">${displayAmount} ${tokenType}</td>
+                        <td class="amount-negative">${displayAmount} SIG6</td>
                         <td><span class="reason-badge ${reasonClass}">${reason}</span></td>
                         <td>${dateStr}</td>
                         <td>${timeStr}</td>
@@ -1373,7 +1351,7 @@
                 mobileHtml += `
                     <div class="mobile-card">
                         <div class="mobile-card-header">
-                            <div class="mobile-card-title" style="color:var(--danger)">${incomeName} ${tokenBadge}</div>
+                            <div class="mobile-card-title" style="color:var(--danger)">${incomeName} <span class="token-badge badge-sig6">SIG6</span></div>
                             <span class="status-badge status-lapsed">#${index + 1}</span>
                         </div>
                         <div class="mobile-card-row">
@@ -1386,7 +1364,7 @@
                         </div>
                         <div class="mobile-card-row">
                             <span class="mobile-card-label">Amount</span>
-                            <span class="mobile-card-value mobile-amount negative">${displayAmount} ${tokenType}</span>
+                            <span class="mobile-card-value mobile-amount negative">${displayAmount} SIG6</span>
                         </div>
                         <div class="mobile-card-row">
                             <span class="mobile-card-label">Reason</span>
@@ -1403,13 +1381,12 @@
             desktopBody.innerHTML = desktopHtml;
             mobileContainer.innerHTML = mobileHtml;
             
-            updateLapsedStats(totalLapsedSIG6, totalLapsedUSDT);
+            document.getElementById('lapsed-income').textContent = totalLapsedSIG6.toFixed(4) + " SIG6";
         }
         
         function updateStats(rewardEvents, lapsedEvents) {
             let totalSIG6 = 0;
             let totalLapsedSIG6 = 0;
-            let totalLapsedUSDT = 0;
             
             rewardEvents.forEach(event => {
                 const args = event.args;
@@ -1419,33 +1396,12 @@
             });
             
             lapsedEvents.forEach(event => {
-                const amountBigInt = BigInt(event.args.amount);
-                const reason = event.args.reason;
-                
-                if (reason.includes("4X_LIMIT") || reason.includes("LOW_BALANCE_SKIP") || amountBigInt < 1e12) {
-                    totalLapsedSIG6 += parseFloat(ethers.formatUnits(amountBigInt, 18));
-                } else {
-                    totalLapsedUSDT += parseFloat(ethers.formatUnits(amountBigInt, 6));
-                }
+                totalLapsedSIG6 += parseFloat(ethers.formatUnits(event.args.amount, 18));
             });
             
             document.getElementById('total-sig6').textContent = totalSIG6.toFixed(4) + " SIG6";
-            updateLapsedStats(totalLapsedSIG6, totalLapsedUSDT);
+            document.getElementById('lapsed-income').textContent = totalLapsedSIG6.toFixed(4) + " SIG6";
             document.getElementById('total-transactions').textContent = rewardEvents.length + lapsedEvents.length;
-        }
-        
-        function updateLapsedStats(sig6Amount, usdtAmount) {
-            const lapsedElement = document.getElementById('lapsed-income');
-            
-            if (usdtAmount > 0 && sig6Amount > 0) {
-                lapsedElement.innerHTML = `${usdtAmount.toFixed(2)} USDT<br><span style="font-size:14px">${sig6Amount.toFixed(4)} SIG6</span>`;
-            } else if (usdtAmount > 0) {
-                lapsedElement.textContent = usdtAmount.toFixed(2) + " USDT";
-            } else if (sig6Amount > 0) {
-                lapsedElement.textContent = sig6Amount.toFixed(4) + " SIG6";
-            } else {
-                lapsedElement.textContent = "0.00";
-            }
         }
         
         function applyFilters() {
