@@ -515,28 +515,6 @@
             color: var(--secondary);
         }
         
-        .node-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        
-        .node-stat {
-            text-align: center;
-        }
-        
-        .node-stat-label {
-            font-size: 10px;
-            color: #888;
-        }
-        
-        .node-stat-value {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
         .node-balance {
             font-size: 16px;
             font-weight: 700;
@@ -553,11 +531,20 @@
             font-weight: 400;
         }
         
-        /* Connection Lines */
-        .tree-connections {
-            position: relative;
-            width: 100%;
-            height: 20px;
+        .node-active {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 5px;
+            padding: 4px;
+            border-radius: 12px;
+        }
+        
+        .active-yes {
+            color: #00ff88;
+        }
+        
+        .active-no {
+            color: #ff4d4d;
         }
         
         /* Loading and Empty States */
@@ -816,6 +803,8 @@
             for(let i = 1; i <= 10; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
                 particle.style.animationDelay = `${i * 2}s`;
                 particlesContainer.appendChild(particle);
             }
@@ -848,6 +837,9 @@
                 const shortAddress = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
                 document.getElementById('btn-text').textContent = shortAddress;
                 connectBtn.classList.add('connected');
+                
+                // Save connection status
+                localStorage.setItem('sigma_wallet_connected', 'true');
                 
                 // Load tree data
                 await loadTreeData();
@@ -928,16 +920,31 @@
                 
                 // 4. Fetch balances for all addresses
                 let processed = 0;
-                for (const addr of allAddresses) {
-                    try {
-                        const balance = await sigmaContract.balanceOf(addr);
-                        balanceMap.set(addr, parseFloat(ethers.formatEther(balance)));
-                    } catch (e) {
-                        balanceMap.set(addr, 0);
-                    }
-                    processed++;
-                    if (processed % 20 === 0) {
-                        console.log(`Processed balances: ${processed}/${allAddresses.size}`);
+                const batchSize = 50;
+                const addressArray = Array.from(allAddresses);
+                
+                for (let i = 0; i < addressArray.length; i += batchSize) {
+                    const batch = addressArray.slice(i, i + batchSize);
+                    const batchPromises = batch.map(async (addr) => {
+                        try {
+                            const balance = await sigmaContract.balanceOf(addr);
+                            balanceMap.set(addr, parseFloat(ethers.formatEther(balance)));
+                        } catch (e) {
+                            balanceMap.set(addr, 0);
+                        }
+                    });
+                    await Promise.all(batchPromises);
+                    processed += batch.length;
+                    
+                    // Update progress
+                    if (i % 200 === 0) {
+                        document.getElementById('tree-root').innerHTML = `
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin"></i><br>
+                                Loading balances... ${Math.round((processed/addressArray.length)*100)}%<br>
+                                <small>Found ${allAddresses.size} addresses</small>
+                            </div>
+                        `;
                     }
                 }
                 
@@ -978,7 +985,7 @@
                 treeRoot.innerHTML = `
                     <div class="root-node">
                         <div class="root-wallet" onclick="copyAddress('${userAddress}')">
-                            <i class="fas fa-copy"></i> ${userAddress.slice(0,6)}...${userAddress.slice(-4)}
+                            <i class="fas fa-copy"></i> YOU (${userAddress.slice(0,6)}...${userAddress.slice(-4)})
                         </div>
                     </div>
                     <div class="empty-state">
@@ -1026,7 +1033,7 @@
                         const typeClass = memberType === 'joined' ? 'type-joined' : 'type-migrated';
                         const typeText = memberType === 'joined' ? 'JOINED' : 'MIGRATED';
                         const balance = balanceMap.get(member.address) || 0;
-                        const usdtValue = (balance * (currentSellRate || 0.03)).toFixed(2);
+                        const isActive = balance >= 10;
                         
                         html += `
                             <div class="tree-node" onclick="toggleNode('${member.address}')">
@@ -1039,17 +1046,11 @@
                                     <i class="fas fa-copy" onclick="event.stopPropagation(); copyAddress('${member.address}')" title="Copy Address"></i>
                                 </div>
                                 <div class="node-balance">
-                                    ${balance.toFixed(2)} SIG6 <small>≈ $${usdtValue}</small>
+                                    ${balance.toFixed(2)} SIG6
                                 </div>
-                                <div class="node-stats">
-                                    <div class="node-stat">
-                                        <div class="node-stat-label">Upline</div>
-                                        <div class="node-stat-value">${member.upline.slice(0,6)}...</div>
-                                    </div>
-                                    <div class="node-stat">
-                                        <div class="node-stat-label">Active</div>
-                                        <div class="node-stat-value">${balance >= 10 ? '✅' : '❌'}</div>
-                                    </div>
+                                <div class="node-active ${isActive ? 'active-yes' : 'active-no'}">
+                                    <i class="fas fa-${isActive ? 'check-circle' : 'times-circle'}"></i>
+                                    ${isActive ? 'Active' : 'Inactive'} (Min 10 SIG6)
                                 </div>
                             </div>
                         `;
@@ -1142,9 +1143,29 @@
         window.onload = function() {
             createParticles();
             
-            // Check if wallet is already connected
-            if (window.ethereum && window.ethereum.selectedAddress) {
-                connectWallet();
+            // Check if wallet was previously connected
+            const lastConnected = localStorage.getItem('sigma_wallet_connected');
+            
+            if (lastConnected === 'true' && window.ethereum) {
+                window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                    if (accounts.length > 0) {
+                        connectWallet();
+                    } else {
+                        document.getElementById('tree-root').innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-plug"></i><br>
+                                Connect wallet to view your referral tree
+                            </div>
+                        `;
+                    }
+                }).catch(() => {
+                    document.getElementById('tree-root').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-plug"></i><br>
+                            Connect wallet to view your referral tree
+                        </div>
+                    `;
+                });
             } else {
                 document.getElementById('tree-root').innerHTML = `
                     <div class="empty-state">
