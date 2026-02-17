@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>SIGMA SIX | Tree View</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00ffcc;
+            --secondary: #9d4edd;
+            --bg: #0a0b10;
+            --card: #161821;
+            --text: #ffffff;
+            --border: #2d2f3e;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff4d4d;
+            --gradient: linear-gradient(90deg, #00ffcc, #9d4edd, #ff2a6d, #00ffcc);
+            --level1: #00ffcc;
+            --level2: #00d4ff;
+            --level3: #9d4edd;
+            --level4: #ff6b9d;
+            --level5: #ffaa00;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Rainbow Border */
+        .rainbow-border {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+            background-size: 400% 400%;
+            animation: rainbow 8s ease infinite;
+            z-index: 1000;
+        }
+        
+        /* Crypto Particles */
+        .particles-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: particle-float 20s infinite linear;
+            opacity: 0.3;
+        }
+        
+        .particle:nth-child(1) { top: 10%; left: 5%; background: var(--primary); animation-delay: 0s; }
+        .particle:nth-child(2) { top: 20%; left: 85%; background: var(--secondary); animation-delay: 2s; }
+        .particle:nth-child(3) { top: 40%; left: 15%; background: #ff2a6d; animation-delay: 4s; }
+        .particle:nth-child(4) { top: 60%; left: 90%; background: var(--primary); animation-delay: 6s; }
+        .particle:nth-child(5) { top: 80%; left: 10%; background: var(--secondary); animation-delay: 8s; }
+        .particle:nth-child(6) { top: 30%; left: 70%; background: var(--primary); animation-delay: 10s; }
+        .particle:nth-child(7) { top: 70%; left: 50%; background: #ff2a6d; animation-delay: 12s; }
+        .particle:nth-child(8) { top: 90%; left: 30%; background: var(--secondary); animation-delay: 14s; }
+        .particle:nth-child(9) { top: 15%; left: 50%; background: var(--primary); animation-delay: 16s; }
+        .particle:nth-child(10) { top: 50%; left: 80%; background: var(--secondary); animation-delay: 18s; }
+        
+        @keyframes particle-float {
+            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.3; }
+            25% { transform: translateY(-100px) translateX(50px) scale(1.5); opacity: 0.5; }
+            50% { transform: translateY(-200px) translateX(0) scale(1); opacity: 0.3; }
+            75% { transform: translateY(-100px) translateX(-50px) scale(0.8); opacity: 0.5; }
+            100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.3; }
+        }
+        
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Glass Background */
+        .glass-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 204, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(157, 78, 221, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 40% 80%, rgba(255, 42, 109, 0.08) 0%, transparent 40%);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        .header h1 {
+            background: var(--gradient);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            animation: rainbow 8s ease infinite;
+            line-height: 1.2;
+        }
+        
+        .header p {
+            color: #aaa;
+            font-size: clamp(14px, 3vw, 18px);
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+        
+        /* Connect Button */
+        .connect-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: #000;
+            border: none;
+            border-radius: 15px;
+            padding: 12px 25px;
+            font-weight: 800;
+            font-size: clamp(12px, 3vw, 14px);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.3);
+            z-index: 1001;
+            white-space: nowrap;
+            max-width: 220px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 20px rgba(0, 255, 204, 0.3); }
+            50% { box-shadow: 0 4px 30px rgba(0, 255, 204, 0.6); }
+            100% { box-shadow: 0 4px 20px rgba(0, 255, 204, 0.3); }
+        }
+        
+        .connect-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 255, 204, 0.6);
+        }
+        
+        .connect-btn.connected {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        /* Navigation */
+        .nav-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(0, 255, 204, 0.2);
+            transform: translateX(-5px);
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: #888;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(0, 255, 204, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(22, 24, 33, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 204, 0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 255, 204, 0.1);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+            background-size: 400% 400%;
+            animation: rainbow 8s ease infinite;
+        }
+        
+        .stat-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #aaa;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .stat-title i {
+            font-size: 16px;
+            color: var(--primary);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-sub {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        /* Tree View */
+        .tree-container {
+            background: rgba(22, 24, 33, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(0, 255, 204, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+        }
+        
+        .tree-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+            background-size: 400% 400%;
+            animation: rainbow 8s ease infinite;
+        }
+        
+        .tree-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .tree-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #000;
+        }
+        
+        .tree-title {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 700;
+            flex: 1;
+        }
+        
+        .tree-subtitle {
+            color: #aaa;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        /* Root Node */
+        .root-node {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .root-wallet {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 18px;
+            box-shadow: 0 10px 20px rgba(0, 255, 204, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .root-wallet:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 255, 204, 0.5);
+        }
+        
+        .root-wallet i {
+            margin-right: 10px;
+        }
+        
+        /* Tree Structure */
+        .tree-level {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .level-label {
+            width: 100%;
+            text-align: center;
+            color: var(--secondary);
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .level-label i {
+            margin-right: 8px;
+        }
+        
+        /* Tree Nodes */
+        .tree-nodes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .tree-node {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 15px;
+            min-width: 200px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .tree-node:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(0, 255, 204, 0.2);
+        }
+        
+        .tree-node::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 15px;
+            background: var(--primary);
+            opacity: 0.3;
+        }
+        
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .node-level {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        .node-type {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .type-joined {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+        
+        .type-migrated {
+            background: rgba(255, 170, 0, 0.1);
+            color: #ffaa00;
+            border: 1px solid rgba(255, 170, 0, 0.3);
+        }
+        
+        .node-wallet {
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(0, 255, 204, 0.1);
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+        }
+        
+        .node-wallet span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .node-wallet i {
+            cursor: pointer;
+            color: var(--primary);
+            font-size: 12px;
+        }
+        
+        .node-wallet i:hover {
+            color: var(--secondary);
+        }
+        
+        .node-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .node-stat {
+            text-align: center;
+        }
+        
+        .node-stat-label {
+            font-size: 10px;
+            color: #888;
+        }
+        
+        .node-stat-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .node-balance {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .node-balance small {
+            font-size: 11px;
+            color: #888;
+            font-weight: 400;
+        }
+        
+        /* Connection Lines */
+        .tree-connections {
+            position: relative;
+            width: 100%;
+            height: 20px;
+        }
+        
+        /* Loading and Empty States */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--primary);
+            font-size: 16px;
+        }
+        
+        .loading i {
+            font-size: 32px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            font-size: 16px;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+            opacity: 0.5;
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .control-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-btn:hover {
+            background: rgba(0, 255, 204, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .control-btn.active {
+            background: rgba(0, 255, 204, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .connect-btn {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 0 auto 20px auto;
+                width: 100%;
+                max-width: 100%;
+                justify-content: center;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .tree-node {
+                min-width: 160px;
+            }
+            
+            .root-wallet {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
+            
+            .tree-title {
+                font-size: 20px;
+            }
+            
+            .tree-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .header p {
+                font-size: 14px;
+            }
+            
+            .tree-node {
+                min-width: 140px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .control-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient);
+            border-radius: 4px;
+            background-size: 400% 400%;
+            animation: rainbow 8s ease infinite;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Rainbow Border -->
+    <div class="rainbow-border"></div>
+    
+    <!-- Crypto Particles -->
+    <div class="particles-container" id="particles"></div>
+    
+    <!-- Glass Background -->
+    <div class="glass-bg"></div>
+    
+    <!-- Connect Button -->
+    <button class="connect-btn" id="connectBtn" onclick="connectWallet()">
+        <i class="fas fa-wallet"></i> <span id="btn-text">Connect Wallet</span>
+    </button>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav-container">
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>REFERRAL TREE VIEW</h1>
+            <p>Visualize your complete network - Migrated & Joined members auto-fetched</p>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="stats-container" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-title"><i class="fas fa-users"></i> Total Team</div>
+                <div class="stat-value" id="total-team">0</div>
+                <div class="stat-sub">All levels</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title"><i class="fas fa-user-plus"></i> Direct</div>
+                <div class="stat-value" id="direct-count">0</div>
+                <div class="stat-sub">Level 1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title"><i class="fas fa-coins"></i> Team SIG6</div>
+                <div class="stat-value" id="team-balance">0</div>
+                <div class="stat-sub">Total holdings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title"><i class="fas fa-sitemap"></i> Max Depth</div>
+                <div class="stat-value" id="max-depth">0</div>
+                <div class="stat-sub">Levels deep</div>
+            </div>
+        </div>
+        
+        <!-- Tree Controls -->
+        <div class="controls">
+            <button class="control-btn active" onclick="expandAll()">
+                <i class="fas fa-expand-alt"></i> Expand All
+            </button>
+            <button class="control-btn" onclick="collapseAll()">
+                <i class="fas fa-compress-alt"></i> Collapse All
+            </button>
+            <button class="control-btn" onclick="refreshTree()">
+                <i class="fas fa-sync-alt"></i> Refresh Tree
+            </button>
+        </div>
+        
+        <!-- Tree Container -->
+        <div class="tree-container">
+            <div class="tree-header">
+                <div class="tree-icon">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <div>
+                    <div class="tree-title">YOUR REFERRAL TREE</div>
+                    <div class="tree-subtitle">
+                        <i class="fas fa-circle" style="color:#00ff88; font-size:8px;"></i> Joined Members 
+                        <i class="fas fa-circle" style="color:#ffaa00; font-size:8px; margin-left:15px;"></i> Migrated Members
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tree View -->
+            <div id="tree-root"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONTRACT CONFIGURATION =====
+        const SIGMA_CONTRACT_ADDRESS = "0xeA0a8150c5B368ec026ffB094FCfCdB3FaBFa479";
+        const CREATOR_WALLET = "0xb579377DDe2C03b2b46B5b12453F4dbAddB06f2E";
+        
+        let provider, userAddress, sigmaContract, signer;
+        let teamData = {};
+        let allAddresses = new Set();
+        let uplineMap = new Map();
+        let balanceMap = new Map();
+        let memberTypeMap = new Map(); // 'joined' or 'migrated'
+        
+        // Create particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for(let i = 1; i <= 10; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.animationDelay = `${i * 2}s`;
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Connect Wallet
+        async function connectWallet() {
+            if (!window.ethereum) {
+                alert("Please install MetaMask to use this feature");
+                return;
+            }
+            
+            try {
+                provider = new ethers.BrowserProvider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                userAddress = accounts[0];
+                signer = await provider.getSigner();
+                
+                sigmaContract = new ethers.Contract(SIGMA_CONTRACT_ADDRESS, [
+                    "function upline(address) view returns (address)",
+                    "function balanceOf(address) view returns (uint256)",
+                    "function hasBoughtBefore(address) view returns (bool)",
+                    "function myDirects(address,uint256) view returns (address)",
+                    "event MemberJoined(address indexed user, address indexed referrer, uint256 timestamp)",
+                    "event Transfer(address indexed from, address indexed to, uint256 value)"
+                ], provider);
+                
+                // Update connect button
+                const connectBtn = document.getElementById('connectBtn');
+                const shortAddress = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
+                document.getElementById('btn-text').textContent = shortAddress;
+                connectBtn.classList.add('connected');
+                
+                // Load tree data
+                await loadTreeData();
+                
+            } catch (error) {
+                console.error("Connection error:", error);
+                alert("Failed to connect wallet: " + error.message);
+            }
+        }
+        
+        // Load Tree Data
+        async function loadTreeData() {
+            if (!userAddress) return;
+            
+            try {
+                document.getElementById('tree-root').innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i><br>
+                        Building your referral tree...<br>
+                        <small>Scanning blockchain for migrated & joined members</small>
+                    </div>
+                `;
+                
+                // Clear previous data
+                allAddresses.clear();
+                uplineMap.clear();
+                balanceMap.clear();
+                memberTypeMap.clear();
+                
+                // 1. Fetch MemberJoined events
+                console.log("Fetching MemberJoined events...");
+                const memberFilter = sigmaContract.filters.MemberJoined();
+                const memberEvents = await sigmaContract.queryFilter(memberFilter, 0, 'latest');
+                console.log(`Found ${memberEvents.length} MemberJoined events`);
+                
+                // Add joined members to maps
+                for (const event of memberEvents) {
+                    const user = event.args.user.toLowerCase();
+                    const referrer = event.args.referrer.toLowerCase();
+                    uplineMap.set(user, referrer);
+                    memberTypeMap.set(user, 'joined');
+                    allAddresses.add(user);
+                    allAddresses.add(referrer);
+                }
+                
+                // 2. Fetch Transfer events to find migrated members
+                console.log("Fetching Transfer events for migrated members...");
+                const transferFilter = sigmaContract.filters.Transfer(CREATOR_WALLET, null);
+                const transferEvents = await sigmaContract.queryFilter(transferFilter, 0, 'latest');
+                console.log(`Found ${transferEvents.length} Transfer events from creator`);
+                
+                // Add migrated members
+                for (const event of transferEvents) {
+                    const to = event.args.to.toLowerCase();
+                    if (to !== CREATOR_WALLET.toLowerCase() && to !== userAddress.toLowerCase()) {
+                        allAddresses.add(to);
+                        // If not already in uplineMap, try to get upline from contract
+                        if (!uplineMap.has(to)) {
+                            try {
+                                const uplineAddr = await sigmaContract.upline(to);
+                                if (uplineAddr && uplineAddr !== "0x0000000000000000000000000000000000000000") {
+                                    uplineMap.set(to, uplineAddr.toLowerCase());
+                                }
+                            } catch (e) {}
+                        }
+                        // Mark as migrated if not already joined
+                        if (!memberTypeMap.has(to)) {
+                            memberTypeMap.set(to, 'migrated');
+                        }
+                    }
+                }
+                
+                // 3. Add creator and current user
+                allAddresses.add(userAddress.toLowerCase());
+                allAddresses.add(CREATOR_WALLET.toLowerCase());
+                
+                console.log(`Total unique addresses: ${allAddresses.size}`);
+                
+                // 4. Fetch balances for all addresses
+                let processed = 0;
+                for (const addr of allAddresses) {
+                    try {
+                        const balance = await sigmaContract.balanceOf(addr);
+                        balanceMap.set(addr, parseFloat(ethers.formatEther(balance)));
+                    } catch (e) {
+                        balanceMap.set(addr, 0);
+                    }
+                    processed++;
+                    if (processed % 20 === 0) {
+                        console.log(`Processed balances: ${processed}/${allAddresses.size}`);
+                    }
+                }
+                
+                console.log("Balance map size:", balanceMap.size);
+                
+                // 5. Build and display tree
+                buildTree();
+                
+            } catch (error) {
+                console.error("Error loading tree:", error);
+                document.getElementById('tree-root').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i><br>
+                        Error loading tree: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Build Tree
+        function buildTree() {
+            const treeRoot = document.getElementById('tree-root');
+            
+            if (!userAddress) {
+                treeRoot.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-plug"></i><br>
+                        Connect wallet to view your referral tree
+                    </div>
+                `;
+                return;
+            }
+            
+            // Find all downline members
+            const downline = findDownline(userAddress.toLowerCase());
+            
+            if (downline.length === 0) {
+                treeRoot.innerHTML = `
+                    <div class="root-node">
+                        <div class="root-wallet" onclick="copyAddress('${userAddress}')">
+                            <i class="fas fa-copy"></i> ${userAddress.slice(0,6)}...${userAddress.slice(-4)}
+                        </div>
+                    </div>
+                    <div class="empty-state">
+                        <i class="fas fa-sitemap"></i><br>
+                        No team members found in your network
+                    </div>
+                `;
+                updateStats([]);
+                return;
+            }
+            
+            // Group by level
+            const byLevel = {};
+            downline.forEach(member => {
+                if (!byLevel[member.level]) byLevel[member.level] = [];
+                byLevel[member.level].push(member);
+            });
+            
+            // Update stats
+            updateStats(downline);
+            
+            // Build HTML
+            let html = `
+                <div class="root-node">
+                    <div class="root-wallet" onclick="copyAddress('${userAddress}')">
+                        <i class="fas fa-copy"></i> YOU (${userAddress.slice(0,6)}...${userAddress.slice(-4)})
+                    </div>
+                </div>
+            `;
+            
+            // Add each level
+            const maxLevel = Math.max(...Object.keys(byLevel).map(Number));
+            for (let level = 1; level <= maxLevel; level++) {
+                if (byLevel[level]) {
+                    html += `
+                        <div class="tree-level">
+                            <div class="level-label">
+                                <i class="fas fa-layer-group"></i> LEVEL ${level}
+                            </div>
+                            <div class="tree-nodes">
+                    `;
+                    
+                    byLevel[level].forEach(member => {
+                        const memberType = memberTypeMap.get(member.address) || 'migrated';
+                        const typeClass = memberType === 'joined' ? 'type-joined' : 'type-migrated';
+                        const typeText = memberType === 'joined' ? 'JOINED' : 'MIGRATED';
+                        const balance = balanceMap.get(member.address) || 0;
+                        const usdtValue = (balance * (currentSellRate || 0.03)).toFixed(2);
+                        
+                        html += `
+                            <div class="tree-node" onclick="toggleNode('${member.address}')">
+                                <div class="node-header">
+                                    <span class="node-level">Level ${member.level}</span>
+                                    <span class="node-type ${typeClass}">${typeText}</span>
+                                </div>
+                                <div class="node-wallet">
+                                    <span>${member.address.slice(0,6)}...${member.address.slice(-4)}</span>
+                                    <i class="fas fa-copy" onclick="event.stopPropagation(); copyAddress('${member.address}')" title="Copy Address"></i>
+                                </div>
+                                <div class="node-balance">
+                                    ${balance.toFixed(2)} SIG6 <small>≈ $${usdtValue}</small>
+                                </div>
+                                <div class="node-stats">
+                                    <div class="node-stat">
+                                        <div class="node-stat-label">Upline</div>
+                                        <div class="node-stat-value">${member.upline.slice(0,6)}...</div>
+                                    </div>
+                                    <div class="node-stat">
+                                        <div class="node-stat-label">Active</div>
+                                        <div class="node-stat-value">${balance >= 10 ? '✅' : '❌'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            treeRoot.innerHTML = html;
+        }
+        
+        // Find all downline members recursively
+        function findDownline(address, level = 1, visited = new Set()) {
+            const members = [];
+            
+            // Find all addresses that have this address as upline
+            for (const [user, upline] of uplineMap) {
+                if (upline === address && !visited.has(user)) {
+                    visited.add(user);
+                    members.push({
+                        address: user,
+                        level: level,
+                        upline: upline
+                    });
+                    
+                    // Find their downline
+                    const downline = findDownline(user, level + 1, visited);
+                    members.push(...downline);
+                }
+            }
+            
+            return members;
+        }
+        
+        // Update stats
+        function updateStats(members) {
+            const total = members.length;
+            const direct = members.filter(m => m.level === 1).length;
+            let totalBalance = 0;
+            let maxDepth = 0;
+            
+            members.forEach(m => {
+                totalBalance += balanceMap.get(m.address) || 0;
+                if (m.level > maxDepth) maxDepth = m.level;
+            });
+            
+            document.getElementById('total-team').textContent = total;
+            document.getElementById('direct-count').textContent = direct;
+            document.getElementById('team-balance').textContent = totalBalance.toFixed(2) + ' SIG6';
+            document.getElementById('max-depth').textContent = maxDepth;
+        }
+        
+        // Toggle node (expand/collapse)
+        function toggleNode(address) {
+            // Implementation for future expansion
+            console.log("Toggle node:", address);
+        }
+        
+        // Expand all
+        function expandAll() {
+            console.log("Expand all");
+            // Future implementation
+        }
+        
+        // Collapse all
+        function collapseAll() {
+            console.log("Collapse all");
+            // Future implementation
+        }
+        
+        // Refresh tree
+        async function refreshTree() {
+            await loadTreeData();
+        }
+        
+        // Copy address
+        function copyAddress(address) {
+            navigator.clipboard.writeText(address).then(() => {
+                alert("Address copied to clipboard!");
+            }).catch(err => {
+                console.error("Failed to copy:", err);
+            });
+        }
+        
+        // Initialize
+        window.onload = function() {
+            createParticles();
+            
+            // Check if wallet is already connected
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                connectWallet();
+            } else {
+                document.getElementById('tree-root').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-plug"></i><br>
+                        Connect wallet to view your referral tree
+                    </div>
+                `;
+            }
+        };
+    </script>
+</body>
+</html>
