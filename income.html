@@ -36,7 +36,6 @@
             position: relative;
         }
         
-        /* Rainbow Border Top */
         .rainbow-border {
             position: fixed;
             top: 0;
@@ -49,7 +48,6 @@
             z-index: 1000;
         }
         
-        /* Crypto Live Animation Background */
         .crypto-bg {
             position: fixed;
             top: 0;
@@ -64,7 +62,6 @@
                 radial-gradient(circle at 40% 80%, rgba(255, 42, 109, 0.15) 0%, transparent 40%);
         }
         
-        /* Floating Crypto Icons Animation */
         .floating-icons {
             position: fixed;
             width: 100%;
@@ -95,22 +92,10 @@
         }
         
         @keyframes float {
-            0%, 100% { 
-                transform: translateY(0) rotate(0deg); 
-                opacity: 0.3;
-            }
-            25% { 
-                transform: translateY(-20px) rotate(90deg); 
-                opacity: 0.6;
-            }
-            50% { 
-                transform: translateY(0) rotate(180deg); 
-                opacity: 0.3;
-            }
-            75% { 
-                transform: translateY(20px) rotate(270deg); 
-                opacity: 0.6;
-            }
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+            25% { transform: translateY(-20px) rotate(90deg); opacity: 0.6; }
+            50% { transform: translateY(0) rotate(180deg); opacity: 0.3; }
+            75% { transform: translateY(20px) rotate(270deg); opacity: 0.6; }
         }
         
         .container {
@@ -148,7 +133,6 @@
             line-height: 1.4;
         }
         
-        /* Connect Button */
         .connect-btn {
             position: fixed;
             top: 10px;
@@ -182,7 +166,6 @@
             border: 1px solid var(--primary);
         }
         
-        /* Wallet Selector Modal */
         .wallet-modal {
             display: none;
             position: fixed;
@@ -305,7 +288,6 @@
             box-shadow: 0 0 20px rgba(255, 77, 77, 0.5);
         }
         
-        /* Chain Warning */
         .chain-warning {
             position: fixed;
             top: 80px;
@@ -501,7 +483,6 @@
             color: var(--danger);
         }
         
-        /* Mobile-Optimized Table Styles */
         .table-container {
             overflow-x: hidden;
             border-radius: 12px;
@@ -509,14 +490,12 @@
             background: rgba(0, 0, 0, 0.2);
         }
         
-        /* Desktop Table */
         .desktop-table {
             display: table;
             width: 100%;
             border-collapse: collapse;
         }
         
-        /* Mobile Cards */
         .mobile-cards {
             display: none;
         }
@@ -798,166 +777,75 @@
             line-height: 1.3;
         }
         
-        /* Mobile Responsive Design */
+        .reason-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid transparent;
+        }
+        
+        .reason-low-balance {
+            background: rgba(255, 170, 0, 0.1);
+            color: #ffaa00;
+            border-color: rgba(255, 170, 0, 0.3);
+        }
+        
+        .reason-4x-cap {
+            background: rgba(255, 77, 77, 0.1);
+            color: #ff4d4d;
+            border-color: rgba(255, 77, 77, 0.3);
+        }
+        
+        .reason-ineligible {
+            background: rgba(157, 78, 221, 0.1);
+            color: #9d4edd;
+            border-color: rgba(157, 78, 221, 0.3);
+        }
+        
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .connect-btn {
-                position: relative;
-                top: auto;
-                right: auto;
-                margin: 0 auto 15px auto;
-                width: 100%;
-                max-width: 100%;
-                justify-content: center;
-            }
-            
-            .chain-warning {
-                position: relative;
-                top: auto;
-                right: auto;
-                margin-bottom: 15px;
-                text-align: center;
-            }
-            
-            .main-card {
-                padding: 15px;
-                margin-bottom: 15px;
-            }
-            
-            .filters-section {
-                padding: 12px;
-            }
-            
-            .filter-row {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .filter-group {
-                width: 100%;
-                min-width: 100%;
-            }
-            
-            .filter-buttons {
-                flex-direction: column;
-            }
-            
-            .apply-btn, .reset-btn {
-                width: 100%;
-                justify-content: center;
-                margin-top: 5px;
-            }
-            
-            /* Hide desktop table on mobile */
-            .desktop-table {
-                display: none;
-            }
-            
-            /* Show mobile cards on mobile */
-            .mobile-cards {
-                display: block;
-            }
-            
-            .stats-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .wallet-modal-content {
-                padding: 20px;
-                width: 95%;
-            }
-            
-            .wallet-option {
-                padding: 12px;
-            }
-            
-            .wallet-option img {
-                width: 35px;
-                height: 35px;
-            }
-            
-            .wallet-option span {
-                font-size: 16px;
-            }
-            
-            .close-modal {
-                padding: 8px 20px;
-                font-size: 14px;
-            }
+            .container { padding: 10px; }
+            .connect-btn { position: relative; top: auto; right: auto; margin: 0 auto 15px auto; width: 100%; max-width: 100%; justify-content: center; }
+            .chain-warning { position: relative; top: auto; right: auto; margin-bottom: 15px; text-align: center; }
+            .main-card { padding: 15px; margin-bottom: 15px; }
+            .filters-section { padding: 12px; }
+            .filter-row { flex-direction: column; gap: 15px; }
+            .filter-group { width: 100%; min-width: 100%; }
+            .filter-buttons { flex-direction: column; }
+            .apply-btn, .reset-btn { width: 100%; justify-content: center; margin-top: 5px; }
+            .desktop-table { display: none; }
+            .mobile-cards { display: block; }
+            .stats-row { grid-template-columns: 1fr; }
+            .wallet-modal-content { padding: 20px; width: 95%; }
+            .wallet-option { padding: 12px; }
+            .wallet-option img { width: 35px; height: 35px; }
+            .wallet-option span { font-size: 16px; }
+            .close-modal { padding: 8px 20px; font-size: 14px; }
         }
         
-        /* Small phones */
         @media (max-width: 480px) {
-            .header h1 {
-                font-size: 26px;
-            }
-            
-            .header p {
-                font-size: 13px;
-            }
-            
-            .card-title {
-                font-size: 18px;
-            }
-            
-            .stat-box {
-                padding: 12px;
-            }
-            
-            .stat-value {
-                font-size: 22px;
-            }
-            
-            .mobile-card {
-                padding: 12px;
-            }
-            
-            .mobile-card-title {
-                font-size: 14px;
-            }
-            
-            .mobile-card-value {
-                font-size: 12px;
-            }
-            
-            .mobile-wallet-address {
-                font-size: 10px;
-                padding: 3px 6px;
-            }
+            .header h1 { font-size: 26px; }
+            .header p { font-size: 13px; }
+            .card-title { font-size: 18px; }
+            .stat-box { padding: 12px; }
+            .stat-value { font-size: 22px; }
+            .mobile-card { padding: 12px; }
+            .mobile-card-title { font-size: 14px; }
+            .mobile-card-value { font-size: 12px; }
+            .mobile-wallet-address { font-size: 10px; padding: 3px 6px; }
         }
         
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary);
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
     </style>
 </head>
 <body>
-    <!-- Rainbow Border -->
     <div class="rainbow-border"></div>
-    
-    <!-- Crypto Background Animation -->
     <div class="crypto-bg"></div>
-    
-    <!-- Floating Crypto Icons -->
     <div class="floating-icons">
         <div class="floating-icon">₿</div>
         <div class="floating-icon">Ξ</div>
@@ -968,44 +856,33 @@
         <div class="floating-icon">✦</div>
     </div>
     
-    <!-- Chain Warning -->
     <div class="chain-warning" id="chainWarning">
         <i class="fas fa-exclamation-triangle"></i> Please switch to Polygon network
     </div>
     
-    <!-- Wallet Selector Modal -->
     <div class="wallet-modal" id="walletModal">
         <div class="wallet-modal-content">
             <h2><i class="fas fa-wallet"></i> Connect Wallet</h2>
-            
-            <!-- MetaMask -->
             <div class="wallet-option" onclick="connectWallet('metamask')">
                 <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect width=%2240%22 height=%2240%22 fill=%22%23f6851b%22 rx=%228%22/><text x=%225%22 y=%2228%22 fill=%22white%22 font-size=%2224%22>M</text></svg>'">
                 <span>MetaMask</span>
             </div>
-            
-            <!-- Trust Wallet -->
             <div class="wallet-option" onclick="connectWallet('trust')">
                 <img src="https://trustwallet.com/assets/images/favicon.png" alt="Trust Wallet" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect width=%2240%22 height=%2240%22 fill=%22%230050ef%22 rx=%228%22/><text x=%225%22 y=%2228%22 fill=%22white%22 font-size=%2224%22>T</text></svg>'">
                 <span>Trust Wallet</span>
             </div>
-            
-            <!-- BitGet Wallet -->
             <div class="wallet-option" onclick="connectWallet('bitget')">
                 <img src="https://cdn.prod.website-files.com/64449f9b1fa7be3e7e9aa001/65acd9d3a66cc56a38d4b9c3_favicon%20(1).png" alt="BitGet Wallet" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect width=%2240%22 height=%2240%22 fill=%22%2300b2ff%22 rx=%228%22/><text x=%225%22 y=%2228%22 fill=%22white%22 font-size=%2224%22>B</text></svg>'">
                 <span>BitGet Wallet</span>
             </div>
-            
             <button class="close-modal" onclick="closeWalletModal()">Cancel</button>
         </div>
     </div>
     
-    <!-- Connect Button -->
     <button class="connect-btn" id="connectBtn" onclick="showWalletModal()">
         <i class="fas fa-wallet"></i> <span id="btn-text">Connect Wallet</span>
     </button>
     
-    <!-- Main Container -->
     <div class="container">
         <div class="header-actions">
             <a href="index.html" class="back-btn">
@@ -1021,7 +898,6 @@
             <p>Track your rewards & commissions from SIGMA SIX</p>
         </div>
         
-        <!-- Filters Section -->
         <div class="filters-section">
             <h2 class="filters-title"><i class="fas fa-filter"></i> Filter Income Data</h2>
             
@@ -1042,7 +918,7 @@
                         <option value="all">All Types</option>
                         <option value="ICO_REWARD">ICO Bonus</option>
                         <option value="REFERRAL">Team Referral</option>
-                        <option value="INELIGIBLE">Lapsed Income</option>
+                        <option value="lapsed">Lapsed Income</option>
                     </select>
                 </div>
                 
@@ -1062,7 +938,6 @@
             </div>
         </div>
         
-        <!-- Stats Overview -->
         <div class="main-card">
             <h2 class="card-title"><i class="fas fa-chart-line"></i> Income Overview</h2>
             
@@ -1073,7 +948,7 @@
                 </div>
                 <div class="stat-box">
                     <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Lapsed Income</div>
-                    <div id="lapsed-income" class="stat-value negative multi-line-stat">0.00 USDT</div>
+                    <div id="lapsed-income" class="stat-value negative multi-line-stat">0.00</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label"><i class="fas fa-history"></i> Total Transactions</div>
@@ -1082,12 +957,10 @@
             </div>
         </div>
         
-        <!-- Active Rewards Table -->
         <div class="main-card">
             <h2 class="card-title"><i class="fas fa-check-circle"></i> Active Rewards History</h2>
             
             <div class="table-container">
-                <!-- Desktop Table View -->
                 <table class="desktop-table" id="rewards-table">
                     <thead>
                         <tr>
@@ -1104,17 +977,14 @@
                     <tbody id="rewards-body-desktop"></tbody>
                 </table>
                 
-                <!-- Mobile Cards View -->
                 <div class="mobile-cards" id="rewards-body-mobile"></div>
             </div>
         </div>
         
-        <!-- Lapsed Income Table -->
         <div class="main-card">
             <h2 class="card-title"><i class="fas fa-exclamation-triangle"></i> Lapsed Income History</h2>
             
             <div class="table-container">
-                <!-- Desktop Table View -->
                 <table class="desktop-table" id="lapsed-table">
                     <thead>
                         <tr>
@@ -1131,889 +1001,25 @@
                     <tbody id="lapsed-body-desktop"></tbody>
                 </table>
                 
-                <!-- Mobile Cards View -->
                 <div class="mobile-cards" id="lapsed-body-mobile"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // ===== UPDATED CONTRACT CONFIGURATION =====
         const SIGMA_CONTRACT_ADDRESS = "0xeA0a8150c5B368ec026ffB094FCfCdB3FaBFa479";
         
         let provider, userAddress, sigmaContract, signer;
-        
-        // Global variables to store filtered data
         let allRewardEvents = [];
         let allLapsedEvents = [];
         
-        // ===== UPDATED ABI =====
-        const sigmaABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "sigmaAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "_upline",
-				"type": "address"
-			}
-		],
-		"name": "buySigma",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "emergencyWithdraw",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_usdt",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "allowance",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "needed",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC20InsufficientAllowance",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "balance",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "needed",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC20InsufficientBalance",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "approver",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidApprover",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "receiver",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidReceiver",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidSender",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidSpender",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "OwnableInvalidOwner",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "OwnableUnauthorizedAccount",
-		"type": "error"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Approval",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "reason",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "IncomeLapsed",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "referrer",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "MemberJoined",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address[]",
-				"name": "_users",
-				"type": "address[]"
-			},
-			{
-				"internalType": "address[]",
-				"name": "_ups",
-				"type": "address[]"
-			},
-			{
-				"internalType": "uint256[]",
-				"name": "_bals",
-				"type": "uint256[]"
-			}
-		],
-		"name": "migrateData",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "previousOwner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferred",
-		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "level",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "rewardType",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "RewardReport",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "sigmaAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "sellSigma",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "tradeType",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "sigmaAmount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "rate",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "taxUsdt",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "TradeReport",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "transfer",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Transfer",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "transferFrom",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "UserTransfer",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_u",
-				"type": "address"
-			}
-		],
-		"name": "_checkEligibility",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "allowance",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "balanceOf",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "buyRate",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "creatorWallet",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "decimals",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getSellRate",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "hasBoughtBefore",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "last30DaysBuyVolume",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "lastBuyTimestamp",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "myDirects",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "name",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "rateStep",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "symbol",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "totalLapsedReferral",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "totalReceivedReferral",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalSupply",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "upline",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "usdt",
-		"outputs": [
-			{
-				"internalType": "contract IERC20",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-];
-        
-        // Check if correct chain (Polygon)
+        const sigmaABI = [{"inputs":[{"internalType":"uint256","name":"sigmaAmount","type":"uint256"},{"internalType":"address","name":"_upline","type":"address"}],"name":"buySigma","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"emergencyWithdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_usdt","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"string","name":"reason","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"IncomeLapsed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"MemberJoined","type":"event"},{"inputs":[{"internalType":"address[]","name":"_users","type":"address[]"},{"internalType":"address[]","name":"_ups","type":"address[]"},{"internalType":"uint256[]","name":"_bals","type":"uint256[]"}],"name":"migrateData","outputs":[],"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"level","type":"uint256"},{"indexed":false,"internalType":"string","name":"rewardType","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"RewardReport","type":"event"},{"inputs":[{"internalType":"uint256","name":"sigmaAmount","type":"uint256"}],"name":"sellSigma","outputs":[],"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"string","name":"tradeType","type":"string"},{"indexed":false,"internalType":"uint256","name":"sigmaAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rate","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"taxUsdt","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"TradeReport","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"_u","type":"address"}],"name":"_checkEligibility","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"creatorWallet","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getSellRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"hasBoughtBefore","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"last30DaysBuyVolume","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastBuyTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"myDirects","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rateStep","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalLapsedReferral","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalReceivedReferral","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"upline","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
+
         async function checkChain() {
             if (!provider) return false;
-            
             try {
                 const network = await provider.getNetwork();
                 const chainId = Number(network.chainId);
-                
                 if (chainId !== 137 && chainId !== 80001) {
                     document.getElementById('chainWarning').classList.add('show');
                     return false;
@@ -2027,133 +1033,63 @@
             }
         }
         
-        // Show wallet modal
         function showWalletModal() {
             document.getElementById('walletModal').classList.add('active');
         }
         
-        // Close wallet modal
         function closeWalletModal() {
             document.getElementById('walletModal').classList.remove('active');
         }
         
-        // Universal provider detection
         function getProvider(walletType) {
             if (walletType === 'metamask' || walletType === 'trust' || walletType === 'bitget') {
-                if (typeof window.ethereum !== 'undefined') {
-                    if (walletType === 'trust' && window.ethereum.isTrust) {
-                        return window.ethereum;
-                    } else if (walletType === 'bitget' && (window.ethereum.isBitGet || window.ethereum.isBitkeep)) {
-                        return window.ethereum;
-                    } else if (walletType === 'metamask' && window.ethereum.isMetaMask) {
-                        return window.ethereum;
-                    } else if (walletType === 'trust' || walletType === 'bitget') {
-                        return window.ethereum;
-                    } else {
-                        return window.ethereum;
-                    }
-                }
-                
-                if (walletType === 'trust' && window.trustWallet) {
-                    return window.trustWallet;
-                }
-                
+                if (typeof window.ethereum !== 'undefined') return window.ethereum;
+                if (walletType === 'trust' && window.trustWallet) return window.trustWallet;
                 if (walletType === 'bitget') {
-                    if (window.bitkeep && window.bitkeep.ethereum) {
-                        return window.bitkeep.ethereum;
-                    }
-                    if (window.bitget && window.bitget.ethereum) {
-                        return window.bitget.ethereum;
-                    }
+                    if (window.bitkeep?.ethereum) return window.bitkeep.ethereum;
+                    if (window.bitget?.ethereum) return window.bitget.ethereum;
                 }
             }
-            
             return null;
         }
         
-        // Connect Wallet Function
         async function connectWallet(walletType) {
             closeWalletModal();
-            
             let ethProvider = null;
             
             try {
                 ethProvider = getProvider(walletType);
-                
                 if (!ethProvider) {
                     if (walletType === 'metamask') {
-                        if (confirm("MetaMask not found! Would you like to install it?")) {
-                            window.open("https://metamask.io/download/", "_blank");
-                        }
+                        if (confirm("MetaMask not found! Install it?")) window.open("https://metamask.io/download/", "_blank");
                     } else if (walletType === 'trust') {
-                        if (confirm("Trust Wallet not found! Please install Trust Wallet browser extension or use in-app browser.")) {
-                            window.open("https://trustwallet.com/browser-extension", "_blank");
-                        }
+                        if (confirm("Trust Wallet not found!")) window.open("https://trustwallet.com/browser-extension", "_blank");
                     } else if (walletType === 'bitget') {
-                        if (confirm("BitGet Wallet not found! Please install BitGet Wallet extension or use in-app browser.")) {
-                            window.open("https://web3.bitget.com/en/wallet-download", "_blank");
-                        }
+                        if (confirm("BitGet Wallet not found!")) window.open("https://web3.bitget.com/en/wallet-download", "_blank");
                     }
                     return;
                 }
                 
-                if (walletType === 'trust' && ethProvider.providers) {
-                    const trustProvider = ethProvider.providers.find(p => p.isTrust || p.isTrustWallet);
-                    if (trustProvider) {
-                        ethProvider = trustProvider;
-                    }
-                }
-                
-                if (walletType === 'bitget' && ethProvider.providers) {
-                    const bitgetProvider = ethProvider.providers.find(p => p.isBitGet || p.isBitkeep);
-                    if (bitgetProvider) {
-                        ethProvider = bitgetProvider;
-                    }
-                }
-                
                 provider = new ethers.BrowserProvider(ethProvider);
-                
-                let accounts;
-                try {
-                    accounts = await provider.send("eth_requestAccounts", []);
-                } catch (error) {
-                    if (error.message.includes("wallet_requestPermissions")) {
-                        await provider.send("wallet_requestPermissions", [{ eth_accounts: {} }]);
-                        accounts = await provider.send("eth_accounts", []);
-                    } else {
-                        throw error;
-                    }
-                }
-                
-                if (!accounts || accounts.length === 0) {
-                    throw new Error("No accounts found");
-                }
+                const accounts = await provider.send("eth_requestAccounts", []);
+                if (!accounts || accounts.length === 0) throw new Error("No accounts found");
                 
                 userAddress = accounts[0];
                 signer = await provider.getSigner();
-                
                 sigmaContract = new ethers.Contract(SIGMA_CONTRACT_ADDRESS, sigmaABI, provider);
                 
-                // Check chain
                 await checkChain();
                 
-                // Update connect button
                 const connectBtn = document.getElementById('connectBtn');
-                let walletIcon = '';
-                if (walletType === 'metamask') walletIcon = '🦊';
-                else if (walletType === 'trust') walletIcon = '🔵';
-                else if (walletType === 'bitget') walletIcon = '⚡';
-                
+                let walletIcon = walletType === 'metamask' ? '🦊' : walletType === 'trust' ? '🔵' : '⚡';
                 const shortAddress = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
                 document.getElementById('btn-text').textContent = walletIcon + " " + shortAddress;
                 connectBtn.classList.add('connected');
                 
-                // Load income data
                 loadIncomeData();
                 
-                // Listen for account changes
                 ethProvider.on('accountsChanged', async (accounts) => {
-                    if (accounts && accounts.length > 0) {
+                    if (accounts?.length > 0) {
                         userAddress = accounts[0];
                         signer = await provider.getSigner();
                         document.getElementById('btn-text').textContent = walletIcon + " " + userAddress.slice(0,6) + "..." + userAddress.slice(-4);
@@ -2166,12 +1102,8 @@
                     }
                 });
                 
-                ethProvider.on('chainChanged', (chainId) => {
-                    window.location.reload();
-                });
-                
-                ethProvider.on('disconnect', (error) => {
-                    console.log("Wallet disconnected:", error);
+                ethProvider.on('chainChanged', () => window.location.reload());
+                ethProvider.on('disconnect', () => {
                     userAddress = null;
                     document.getElementById('btn-text').textContent = "Connect Wallet";
                     connectBtn.classList.remove('connected');
@@ -2199,95 +1131,55 @@
             }
             
             try {
-                // Check chain first
                 const isCorrectChain = await checkChain();
-                if (!isCorrectChain) {
-                    return;
-                }
+                if (!isCorrectChain) return;
                 
-                // Show loading state
-                document.getElementById('rewards-body-desktop').innerHTML = `
-                    <tr>
-                        <td colspan="8" class="loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            Loading rewards data...
-                        </td>
-                    </tr>
-                `;
+                // Show loading states
+                document.getElementById('rewards-body-desktop').innerHTML = `<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading rewards...</td></tr>`;
+                document.getElementById('rewards-body-mobile').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading rewards...</div>`;
+                document.getElementById('lapsed-body-desktop').innerHTML = `<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading lapsed...</td></tr>`;
+                document.getElementById('lapsed-body-mobile').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading lapsed...</div>`;
                 
-                document.getElementById('rewards-body-mobile').innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        Loading rewards data...
-                    </div>
-                `;
-                
-                document.getElementById('lapsed-body-desktop').innerHTML = `
-                    <tr>
-                        <td colspan="8" class="loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            Loading lapsed income data...
-                        </td>
-                    </tr>
-                `;
-                
-                document.getElementById('lapsed-body-mobile').innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        Loading lapsed income data...
-                    </div>
-                `;
-                
-                // Get current block number
                 const currentBlock = await provider.getBlockNumber();
                 const fromBlock = Math.max(currentBlock - 1000000, 0);
                 
                 // Fetch RewardReport events
                 const rewardFilter = sigmaContract.filters.RewardReport(userAddress);
                 const rewardEvents = await sigmaContract.queryFilter(rewardFilter, fromBlock, currentBlock);
-                
                 allRewardEvents = rewardEvents;
                 
                 // Fetch IncomeLapsed events
                 const lapsedFilter = sigmaContract.filters.IncomeLapsed(userAddress);
                 const lapsedEvents = await sigmaContract.queryFilter(lapsedFilter, fromBlock, currentBlock);
-                
                 allLapsedEvents = lapsedEvents;
                 
-                // Process and display data
                 displayRewardsData(allRewardEvents);
                 displayLapsedData(allLapsedEvents);
                 updateStats(allRewardEvents, allLapsedEvents);
                 
             } catch (error) {
                 console.error("Error loading income data:", error);
-                
-                const errorHtml = `
-                    <tr>
-                        <td colspan="8" class="no-data">
-                            <i class="fas fa-exclamation-circle"></i>
-                            Error loading data: ${error.message}
-                        </td>
-                    </tr>
-                `;
-                
+                const errorHtml = `<tr><td colspan="8" class="no-data"><i class="fas fa-exclamation-circle"></i> Error: ${error.message}</td></tr>`;
                 document.getElementById('rewards-body-desktop').innerHTML = errorHtml;
                 document.getElementById('lapsed-body-desktop').innerHTML = errorHtml;
-                
-                document.getElementById('rewards-body-mobile').innerHTML = `
-                    <div class="no-data">
-                        <i class="fas fa-exclamation-circle"></i>
-                        Error loading data: ${error.message}
-                    </div>
-                `;
-                
-                document.getElementById('lapsed-body-mobile').innerHTML = `
-                    <div class="no-data">
-                        <i class="fas fa-exclamation-circle"></i>
-                        Error loading data: ${error.message}
-                    </div>
-                `;
+                document.getElementById('rewards-body-mobile').innerHTML = `<div class="no-data">Error: ${error.message}</div>`;
+                document.getElementById('lapsed-body-mobile').innerHTML = `<div class="no-data">Error: ${error.message}</div>`;
             }
+        }
+        
+        function formatReason(reason) {
+            if (reason.includes("4X_LIMIT")) return "4X Cap Exceeded";
+            if (reason.includes("INELIGIBLE")) return "Insufficient Balance (<10 USDT) or Inactive >30 Days";
+            if (reason.includes("LOW_BALANCE_SKIP")) return "Upline Balance <10 SIG6";
+            if (reason.includes("2X_CAP")) return "2X Cap Exceeded";
+            return reason;
+        }
+        
+        function getReasonClass(reason) {
+            if (reason.includes("4X_LIMIT") || reason.includes("2X_CAP")) return "reason-4x-cap";
+            if (reason.includes("INELIGIBLE")) return "reason-ineligible";
+            if (reason.includes("LOW_BALANCE_SKIP")) return "reason-low-balance";
+            return "";
         }
         
         function displayRewardsData(events) {
@@ -2295,22 +1187,8 @@
             const mobileContainer = document.getElementById('rewards-body-mobile');
             
             if (!events || events.length === 0) {
-                const noDataHtml = `
-                    <tr>
-                        <td colspan="8" class="no-data">
-                            <i class="fas fa-inbox"></i>
-                            No rewards found
-                        </td>
-                    </tr>
-                `;
-                desktopBody.innerHTML = noDataHtml;
-                
-                mobileContainer.innerHTML = `
-                    <div class="no-data">
-                        <i class="fas fa-inbox"></i>
-                        No rewards found
-                    </div>
-                `;
+                desktopBody.innerHTML = `<tr><td colspan="8" class="no-data"><i class="fas fa-inbox"></i> No rewards found</td></tr>`;
+                mobileContainer.innerHTML = `<div class="no-data"><i class="fas fa-inbox"></i> No rewards found</div>`;
                 return;
             }
             
@@ -2332,145 +1210,80 @@
             
             uniqueEvents.forEach((event, index) => {
                 const args = event.args;
-                let amount, tokenType, displayAmount, tokenBadge;
-                
                 const timestamp = Number(args.timestamp);
                 const amountBigInt = BigInt(args.amount);
                 
-                if (args.rewardType === "ICO_REWARD" || 
-                    args.rewardType === "REFERRAL") {
-                    amount = parseFloat(ethers.formatUnits(amountBigInt.toString(), 18));
+                let amount, tokenType, displayAmount, tokenBadge;
+                
+                if (args.rewardType === "ICO_REWARD" || args.rewardType === "REFERRAL") {
+                    amount = parseFloat(ethers.formatUnits(amountBigInt, 18));
                     tokenType = "SIG6";
                     displayAmount = amount.toFixed(4);
                     tokenBadge = '<span class="token-badge badge-sig6">SIG6</span>';
                     totalSIG6 += amount;
                 } else {
-                    amount = parseFloat(ethers.formatUnits(amountBigInt.toString(), 6));
+                    amount = parseFloat(ethers.formatUnits(amountBigInt, 6));
                     tokenType = "USDT";
                     displayAmount = amount.toFixed(2);
                     tokenBadge = '<span class="token-badge badge-usdt">USDT</span>';
                 }
                 
-                let incomeName = "Commission";
-                let description = "Referral commission";
-                let badgeColor = "status-active";
-                
-                if (args.rewardType === "ICO_REWARD") {
-                    incomeName = "ICO Bonus";
-                    description = "10% first purchase bonus";
-                } else if (args.rewardType === "REFERRAL") {
-                    incomeName = `Level ${args.level}`;
-                    description = `Level ${args.level} team commission`;
-                }
+                let incomeName = args.rewardType === "ICO_REWARD" ? "ICO Bonus" : `Level ${args.level}`;
+                let description = args.rewardType === "ICO_REWARD" ? "10% first purchase bonus" : `Level ${args.level} commission`;
                 
                 const date = new Date(timestamp * 1000);
-                // DD/MM/YYYY format
-                const dateStr = date.toLocaleDateString('en-IN', { 
-                    day: '2-digit', 
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-                // HH:MM:SS format
-                const timeStr = date.toLocaleTimeString('en-IN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false
-                });
+                const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
                 
                 let fromAddress = args.from || "System";
-                let fromDisplay = "System";
-                let fullAddress = fromAddress;
-                if (fromAddress !== "System" && fromAddress !== "0x0000000000000000000000000000000000000000") {
-                    fromDisplay = fromAddress.slice(0,6) + "..." + fromAddress.slice(-4);
-                }
+                let fromDisplay = fromAddress !== "System" && fromAddress !== "0x0000000000000000000000000000000000000000" 
+                    ? fromAddress.slice(0,6) + "..." + fromAddress.slice(-4) 
+                    : "System";
                 
-                // Desktop HTML
                 desktopHtml += `
                     <tr>
                         <td>${index + 1}</td>
                         <td>
-                            <div style="font-weight:600; color:var(--primary); font-size: 14px;">
-                                ${incomeName}
-                            </div>
-                            <div style="font-size:11px; color:#888; margin-top:3px">
-                                ${tokenBadge}
-                            </div>
+                            <div style="font-weight:600; color:var(--primary);">${incomeName}</div>
+                            ${tokenBadge}
                         </td>
+                        <td><div style="font-size:12px;">${description}</div></td>
                         <td>
-                            <div style="font-size:12px;">${description}</div>
-                            <div style="font-size:11px; color:#888; margin-top:3px">${args.rewardType}</div>
-                        </td>
-                        <td style="font-family:monospace; font-size:12px">
                             <div style="color:var(--primary)">${fromDisplay}</div>
-                            <div class="wallet-address" title="Click to copy" onclick="copyToClipboard('${fullAddress}')">
-                                ${fullAddress !== "System" ? fullAddress.slice(0,12) + "..." : "System"}
-                            </div>
+                            <div class="wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,10)}...</div>
                         </td>
-                        <td>
-                            <span class="status-badge ${badgeColor}">${args.level}</span>
-                        </td>
-                        <td class="amount-positive">
-                            <div><i class="fas fa-plus-circle"></i> ${displayAmount}</div>
-                            <div style="font-size:10px; color:#888">${tokenType}</div>
-                        </td>
-                        <td style="font-size:12px; color:#aaa">
-                            <div style="font-weight:600;">${dateStr}</div>
-                        </td>
-                        <td style="font-size:12px; color:#aaa">
-                            <div>${timeStr}</div>
-                        </td>
+                        <td><span class="status-badge status-active">Level ${args.level}</span></td>
+                        <td class="amount-positive">${displayAmount} ${tokenType}</td>
+                        <td>${dateStr}</td>
+                        <td>${timeStr}</td>
                     </tr>
                 `;
                 
-                // Mobile HTML - Card format
                 mobileHtml += `
                     <div class="mobile-card">
                         <div class="mobile-card-header">
-                            <div class="mobile-card-title">
-                                <i class="fas fa-trophy" style="color:var(--primary)"></i>
-                                ${incomeName}
-                                ${tokenBadge}
-                            </div>
-                            <span class="status-badge ${badgeColor}" style="font-size:11px">#${index + 1}</span>
+                            <div class="mobile-card-title">${incomeName} ${tokenBadge}</div>
+                            <span class="status-badge status-active">#${index + 1}</span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-info-circle" style="color:var(--primary)"></i> Details</span>
+                            <span class="mobile-card-label">Details</span>
                             <span class="mobile-card-value">${description}</span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-user" style="color:var(--primary)"></i> From</span>
-                            <span class="mobile-card-value">
-                                <span class="mobile-wallet-address" onclick="copyToClipboard('${fullAddress}')">
-                                    ${fullAddress !== "System" ? fullAddress.slice(0,8) + "..." + fullAddress.slice(-6) : "System"}
-                                </span>
-                            </span>
+                            <span class="mobile-card-label">From</span>
+                            <span class="mobile-card-value mobile-wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,8)}...</span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-layer-group" style="color:var(--primary)"></i> Level</span>
-                            <span class="mobile-card-value"><span class="status-badge ${badgeColor}">${args.level}</span></span>
+                            <span class="mobile-card-label">Level</span>
+                            <span class="mobile-card-value"><span class="status-badge status-active">${args.level}</span></span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-coins" style="color:var(--primary)"></i> Amount</span>
-                            <span class="mobile-card-value mobile-amount positive">
-                                <i class="fas fa-plus-circle"></i> ${displayAmount} ${tokenType}
-                            </span>
+                            <span class="mobile-card-label">Amount</span>
+                            <span class="mobile-card-value mobile-amount positive">${displayAmount} ${tokenType}</span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-calendar" style="color:var(--primary)"></i> Date & Time</span>
-                            <span class="mobile-card-value" style="font-size:11px">
-                                ${dateStr} ${timeStr}
-                            </span>
-                        </div>
-                        
-                        <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-tag" style="color:var(--primary)"></i> Type</span>
-                            <span class="mobile-card-value" style="font-size:11px; color:#888">${args.rewardType}</span>
+                            <span class="mobile-card-label">Date</span>
+                            <span class="mobile-card-value">${dateStr} ${timeStr}</span>
                         </div>
                     </div>
                 `;
@@ -2478,7 +1291,6 @@
             
             desktopBody.innerHTML = desktopHtml;
             mobileContainer.innerHTML = mobileHtml;
-            
             document.getElementById('total-sig6').textContent = totalSIG6.toFixed(4) + " SIG6";
         }
         
@@ -2487,22 +1299,8 @@
             const mobileContainer = document.getElementById('lapsed-body-mobile');
             
             if (!events || events.length === 0) {
-                const noDataHtml = `
-                    <tr>
-                        <td colspan="8" class="no-data">
-                            <i class="fas fa-inbox"></i>
-                            No lapsed income found
-                        </td>
-                    </tr>
-                `;
-                desktopBody.innerHTML = noDataHtml;
-                
-                mobileContainer.innerHTML = `
-                    <div class="no-data">
-                        <i class="fas fa-inbox"></i>
-                        No lapsed income found
-                    </div>
-                `;
+                desktopBody.innerHTML = `<tr><td colspan="8" class="no-data"><i class="fas fa-inbox"></i> No lapsed income found</td></tr>`;
+                mobileContainer.innerHTML = `<div class="no-data"><i class="fas fa-inbox"></i> No lapsed income found</div>`;
                 return;
             }
             
@@ -2516,144 +1314,87 @@
             events.forEach((event, index) => {
                 const args = event.args;
                 const amountBigInt = BigInt(args.amount);
+                const reason = args.reason;
                 
                 let amount, displayAmount, tokenType, tokenBadge;
                 
-                if (args.reason.includes("SIG6") || args.reason.includes("LOW_BALANCE_SKIP") || 
-                    args.reason.includes("BALANCE_CHECK") || args.reason.toLowerCase().includes("low_balance") ||
-                    args.reason.includes("4X_LIMIT")) {
-                    amount = parseFloat(ethers.formatUnits(amountBigInt.toString(), 18));
+                // Determine token type based on amount magnitude or reason
+                if (reason.includes("4X_LIMIT") || reason.includes("LOW_BALANCE_SKIP") || amountBigInt < 1e12) {
+                    amount = parseFloat(ethers.formatUnits(amountBigInt, 18));
                     tokenType = "SIG6";
                     displayAmount = amount.toFixed(4);
                     tokenBadge = '<span class="token-badge badge-sig6">SIG6</span>';
                     totalLapsedSIG6 += amount;
                 } else {
-                    amount = parseFloat(ethers.formatUnits(amountBigInt.toString(), 6));
+                    amount = parseFloat(ethers.formatUnits(amountBigInt, 6));
                     tokenType = "USDT";
                     displayAmount = amount.toFixed(2);
                     tokenBadge = '<span class="token-badge badge-usdt">USDT</span>';
                     totalLapsedUSDT += amount;
                 }
                 
-                let incomeName = "Commission";
-                let description = "Income lapsed";
+                let incomeName = "Lapsed Income";
+                if (reason.includes("4X_LIMIT")) incomeName = "4X Cap Lapsed";
+                else if (reason.includes("INELIGIBLE")) incomeName = "Ineligible Lapsed";
+                else if (reason.includes("LOW_BALANCE_SKIP")) incomeName = "Low Balance Lapsed";
                 
-                if (args.reason.includes("LOW_BALANCE_SKIP") || args.reason.toLowerCase().includes("low_balance")) {
-                    incomeName = "Low Balance";
-                    description = "Upline < 10 SIG6";
-                } else if (args.reason.includes("4X_LIMIT")) {
-                    incomeName = "Capped";
-                    description = "Exceeded 4x cap";
-                } else if (args.reason.includes("BALANCE_CHECK")) {
-                    incomeName = "Balance Check";
-                    description = "Insufficient SIG6 balance";
-                } else if (args.reason.includes("INELIGIBLE")) {
-                    incomeName = "Ineligible";
-                    description = "Upline not eligible";
-                }
+                const formattedReason = formatReason(reason);
+                const reasonClass = getReasonClass(reason);
                 
                 const timestamp = Number(args.timestamp);
                 const date = new Date(timestamp * 1000);
-                // DD/MM/YYYY format
-                const dateStr = date.toLocaleDateString('en-IN', { 
-                    day: '2-digit', 
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-                // HH:MM:SS format
-                const timeStr = date.toLocaleTimeString('en-IN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false
-                });
+                const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
                 
                 let fromAddress = args.from || "System";
-                let fromDisplay = "System";
-                let fullAddress = fromAddress;
-                if (fromAddress !== "System" && fromAddress !== "0x0000000000000000000000000000000000000000") {
-                    fromDisplay = fromAddress.slice(0,6) + "..." + fromAddress.slice(-4);
-                }
+                let fromDisplay = fromAddress !== "System" && fromAddress !== "0x0000000000000000000000000000000000000000" 
+                    ? fromAddress.slice(0,6) + "..." + fromAddress.slice(-4) 
+                    : "System";
                 
-                // Desktop HTML
                 desktopHtml += `
                     <tr>
                         <td>${index + 1}</td>
                         <td>
-                            <div style="font-weight:600; color:var(--danger); font-size: 14px;">
-                                ${incomeName}
-                            </div>
+                            <div style="font-weight:600; color:var(--danger);">${incomeName}</div>
                             ${tokenBadge}
                         </td>
+                        <td><div style="font-size:12px;">${formattedReason}</div></td>
                         <td>
-                            <div style="font-size:12px;">${description}</div>
-                            <div style="font-size:11px; color:#888; margin-top:3px">${args.reason}</div>
-                        </td>
-                        <td style="font-family:monospace; font-size:12px">
                             <div style="color:var(--primary)">${fromDisplay}</div>
-                            <div class="wallet-address" title="Click to copy" onclick="copyToClipboard('${fullAddress}')">
-                                ${fullAddress !== "System" ? fullAddress.slice(0,12) + "..." : "System"}
-                            </div>
+                            <div class="wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,10)}...</div>
                         </td>
-                        <td class="amount-negative">
-                            <div><i class="fas fa-minus-circle"></i> ${displayAmount}</div>
-                            <div style="font-size:10px; color:#888">${tokenType}</div>
-                        </td>
-                        <td>
-                            <span class="status-badge status-lapsed" style="font-size:11px">${args.reason}</span>
-                        </td>
-                        <td style="font-size:12px; color:#aaa">
-                            <div style="font-weight:600;">${dateStr}</div>
-                        </td>
-                        <td style="font-size:12px; color:#aaa">
-                            <div>${timeStr}</div>
-                        </td>
+                        <td class="amount-negative">${displayAmount} ${tokenType}</td>
+                        <td><span class="reason-badge ${reasonClass}">${reason}</span></td>
+                        <td>${dateStr}</td>
+                        <td>${timeStr}</td>
                     </tr>
                 `;
                 
-                // Mobile HTML - Card format
                 mobileHtml += `
                     <div class="mobile-card">
                         <div class="mobile-card-header">
-                            <div class="mobile-card-title">
-                                <i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i>
-                                ${incomeName}
-                                ${tokenBadge}
-                            </div>
-                            <span class="status-badge status-lapsed" style="font-size:11px">#${index + 1}</span>
+                            <div class="mobile-card-title" style="color:var(--danger)">${incomeName} ${tokenBadge}</div>
+                            <span class="status-badge status-lapsed">#${index + 1}</span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-info-circle" style="color:var(--danger)"></i> Details</span>
-                            <span class="mobile-card-value">${description}</span>
+                            <span class="mobile-card-label">Details</span>
+                            <span class="mobile-card-value">${formattedReason}</span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-user" style="color:var(--danger)"></i> From</span>
-                            <span class="mobile-card-value">
-                                <span class="mobile-wallet-address" onclick="copyToClipboard('${fullAddress}')">
-                                    ${fullAddress !== "System" ? fullAddress.slice(0,8) + "..." + fullAddress.slice(-6) : "System"}
-                                </span>
-                            </span>
+                            <span class="mobile-card-label">From</span>
+                            <span class="mobile-card-value mobile-wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,8)}...</span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-coins" style="color:var(--danger)"></i> Amount</span>
-                            <span class="mobile-card-value mobile-amount negative">
-                                <i class="fas fa-minus-circle"></i> ${displayAmount} ${tokenType}
-                            </span>
+                            <span class="mobile-card-label">Amount</span>
+                            <span class="mobile-card-value mobile-amount negative">${displayAmount} ${tokenType}</span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-calendar" style="color:var(--danger)"></i> Date & Time</span>
-                            <span class="mobile-card-value" style="font-size:11px">
-                                ${dateStr} ${timeStr}
-                            </span>
+                            <span class="mobile-card-label">Reason</span>
+                            <span class="mobile-card-value"><span class="reason-badge ${reasonClass}">${reason}</span></span>
                         </div>
-                        
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label"><i class="fas fa-tag" style="color:var(--danger)"></i> Reason</span>
-                            <span class="mobile-card-value" style="font-size:11px; color:#888">${args.reason}</span>
+                            <span class="mobile-card-label">Date</span>
+                            <span class="mobile-card-value">${dateStr} ${timeStr}</span>
                         </div>
                     </div>
                 `;
@@ -2672,11 +1413,8 @@
             
             rewardEvents.forEach(event => {
                 const args = event.args;
-                const amountBigInt = BigInt(args.amount);
-                
-                if (args.rewardType === "ICO_REWARD" || 
-                    args.rewardType === "REFERRAL") {
-                    totalSIG6 += parseFloat(ethers.formatUnits(amountBigInt.toString(), 18));
+                if (args.rewardType === "ICO_REWARD" || args.rewardType === "REFERRAL") {
+                    totalSIG6 += parseFloat(ethers.formatUnits(args.amount, 18));
                 }
             });
             
@@ -2684,35 +1422,29 @@
                 const amountBigInt = BigInt(event.args.amount);
                 const reason = event.args.reason;
                 
-                if (reason.includes("SIG6") || reason.includes("LOW_BALANCE_SKIP") || 
-                    reason.includes("BALANCE_CHECK") || reason.toLowerCase().includes("low_balance") ||
-                    reason.includes("4X_LIMIT")) {
-                    totalLapsedSIG6 += parseFloat(ethers.formatUnits(amountBigInt.toString(), 18));
+                if (reason.includes("4X_LIMIT") || reason.includes("LOW_BALANCE_SKIP") || amountBigInt < 1e12) {
+                    totalLapsedSIG6 += parseFloat(ethers.formatUnits(amountBigInt, 18));
                 } else {
-                    totalLapsedUSDT += parseFloat(ethers.formatUnits(amountBigInt.toString(), 6));
+                    totalLapsedUSDT += parseFloat(ethers.formatUnits(amountBigInt, 6));
                 }
             });
             
             document.getElementById('total-sig6').textContent = totalSIG6.toFixed(4) + " SIG6";
             updateLapsedStats(totalLapsedSIG6, totalLapsedUSDT);
-            document.getElementById('total-transactions').textContent = 
-                (rewardEvents.length + lapsedEvents.length);
+            document.getElementById('total-transactions').textContent = rewardEvents.length + lapsedEvents.length;
         }
         
         function updateLapsedStats(sig6Amount, usdtAmount) {
-            const lapsedIncomeElement = document.getElementById('lapsed-income');
+            const lapsedElement = document.getElementById('lapsed-income');
             
             if (usdtAmount > 0 && sig6Amount > 0) {
-                lapsedIncomeElement.innerHTML = `
-                    <div>${usdtAmount.toFixed(2)} USDT</div>
-                    <div style="font-size:16px; margin-top:5px">${sig6Amount.toFixed(4)} SIG6</div>
-                `;
+                lapsedElement.innerHTML = `${usdtAmount.toFixed(2)} USDT<br><span style="font-size:14px">${sig6Amount.toFixed(4)} SIG6</span>`;
             } else if (usdtAmount > 0) {
-                lapsedIncomeElement.textContent = usdtAmount.toFixed(2) + " USDT";
+                lapsedElement.textContent = usdtAmount.toFixed(2) + " USDT";
             } else if (sig6Amount > 0) {
-                lapsedIncomeElement.textContent = sig6Amount.toFixed(4) + " SIG6";
+                lapsedElement.textContent = sig6Amount.toFixed(4) + " SIG6";
             } else {
-                lapsedIncomeElement.textContent = "0.00";
+                lapsedElement.textContent = "0.00";
             }
         }
         
@@ -2727,45 +1459,28 @@
             
             if (startDate) {
                 const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000);
-                filteredRewards = filteredRewards.filter(event => 
-                    Number(event.args.timestamp) >= startTimestamp
-                );
-                filteredLapsed = filteredLapsed.filter(event => 
-                    Number(event.args.timestamp) >= startTimestamp
-                );
+                filteredRewards = filteredRewards.filter(e => Number(e.args.timestamp) >= startTimestamp);
+                filteredLapsed = filteredLapsed.filter(e => Number(e.args.timestamp) >= startTimestamp);
             }
             
             if (endDate) {
                 const endTimestamp = Math.floor(new Date(endDate).getTime() / 1000) + 86400;
-                filteredRewards = filteredRewards.filter(event => 
-                    Number(event.args.timestamp) <= endTimestamp
-                );
-                filteredLapsed = filteredLapsed.filter(event => 
-                    Number(event.args.timestamp) <= endTimestamp
-                );
+                filteredRewards = filteredRewards.filter(e => Number(e.args.timestamp) <= endTimestamp);
+                filteredLapsed = filteredLapsed.filter(e => Number(e.args.timestamp) <= endTimestamp);
             }
             
             if (incomeType !== 'all') {
-                if (incomeType === 'INELIGIBLE') {
+                if (incomeType === 'lapsed') {
                     filteredRewards = [];
                 } else {
-                    filteredRewards = filteredRewards.filter(event => 
-                        event.args.rewardType === incomeType
-                    );
+                    filteredRewards = filteredRewards.filter(e => e.args.rewardType === incomeType);
                     filteredLapsed = [];
                 }
             }
             
             if (searchWallet) {
-                filteredRewards = filteredRewards.filter(event => {
-                    const fromAddr = event.args.from ? event.args.from.toLowerCase() : '';
-                    return fromAddr.includes(searchWallet);
-                });
-                
-                filteredLapsed = filteredLapsed.filter(event => {
-                    const fromAddr = event.args.from ? event.args.from.toLowerCase() : '';
-                    return fromAddr.includes(searchWallet);
-                });
+                filteredRewards = filteredRewards.filter(e => e.args.from?.toLowerCase().includes(searchWallet));
+                filteredLapsed = filteredLapsed.filter(e => e.args.from?.toLowerCase().includes(searchWallet));
             }
             
             displayRewardsData(filteredRewards);
@@ -2785,14 +1500,10 @@
         }
         
         function copyToClipboard(text) {
-            if (text === "System") return;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                alert("Wallet address copied to clipboard!");
-            });
+            if (text === "System" || text === "0x0000000000000000000000000000000000000000") return;
+            navigator.clipboard.writeText(text).then(() => alert("Address copied!"));
         }
         
-        // Initialize when page loads
         window.onload = function() {
             const endDate = new Date();
             const startDate = new Date();
@@ -2807,17 +1518,9 @@
                     provider.send("eth_accounts", []).then(accounts => {
                         if (accounts.length > 0) {
                             userAddress = accounts[0];
-                            
-                            let walletIcon = '';
-                            if (window.ethereum.isMetaMask) walletIcon = '🦊';
-                            else if (window.ethereum.isTrust) walletIcon = '🔵';
-                            else if (window.ethereum.isBitGet) walletIcon = '⚡';
-                            
-                            const connectBtn = document.getElementById('connectBtn');
-                            const shortAddress = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
-                            document.getElementById('btn-text').textContent = walletIcon + " " + shortAddress;
-                            connectBtn.classList.add('connected');
-                            
+                            let walletIcon = window.ethereum.isMetaMask ? '🦊' : window.ethereum.isTrust ? '🔵' : '⚡';
+                            document.getElementById('btn-text').textContent = walletIcon + " " + userAddress.slice(0,6) + "..." + userAddress.slice(-4);
+                            document.getElementById('connectBtn').classList.add('connected');
                             sigmaContract = new ethers.Contract(SIGMA_CONTRACT_ADDRESS, sigmaABI, provider);
                             loadIncomeData();
                         }
