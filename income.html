@@ -18,6 +18,7 @@
             --success: #00ff88;
             --warning: #ffaa00;
             --danger: #ff4d4d;
+            --ico: #ffaa00;
             --gradient: linear-gradient(90deg, #00ffcc, #9d4edd, #ff2a6d, #00ffcc);
         }
         
@@ -426,6 +427,15 @@
             animation: rainbow 8s ease infinite;
         }
         
+        .ico-card {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid var(--ico);
+        }
+        
+        .ico-card::before {
+            background: linear-gradient(90deg, #ffaa00, #ff6b9d, #ffaa00);
+        }
+        
         .card-title {
             color: var(--primary);
             font-size: clamp(18px, 4vw, 24px);
@@ -434,6 +444,10 @@
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
+        }
+        
+        .ico-title {
+            color: var(--ico);
         }
         
         .stats-row {
@@ -481,6 +495,10 @@
         
         .stat-value.negative {
             color: var(--danger);
+        }
+        
+        .ico-value {
+            color: var(--ico);
         }
         
         .table-container {
@@ -645,6 +663,11 @@
             color: var(--danger);
         }
         
+        .status-ico {
+            background: rgba(255, 170, 0, 0.1);
+            color: var(--ico);
+        }
+        
         .amount-positive {
             color: var(--success);
             font-weight: 700;
@@ -753,6 +776,12 @@
             background: rgba(157, 78, 221, 0.1);
             color: var(--secondary);
             border: 1px solid rgba(157, 78, 221, 0.3);
+        }
+        
+        .badge-ico {
+            background: rgba(255, 170, 0, 0.1);
+            color: var(--ico);
+            border: 1px solid rgba(255, 170, 0, 0.3);
         }
         
         .wallet-address {
@@ -947,8 +976,12 @@
                     <div id="total-sig6" class="stat-value positive">0.0000 SIG6</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Lapsed Income (SIG6)</div>
-                    <div id="lapsed-income" class="stat-value negative multi-line-stat">0.0000 SIG6</div>
+                    <div class="stat-label"><i class="fas fa-gift"></i> ICO Bonus Received</div>
+                    <div id="total-ico" class="stat-value ico-value">0.0000 SIG6</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Lapsed Income</div>
+                    <div id="lapsed-income" class="stat-value negative">0.0000 SIG6</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label"><i class="fas fa-history"></i> Total Transactions</div>
@@ -957,30 +990,52 @@
             </div>
         </div>
         
-        <div class="main-card">
-            <h2 class="card-title"><i class="fas fa-check-circle"></i> Active Rewards History</h2>
+        <!-- ICO Bonus Section - SEPARATE SECTION -->
+        <div class="main-card ico-card">
+            <h2 class="card-title ico-title"><i class="fas fa-gift"></i> ICO BONUS (One Time)</h2>
             
             <div class="table-container">
-                <table class="desktop-table" id="rewards-table">
+                <table class="desktop-table" id="ico-table">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Income</th>
-                            <th>Details</th>
-                            <th>From Wallet</th>
-                            <th>Level</th>
-                            <th>Amount</th>
+                            <th>Bonus Type</th>
+                            <th>Amount (SIG6)</th>
                             <th>Date</th>
                             <th>Time</th>
                         </tr>
                     </thead>
-                    <tbody id="rewards-body-desktop"></tbody>
+                    <tbody id="ico-body-desktop"></tbody>
                 </table>
                 
-                <div class="mobile-cards" id="rewards-body-mobile"></div>
+                <div class="mobile-cards" id="ico-body-mobile"></div>
             </div>
         </div>
         
+        <!-- Team Referral Section -->
+        <div class="main-card">
+            <h2 class="card-title"><i class="fas fa-users"></i> Team Referral Rewards</h2>
+            
+            <div class="table-container">
+                <table class="desktop-table" id="referral-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Level</th>
+                            <th>From Wallet</th>
+                            <th>Amount (SIG6)</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="referral-body-desktop"></tbody>
+                </table>
+                
+                <div class="mobile-cards" id="referral-body-mobile"></div>
+            </div>
+        </div>
+        
+        <!-- Lapsed Income Section -->
         <div class="main-card">
             <h2 class="card-title"><i class="fas fa-exclamation-triangle"></i> Lapsed Income History (SIG6)</h2>
             
@@ -1119,7 +1174,8 @@
         function resetData() {
             allRewardEvents = [];
             allLapsedEvents = [];
-            displayRewardsData([]);
+            displayICOBonus([]);
+            displayReferralRewards([]);
             displayLapsedData([]);
             updateStats([], []);
         }
@@ -1134,15 +1190,14 @@
                 const isCorrectChain = await checkChain();
                 if (!isCorrectChain) return;
                 
-                document.getElementById('rewards-body-desktop').innerHTML = `<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading rewards...</td></tr>`;
-                document.getElementById('rewards-body-mobile').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading rewards...</div>`;
-                document.getElementById('lapsed-body-desktop').innerHTML = `<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading lapsed...</td></tr>`;
-                document.getElementById('lapsed-body-mobile').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading lapsed...</div>`;
+                document.getElementById('ico-body-desktop').innerHTML = `<tr><td colspan="4" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading ICO data...</td></tr>`;
+                document.getElementById('referral-body-desktop').innerHTML = `<tr><td colspan="6" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading referral data...</td></tr>`;
+                document.getElementById('lapsed-body-desktop').innerHTML = `<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading lapsed data...</td></tr>`;
                 
                 const currentBlock = await provider.getBlockNumber();
                 const fromBlock = Math.max(currentBlock - 1000000, 0);
                 
-                // Fetch RewardReport events (ICO and Referrals)
+                // Fetch RewardReport events
                 const rewardFilter = sigmaContract.filters.RewardReport(userAddress);
                 const rewardEvents = await sigmaContract.queryFilter(rewardFilter, fromBlock, currentBlock);
                 console.log("✅ Total Reward Events Found:", rewardEvents.length);
@@ -1167,51 +1222,41 @@
                 console.log("Lapsed Events Found:", lapsedEvents.length);
                 allLapsedEvents = lapsedEvents;
                 
-                displayRewardsData(allRewardEvents);
+                // Separate ICO and Referral events
+                const icoEvents = rewardEvents.filter(e => e.args.rewardType === "ICO_REWARD");
+                const referralEvents = rewardEvents.filter(e => e.args.rewardType === "REFERRAL");
+                
+                displayICOBonus(icoEvents);
+                displayReferralRewards(referralEvents);
                 displayLapsedData(allLapsedEvents);
-                updateStats(allRewardEvents, allLapsedEvents);
+                updateStats(rewardEvents, allLapsedEvents);
                 
             } catch (error) {
                 console.error("Error loading income data:", error);
                 const errorHtml = `<tr><td colspan="8" class="no-data"><i class="fas fa-exclamation-circle"></i> Error: ${error.message}</td></tr>`;
-                document.getElementById('rewards-body-desktop').innerHTML = errorHtml;
+                document.getElementById('ico-body-desktop').innerHTML = errorHtml;
+                document.getElementById('referral-body-desktop').innerHTML = errorHtml;
                 document.getElementById('lapsed-body-desktop').innerHTML = errorHtml;
-                document.getElementById('rewards-body-mobile').innerHTML = `<div class="no-data">Error: ${error.message}</div>`;
-                document.getElementById('lapsed-body-mobile').innerHTML = `<div class="no-data">Error: ${error.message}</div>`;
             }
         }
         
-        function formatReason(reason) {
-            if (reason.includes("4X_LIMIT")) return "4X Cap Exceeded";
-            if (reason.includes("INELIGIBLE")) return "Insufficient Balance (<10 USDT) or Inactive >30 Days";
-            if (reason.includes("LOW_BALANCE_SKIP")) return "Upline Balance <10 SIG6";
-            return reason;
-        }
-        
-        function getReasonClass(reason) {
-            if (reason.includes("4X_LIMIT")) return "reason-4x-cap";
-            if (reason.includes("INELIGIBLE")) return "reason-ineligible";
-            if (reason.includes("LOW_BALANCE_SKIP")) return "reason-low-balance";
-            return "";
-        }
-        
-        function displayRewardsData(events) {
-            const desktopBody = document.getElementById('rewards-body-desktop');
-            const mobileContainer = document.getElementById('rewards-body-mobile');
+        function displayICOBonus(events) {
+            const desktopBody = document.getElementById('ico-body-desktop');
+            const mobileContainer = document.getElementById('ico-body-mobile');
             
-            console.log("Displaying rewards events count:", events.length);
+            console.log("Displaying ICO events count:", events.length);
             
             if (!events || events.length === 0) {
-                desktopBody.innerHTML = `<tr><td colspan="8" class="no-data"><i class="fas fa-inbox"></i> No rewards found</td></tr>`;
-                mobileContainer.innerHTML = `<div class="no-data"><i class="fas fa-inbox"></i> No rewards found</div>`;
+                desktopBody.innerHTML = `<tr><td colspan="4" class="no-data"><i class="fas fa-inbox"></i> No ICO bonus received</td></tr>`;
+                mobileContainer.innerHTML = `<div class="no-data"><i class="fas fa-inbox"></i> No ICO bonus received</div>`;
+                document.getElementById('total-ico').textContent = "0.0000 SIG6";
                 return;
             }
             
             let desktopHtml = '';
             let mobileHtml = '';
-            let totalSIG6 = 0;
+            let totalICO = 0;
             
-            // Sort by timestamp (newest first)
             events.sort((a, b) => Number(b.args.timestamp) - Number(a.args.timestamp));
             
             events.forEach((event, index) => {
@@ -1219,39 +1264,18 @@
                 const timestamp = Number(args.timestamp);
                 const amountBigInt = BigInt(args.amount);
                 
-                // All rewards are SIG6 (18 decimals)
                 const amount = parseFloat(ethers.formatUnits(amountBigInt, 18));
                 const displayAmount = amount.toFixed(4);
-                totalSIG6 += amount;
-                
-                let incomeName = args.rewardType === "ICO_REWARD" ? "ICO Bonus" : `Level ${args.level} Referral`;
-                let description = args.rewardType === "ICO_REWARD" ? "10% first purchase bonus" : `Level ${args.level} team commission`;
-                
-                // For ICO, level is 0, so show "N/A" or keep as is
-                const levelDisplay = args.rewardType === "ICO_REWARD" ? "N/A" : args.level;
+                totalICO += amount;
                 
                 const date = new Date(timestamp * 1000);
                 const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
                 
-                let fromAddress = args.from || "System";
-                let fromDisplay = fromAddress !== "System" && fromAddress !== "0x0000000000000000000000000000000000000000" 
-                    ? fromAddress.slice(0,6) + "..." + fromAddress.slice(-4) 
-                    : "System";
-                
                 desktopHtml += `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>
-                            <div style="font-weight:600; color:var(--primary);">${incomeName}</div>
-                            <span class="token-badge badge-sig6">SIG6</span>
-                        </td>
-                        <td><div style="font-size:12px;">${description}</div></td>
-                        <td>
-                            <div style="color:var(--primary)">${fromDisplay}</div>
-                            <div class="wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,10)}...</div>
-                        </td>
-                        <td><span class="status-badge status-active">${args.rewardType === "ICO_REWARD" ? "ICO" : `Level ${args.level}`}</span></td>
+                        <td><span class="status-badge status-ico">ICO Bonus (10%)</span></td>
                         <td class="amount-positive">${displayAmount} SIG6</td>
                         <td>${dateStr}</td>
                         <td>${timeStr}</td>
@@ -1261,20 +1285,8 @@
                 mobileHtml += `
                     <div class="mobile-card">
                         <div class="mobile-card-header">
-                            <div class="mobile-card-title">${incomeName} <span class="token-badge badge-sig6">SIG6</span></div>
-                            <span class="status-badge status-active">#${index + 1}</span>
-                        </div>
-                        <div class="mobile-card-row">
-                            <span class="mobile-card-label">Details</span>
-                            <span class="mobile-card-value">${description}</span>
-                        </div>
-                        <div class="mobile-card-row">
-                            <span class="mobile-card-label">From</span>
-                            <span class="mobile-card-value mobile-wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,8)}...</span>
-                        </div>
-                        <div class="mobile-card-row">
-                            <span class="mobile-card-label">Level</span>
-                            <span class="mobile-card-value"><span class="status-badge status-active">${args.rewardType === "ICO_REWARD" ? "ICO" : args.level}</span></span>
+                            <div class="mobile-card-title"><span class="status-badge status-ico">ICO Bonus</span></div>
+                            <span class="status-badge status-ico">#${index + 1}</span>
                         </div>
                         <div class="mobile-card-row">
                             <span class="mobile-card-label">Amount</span>
@@ -1290,8 +1302,81 @@
             
             desktopBody.innerHTML = desktopHtml;
             mobileContainer.innerHTML = mobileHtml;
-            document.getElementById('total-sig6').textContent = totalSIG6.toFixed(4) + " SIG6";
-            document.getElementById('total-transactions').textContent = events.length + allLapsedEvents.length;
+            document.getElementById('total-ico').textContent = totalICO.toFixed(4) + " SIG6";
+        }
+        
+        function displayReferralRewards(events) {
+            const desktopBody = document.getElementById('referral-body-desktop');
+            const mobileContainer = document.getElementById('referral-body-mobile');
+            
+            console.log("Displaying referral events count:", events.length);
+            
+            if (!events || events.length === 0) {
+                desktopBody.innerHTML = `<tr><td colspan="6" class="no-data"><i class="fas fa-inbox"></i> No referral rewards found</td></tr>`;
+                mobileContainer.innerHTML = `<div class="no-data"><i class="fas fa-inbox"></i> No referral rewards found</div>`;
+                return;
+            }
+            
+            let desktopHtml = '';
+            let mobileHtml = '';
+            
+            events.sort((a, b) => Number(b.args.timestamp) - Number(a.args.timestamp));
+            
+            events.forEach((event, index) => {
+                const args = event.args;
+                const timestamp = Number(args.timestamp);
+                const amountBigInt = BigInt(args.amount);
+                
+                const amount = parseFloat(ethers.formatUnits(amountBigInt, 18));
+                const displayAmount = amount.toFixed(4);
+                
+                const date = new Date(timestamp * 1000);
+                const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                
+                let fromAddress = args.from || "System";
+                let fromDisplay = fromAddress !== "System" && fromAddress !== "0x0000000000000000000000000000000000000000" 
+                    ? fromAddress.slice(0,6) + "..." + fromAddress.slice(-4) 
+                    : "System";
+                
+                desktopHtml += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><span class="status-badge status-active">Level ${args.level}</span></td>
+                        <td>
+                            <div style="color:var(--primary)">${fromDisplay}</div>
+                            <div class="wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,10)}...</div>
+                        </td>
+                        <td class="amount-positive">${displayAmount} SIG6</td>
+                        <td>${dateStr}</td>
+                        <td>${timeStr}</td>
+                    </tr>
+                `;
+                
+                mobileHtml += `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">Level ${args.level} Referral</div>
+                            <span class="status-badge status-active">#${index + 1}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">From</span>
+                            <span class="mobile-card-value mobile-wallet-address" onclick="copyToClipboard('${fromAddress}')">${fromAddress.slice(0,8)}...</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Amount</span>
+                            <span class="mobile-card-value mobile-amount positive">${displayAmount} SIG6</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Date</span>
+                            <span class="mobile-card-value">${dateStr} ${timeStr}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            desktopBody.innerHTML = desktopHtml;
+            mobileContainer.innerHTML = mobileHtml;
         }
         
         function displayLapsedData(events) {
@@ -1315,7 +1400,6 @@
                 const amountBigInt = BigInt(args.amount);
                 const reason = args.reason;
                 
-                // ALL lapsed income is SIG6 (18 decimals)
                 const amount = parseFloat(ethers.formatUnits(amountBigInt, 18));
                 const displayAmount = amount.toFixed(4);
                 totalLapsedSIG6 += amount;
@@ -1393,11 +1477,29 @@
             document.getElementById('lapsed-income').textContent = totalLapsedSIG6.toFixed(4) + " SIG6";
         }
         
+        function formatReason(reason) {
+            if (reason.includes("4X_LIMIT")) return "4X Cap Exceeded";
+            if (reason.includes("INELIGIBLE")) return "Insufficient Balance (<10 USDT) or Inactive >30 Days";
+            if (reason.includes("LOW_BALANCE_SKIP")) return "Upline Balance <10 SIG6";
+            return reason;
+        }
+        
+        function getReasonClass(reason) {
+            if (reason.includes("4X_LIMIT")) return "reason-4x-cap";
+            if (reason.includes("INELIGIBLE")) return "reason-ineligible";
+            if (reason.includes("LOW_BALANCE_SKIP")) return "reason-low-balance";
+            return "";
+        }
+        
         function updateStats(rewardEvents, lapsedEvents) {
             let totalSIG6 = 0;
+            let totalICO = 0;
             let totalLapsedSIG6 = 0;
             
             rewardEvents.forEach(event => {
+                if (event.args.rewardType === "ICO_REWARD") {
+                    totalICO += parseFloat(ethers.formatUnits(event.args.amount, 18));
+                }
                 totalSIG6 += parseFloat(ethers.formatUnits(event.args.amount, 18));
             });
             
@@ -1406,6 +1508,7 @@
             });
             
             document.getElementById('total-sig6').textContent = totalSIG6.toFixed(4) + " SIG6";
+            document.getElementById('total-ico').textContent = totalICO.toFixed(4) + " SIG6";
             document.getElementById('lapsed-income').textContent = totalLapsedSIG6.toFixed(4) + " SIG6";
             document.getElementById('total-transactions').textContent = rewardEvents.length + lapsedEvents.length;
         }
@@ -1445,7 +1548,12 @@
                 filteredLapsed = filteredLapsed.filter(e => e.args.from?.toLowerCase().includes(searchWallet));
             }
             
-            displayRewardsData(filteredRewards);
+            // Separate ICO and Referral events
+            const icoEvents = filteredRewards.filter(e => e.args.rewardType === "ICO_REWARD");
+            const referralEvents = filteredRewards.filter(e => e.args.rewardType === "REFERRAL");
+            
+            displayICOBonus(icoEvents);
+            displayReferralRewards(referralEvents);
             displayLapsedData(filteredLapsed);
             updateStats(filteredRewards, filteredLapsed);
         }
@@ -1456,7 +1564,12 @@
             document.getElementById('incomeType').value = 'all';
             document.getElementById('searchWallet').value = '';
             
-            displayRewardsData(allRewardEvents);
+            // Separate ICO and Referral events
+            const icoEvents = allRewardEvents.filter(e => e.args.rewardType === "ICO_REWARD");
+            const referralEvents = allRewardEvents.filter(e => e.args.rewardType === "REFERRAL");
+            
+            displayICOBonus(icoEvents);
+            displayReferralRewards(referralEvents);
             displayLapsedData(allLapsedEvents);
             updateStats(allRewardEvents, allLapsedEvents);
         }
