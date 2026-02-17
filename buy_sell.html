@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGMA SIX | Buy/Sell Report</title>
+    <title>SIGMA SIX | Trade History</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -366,13 +366,13 @@
             letter-spacing: 0.5px;
         }
         
-        .badge-buy {
-            background: rgba(0, 255, 136, 0.1);
-            color: var(--profit);
-            border: 1px solid rgba(0, 255, 136, 0.3);
+        .badge-active {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(0, 255, 204, 0.3);
         }
         
-        .badge-sell {
+        .badge-closed {
             background: rgba(255, 77, 77, 0.1);
             color: var(--loss);
             border: 1px solid rgba(255, 77, 77, 0.3);
@@ -466,6 +466,9 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 1;
+            justify-content: center;
+            min-width: 150px;
         }
         
         .action-btn:hover {
@@ -475,9 +478,10 @@
         }
         
         .action-btn.active {
-            background: rgba(0, 255, 204, 0.15);
-            border-color: var(--primary);
-            color: var(--primary);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            color: #000;
+            font-weight: 700;
         }
         
         /* Navigation */
@@ -595,13 +599,12 @@
                 font-size: 14px;
             }
             
-            .action-buttons, .nav-container {
+            .action-buttons {
                 flex-direction: column;
             }
             
-            .action-btn, .nav-btn {
+            .action-btn {
                 width: 100%;
-                justify-content: center;
             }
             
             th, td {
@@ -704,7 +707,7 @@
         
         <!-- Header -->
         <div class="header">
-            <h1>TRADE ANALYTICS</h1>
+            <h1>TRADE HISTORY</h1>
             <p>Complete Buy & Sell History with Real-time P&L Tracking</p>
         </div>
         
@@ -735,33 +738,30 @@
             </div>
         </div>
         
-        <!-- Action Buttons -->
+        <!-- Action Buttons - Only 2 Options -->
         <div class="action-buttons">
-            <button class="action-btn active" onclick="showTab('buy')">
-                <i class="fas fa-arrow-up"></i> Buy History
+            <button class="action-btn active" onclick="showTab('active')">
+                <i class="fas fa-chart-bar"></i> Active Positions (Buy History)
             </button>
-            <button class="action-btn" onclick="showTab('sell')">
-                <i class="fas fa-arrow-down"></i> Sell History
-            </button>
-            <button class="action-btn" onclick="showTab('active')">
-                <i class="fas fa-chart-bar"></i> Active Positions
+            <button class="action-btn" onclick="showTab('closed')">
+                <i class="fas fa-history"></i> Closed Positions (Sell History)
             </button>
         </div>
         
-        <!-- Buy History Section -->
-        <div class="main-card fade-in" id="buy-section">
+        <!-- Active Positions Section (Buy History) -->
+        <div class="main-card fade-in" id="active-section">
             <div class="card-header">
                 <div class="card-icon">
-                    <i class="fas fa-arrow-up"></i>
+                    <i class="fas fa-chart-bar"></i>
                 </div>
                 <div>
-                    <div class="card-title">SIGMA BUY HISTORY</div>
+                    <div class="card-title">ACTIVE POSITIONS</div>
                     <div class="card-subtitle">All your SIGMA purchases with current valuation</div>
                 </div>
             </div>
             
             <div class="table-responsive">
-                <table id="buy-table">
+                <table id="active-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -774,11 +774,11 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="buy-body">
+                    <tbody id="active-body">
                         <tr>
                             <td colspan="8" class="loading">
                                 <i class="fas fa-spinner fa-spin"></i><br>
-                                Loading buy history... Please connect wallet
+                                Loading active positions... Please connect wallet
                             </td>
                         </tr>
                     </tbody>
@@ -786,20 +786,20 @@
             </div>
         </div>
         
-        <!-- Sell History Section -->
-        <div class="main-card fade-in" id="sell-section" style="display: none;">
+        <!-- Closed Positions Section (Sell History) -->
+        <div class="main-card fade-in" id="closed-section" style="display: none;">
             <div class="card-header">
                 <div class="card-icon">
-                    <i class="fas fa-arrow-down"></i>
+                    <i class="fas fa-history"></i>
                 </div>
                 <div>
-                    <div class="card-title">SIGMA SELL HISTORY</div>
+                    <div class="card-title">CLOSED POSITIONS</div>
                     <div class="card-subtitle">All your SIGMA sales with profit/loss calculation</div>
                 </div>
             </div>
             
             <div class="table-responsive">
-                <table id="sell-table">
+                <table id="closed-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -809,52 +809,14 @@
                             <th>Sell Rate</th>
                             <th>P&L Amount</th>
                             <th>P&L %</th>
-                            <th>Type</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="sell-body">
+                    <tbody id="closed-body">
                         <tr>
                             <td colspan="8" class="loading">
                                 <i class="fas fa-spinner fa-spin"></i><br>
-                                Loading sell history...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <!-- Active Positions Section -->
-        <div class="main-card fade-in" id="active-section" style="display: none;">
-            <div class="card-header">
-                <div class="card-icon">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <div>
-                    <div class="card-title">ACTIVE POSITIONS</div>
-                    <div class="card-subtitle">Current SIGMA holdings with unrealized P&L</div>
-                </div>
-            </div>
-            
-            <div class="table-responsive">
-                <table id="active-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Purchase Date</th>
-                            <th>Quantity</th>
-                            <th>Avg Buy Price</th>
-                            <th>Current Price</th>
-                            <th>Current Value</th>
-                            <th>Unrealized P&L</th>
-                            <th>ROI %</th>
-                        </tr>
-                    </thead>
-                    <tbody id="active-body">
-                        <tr>
-                            <td colspan="8" class="loading">
-                                <i class="fas fa-spinner fa-spin"></i><br>
-                                Loading active positions...
+                                Loading closed positions...
                             </td>
                         </tr>
                     </tbody>
@@ -869,7 +831,7 @@
         const USDT_ADDRESS = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         
         let provider, userAddress, sigmaContract;
-        let currentTab = 'buy';
+        let currentTab = 'active';
         let buyTransactions = [];
         let sellTransactions = [];
         let currentBuyRate = 0;
@@ -924,6 +886,25 @@
             }
             
             try {
+                // Show loading state
+                document.getElementById('active-body').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="loading">
+                            <i class="fas fa-spinner fa-spin"></i><br>
+                            Loading data...
+                        </td>
+                    </tr>
+                `;
+                
+                document.getElementById('closed-body').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="loading">
+                            <i class="fas fa-spinner fa-spin"></i><br>
+                            Loading data...
+                        </td>
+                    </tr>
+                `;
+                
                 // Get current rates
                 const [buyRateBN, sellRateBN, sigmaBalance] = await Promise.all([
                     sigmaContract.buyRate(),
@@ -968,8 +949,8 @@
                 const tradeData = {
                     hash: txHash,
                     type: args.tradeType,
-                    amount: parseFloat(ethers.formatUnits(args.sigmaAmount, 18)), // SIG6 has 18 decimals
-                    rate: parseFloat(ethers.formatUnits(args.rate, 6)), // USDT has 6 decimals
+                    amount: parseFloat(ethers.formatUnits(args.sigmaAmount, 18)),
+                    rate: parseFloat(ethers.formatUnits(args.rate, 6)),
                     tax: parseFloat(ethers.formatUnits(args.taxUsdt, 6)),
                     timestamp: Number(args.timestamp),
                     date: new Date(Number(args.timestamp) * 1000),
@@ -979,9 +960,6 @@
                 if (args.tradeType === "BUY") {
                     buyTransactions.push(tradeData);
                 } else if (args.tradeType === "SELL") {
-                    // Find corresponding buy for this sell
-                    const buyMatch = findMatchingBuy(tradeData);
-                    tradeData.buyRate = buyMatch ? buyMatch.rate : tradeData.rate;
                     sellTransactions.push(tradeData);
                 }
             }
@@ -991,26 +969,21 @@
             sellTransactions.sort((a, b) => b.timestamp - a.timestamp);
         }
         
-        function findMatchingBuy(sellData) {
-            // Simple FIFO matching (First In First Out)
-            const relevantBuys = buyTransactions.filter(buy => 
-                buy.timestamp < sellData.timestamp && 
-                buy.amount > 0
-            );
-            
+        function findMatchingBuyRate(sellTimestamp) {
+            // Find the most recent buy before this sell
+            const relevantBuys = buyTransactions.filter(buy => buy.timestamp < sellTimestamp);
             if (relevantBuys.length === 0) return null;
             
-            // Sort buys by timestamp (oldest first)
-            relevantBuys.sort((a, b) => a.timestamp - b.timestamp);
-            
-            return relevantBuys[0];
+            // Sort by timestamp (newest first)
+            relevantBuys.sort((a, b) => b.timestamp - a.timestamp);
+            return relevantBuys[0].rate;
         }
         
         function calculatePL(buyRate, sellRate, amount) {
             const buyValue = amount * buyRate;
             const sellValue = amount * sellRate;
             const plAmount = sellValue - buyValue;
-            const plPercentage = (plAmount / buyValue) * 100;
+            const plPercentage = buyValue > 0 ? (plAmount / buyValue) * 100 : 0;
             
             return {
                 amount: plAmount,
@@ -1041,9 +1014,14 @@
             const currentHoldings = totalBought - totalSold;
             const holdingsValue = currentHoldings * currentBuyRate;
             
+            // Calculate average buy rate for holdings
+            let avgBuyRate = 0;
+            if (totalBought > 0) {
+                avgBuyRate = totalBoughtValue / totalBought;
+            }
+            
             // Calculate P&L
-            const netPL = (totalSoldValue - (totalSold * (buyTransactions[0]?.rate || 0))) + 
-                         (holdingsValue - (currentHoldings * (buyTransactions[0]?.rate || 0)));
+            const netPL = holdingsValue - (currentHoldings * avgBuyRate);
             const plPercentage = totalBoughtValue > 0 ? (netPL / totalBoughtValue) * 100 : 0;
             
             // Update stats cards
@@ -1067,20 +1045,19 @@
         }
         
         function updateTables() {
-            updateBuyTable();
-            updateSellTable();
             updateActiveTable();
+            updateClosedTable();
         }
         
-        function updateBuyTable() {
-            const tbody = document.getElementById('buy-body');
+        function updateActiveTable() {
+            const tbody = document.getElementById('active-body');
             
             if (buyTransactions.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="8" class="empty-state">
-                            <i class="fas fa-shopping-cart"></i><br>
-                            No buy transactions found
+                            <i class="fas fa-chart-bar"></i><br>
+                            No active positions found
                         </td>
                     </tr>
                 `;
@@ -1120,11 +1097,11 @@
                         </td>
                         <td>
                             <div>$${tx.rate.toFixed(4)}</div>
-                            <div style="font-size:12px; color:#888">${(tx.rate * 90).toFixed(2)} INR</div>
+                            <div style="font-size:12px; color:#888">$${(tx.rate * 1).toFixed(2)}</div>
                         </td>
                         <td>
                             <div>$${currentBuyRate.toFixed(4)}</div>
-                            <div style="font-size:12px; color:#888">${(currentBuyRate * 90).toFixed(2)} INR</div>
+                            <div style="font-size:12px; color:#888">$${(currentBuyRate * 1).toFixed(2)}</div>
                         </td>
                         <td>
                             <div class="${difference >= 0 ? 'pnl-positive' : 'pnl-negative'}" style="padding:4px 8px; border-radius:6px; display:inline-block">
@@ -1138,7 +1115,7 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge badge-buy">BUY</span>
+                            <span class="badge badge-active">ACTIVE</span>
                         </td>
                     </tr>
                 `;
@@ -1147,15 +1124,15 @@
             tbody.innerHTML = html;
         }
         
-        function updateSellTable() {
-            const tbody = document.getElementById('sell-body');
+        function updateClosedTable() {
+            const tbody = document.getElementById('closed-body');
             
             if (sellTransactions.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="8" class="empty-state">
-                            <i class="fas fa-coins"></i><br>
-                            No sell transactions found
+                            <i class="fas fa-history"></i><br>
+                            No closed positions found
                         </td>
                     </tr>
                 `;
@@ -1165,7 +1142,9 @@
             let html = '';
             
             sellTransactions.forEach((tx, index) => {
-                const pl = calculatePL(tx.buyRate || tx.rate, tx.rate, tx.amount);
+                // Find matching buy rate (simplified - using average of buys before this sell)
+                const buyRate = findMatchingBuyRate(tx.timestamp) || tx.rate;
+                const pl = calculatePL(buyRate, tx.rate, tx.amount);
                 
                 const dateStr = tx.date.toLocaleDateString('en-GB', {
                     day: '2-digit',
@@ -1189,12 +1168,12 @@
                             ${tx.amount.toFixed(2)} SIG6
                         </td>
                         <td>
-                            <div>$${tx.buyRate?.toFixed(4) || tx.rate.toFixed(4)}</div>
-                            <div style="font-size:12px; color:#888">Buy Rate</div>
+                            <div>$${buyRate.toFixed(4)}</div>
+                            <div style="font-size:12px; color:#888">$${(buyRate * 1).toFixed(2)}</div>
                         </td>
                         <td>
                             <div>$${tx.rate.toFixed(4)}</div>
-                            <div style="font-size:12px; color:#888">Sell Rate</div>
+                            <div style="font-size:12px; color:#888">$${(tx.rate * 1).toFixed(2)}</div>
                         </td>
                         <td>
                             <div class="${pl.amount >= 0 ? 'pnl-positive' : 'pnl-negative'}" style="padding:4px 8px; border-radius:6px; display:inline-block">
@@ -1208,109 +1187,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge badge-sell">SELL</span>
+                            <span class="badge badge-closed">CLOSED</span>
                         </td>
                     </tr>
                 `;
             });
             
             tbody.innerHTML = html;
-        }
-        
-        function updateActiveTable() {
-            const tbody = document.getElementById('active-body');
-            
-            // Calculate active positions (FIFO method)
-            const activePositions = calculateActivePositions();
-            
-            if (activePositions.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="empty-state">
-                            <i class="fas fa-chart-line"></i><br>
-                            No active positions
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            let html = '';
-            let totalUnrealizedPL = 0;
-            let totalInvestment = 0;
-            
-            activePositions.forEach((position, index) => {
-                const currentValue = position.quantity * currentBuyRate;
-                const unrealizedPL = currentValue - position.investment;
-                const roi = (unrealizedPL / position.investment) * 100;
-                
-                totalUnrealizedPL += unrealizedPL;
-                totalInvestment += position.investment;
-                
-                const dateStr = position.date.toLocaleDateString('en-GB', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric'
-                });
-                
-                html += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td style="font-weight:600">${dateStr}</td>
-                        <td style="font-weight:700; color:var(--primary)">
-                            ${position.quantity.toFixed(2)} SIG6
-                        </td>
-                        <td>$${position.avgPrice.toFixed(4)}</td>
-                        <td>$${currentBuyRate.toFixed(4)}</td>
-                        <td>$${currentValue.toFixed(2)}</td>
-                        <td>
-                            <div class="${unrealizedPL >= 0 ? 'pnl-positive' : 'pnl-negative'}" style="padding:4px 8px; border-radius:6px; display:inline-block">
-                                <i class="fas fa-${unrealizedPL >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                                $${Math.abs(unrealizedPL).toFixed(2)}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="${roi >= 0 ? 'badge-profit' : 'badge-loss'}" style="display:inline-block">
-                                ${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tbody.innerHTML = html;
-        }
-        
-        function calculateActivePositions() {
-            const positions = [];
-            let remainingBuys = [...buyTransactions].reverse(); // Oldest first
-            
-            // Subtract sold quantities from buys (FIFO)
-            for (const sell of sellTransactions) {
-                let remainingSell = sell.amount;
-                
-                for (let i = 0; i < remainingBuys.length && remainingSell > 0; i++) {
-                    if (remainingBuys[i].amount > 0) {
-                        const deduct = Math.min(remainingBuys[i].amount, remainingSell);
-                        remainingBuys[i].amount -= deduct;
-                        remainingSell -= deduct;
-                    }
-                }
-            }
-            
-            // Remaining buys are active positions
-            remainingBuys.forEach(buy => {
-                if (buy.amount > 0) {
-                    positions.push({
-                        date: buy.date,
-                        quantity: buy.amount,
-                        avgPrice: buy.rate,
-                        investment: buy.amount * buy.rate
-                    });
-                }
-            });
-            
-            return positions;
         }
         
         function showTab(tabName) {
@@ -1323,9 +1206,8 @@
             event.target.classList.add('active');
             
             // Show selected tab
-            document.getElementById('buy-section').style.display = tabName === 'buy' ? 'block' : 'none';
-            document.getElementById('sell-section').style.display = tabName === 'sell' ? 'block' : 'none';
             document.getElementById('active-section').style.display = tabName === 'active' ? 'block' : 'none';
+            document.getElementById('closed-section').style.display = tabName === 'closed' ? 'block' : 'none';
         }
         
         function exportData() {
@@ -1336,7 +1218,7 @@
             
             let csvContent = "data:text/csv;charset=utf-8,";
             
-            if (currentTab === 'buy') {
+            if (currentTab === 'active') {
                 csvContent += "Serial No,Date,Time,Sigma Quantity,Buy Rate,Current Rate,Difference,P&L %,Status\n";
                 buyTransactions.forEach((tx, index) => {
                     const difference = currentBuyRate - tx.rate;
@@ -1350,43 +1232,25 @@
                         currentBuyRate.toFixed(4),
                         difference.toFixed(4),
                         differencePercent.toFixed(2) + '%',
-                        'BUY'
+                        'ACTIVE'
                     ].join(',');
                     csvContent += row + "\n";
                 });
-            } else if (currentTab === 'sell') {
-                csvContent += "Serial No,Date,Time,Sigma Quantity,Buy Rate,Sell Rate,P&L Amount,P&L %,Type\n";
+            } else {
+                csvContent += "Serial No,Date,Time,Sigma Quantity,Buy Rate,Sell Rate,P&L Amount,P&L %,Status\n";
                 sellTransactions.forEach((tx, index) => {
-                    const pl = calculatePL(tx.buyRate || tx.rate, tx.rate, tx.amount);
+                    const buyRate = findMatchingBuyRate(tx.timestamp) || tx.rate;
+                    const pl = calculatePL(buyRate, tx.rate, tx.amount);
                     const row = [
                         index + 1,
                         tx.date.toLocaleDateString(),
                         tx.date.toLocaleTimeString(),
                         tx.amount.toFixed(2),
-                        (tx.buyRate || tx.rate).toFixed(4),
+                        buyRate.toFixed(4),
                         tx.rate.toFixed(4),
                         pl.amount.toFixed(2),
                         pl.percentage.toFixed(2) + '%',
-                        'SELL'
-                    ].join(',');
-                    csvContent += row + "\n";
-                });
-            } else if (currentTab === 'active') {
-                csvContent += "Serial No,Purchase Date,Quantity,Avg Buy Price,Current Price,Current Value,Unrealized P&L,ROI %\n";
-                const activePositions = calculateActivePositions();
-                activePositions.forEach((position, index) => {
-                    const currentValue = position.quantity * currentBuyRate;
-                    const unrealizedPL = currentValue - position.investment;
-                    const roi = (unrealizedPL / position.investment) * 100;
-                    const row = [
-                        index + 1,
-                        position.date.toLocaleDateString(),
-                        position.quantity.toFixed(2),
-                        position.avgPrice.toFixed(4),
-                        currentBuyRate.toFixed(4),
-                        currentValue.toFixed(2),
-                        unrealizedPL.toFixed(2),
-                        roi.toFixed(2) + '%'
+                        'CLOSED'
                     ].join(',');
                     csvContent += row + "\n";
                 });
@@ -1395,7 +1259,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `sigma_trades_${currentTab}.csv`);
+            link.setAttribute("download", `sigma_${currentTab}_positions.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
