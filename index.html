@@ -841,7 +841,7 @@
                     </button>
                 </div>
                 
-                <!-- Referral Box - Hidden by default, shows only after first buy -->
+                <!-- Referral Box - Dynamic show/hide based on user type -->
                 <div class="ref-box hidden" id="ref-ui">
                     <div class="row">
                         <span style="font-size:12px; color:#888;">
@@ -953,7 +953,6 @@
         let mode = 'buy', buyR = 0, sellR = 0, signer, addr, provider;
         const USDT_TO_INR = 95.0;
         let isWalletConnected = false;
-        let hasUserBoughtBefore = false;
         
         // Create floating particles
         function createParticles() {
@@ -1166,13 +1165,24 @@
                 document.getElementById('bal-usdt').innerText = usdtBalance + " USDT";
                 document.getElementById('bal-sig').innerText = sigBalance + " SIG6";
                 
-                // Check if user has bought before
-                hasUserBoughtBefore = hasBought;
-                if (hasUserBoughtBefore) {
+                // ===== REFERRAL LINK LOGIC =====
+                // Case 1: Migrated User (has balance but never bought)
+                if (sigBalance > 0 && !hasBought) {
+                    console.log("✅ Migrated user - showing referral link");
                     document.getElementById('ref-ui').classList.remove('hidden');
                     document.getElementById('ref-ui').classList.add('visible');
                     updateRefLink();
-                } else {
+                }
+                // Case 2: Joined User (has bought before)
+                else if (hasBought) {
+                    console.log("✅ Joined user - showing referral link");
+                    document.getElementById('ref-ui').classList.remove('hidden');
+                    document.getElementById('ref-ui').classList.add('visible');
+                    updateRefLink();
+                }
+                // Case 3: New User (no balance, never bought)
+                else {
+                    console.log("❌ New user - hiding referral link");
                     document.getElementById('ref-ui').classList.add('hidden');
                     document.getElementById('ref-ui').classList.remove('visible');
                 }
@@ -1341,11 +1351,13 @@
                         msg.innerText = "Purchase Successful!";
                         msg.style.color = "#00ff88";
                         
-                        // After successful buy, show referral link
-                        hasUserBoughtBefore = true;
-                        document.getElementById('ref-ui').classList.remove('hidden');
-                        document.getElementById('ref-ui').classList.add('visible');
-                        updateRefLink();
+                        // After successful buy, check if user now qualifies for referral link
+                        const hasBoughtNow = await sc.hasBoughtBefore(addr);
+                        if (hasBoughtNow) {
+                            document.getElementById('ref-ui').classList.remove('hidden');
+                            document.getElementById('ref-ui').classList.add('visible');
+                            updateRefLink();
+                        }
                         
                         sync();
                     }
