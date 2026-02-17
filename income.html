@@ -1145,7 +1145,19 @@
                 // Fetch RewardReport events (ICO and Referrals)
                 const rewardFilter = sigmaContract.filters.RewardReport(userAddress);
                 const rewardEvents = await sigmaContract.queryFilter(rewardFilter, fromBlock, currentBlock);
-                console.log("Reward Events Found:", rewardEvents.length);
+                console.log("✅ Reward Events Found:", rewardEvents.length);
+                
+                // Log each event for debugging
+                rewardEvents.forEach((event, i) => {
+                    console.log(`Event ${i}:`, {
+                        type: event.args.rewardType,
+                        amount: event.args.amount.toString(),
+                        level: event.args.level.toString(),
+                        from: event.args.from,
+                        timestamp: event.args.timestamp.toString()
+                    });
+                });
+                
                 allRewardEvents = rewardEvents;
                 
                 // Fetch IncomeLapsed events
@@ -1186,6 +1198,8 @@
             const desktopBody = document.getElementById('rewards-body-desktop');
             const mobileContainer = document.getElementById('rewards-body-mobile');
             
+            console.log("Displaying rewards events:", events.length);
+            
             if (!events || events.length === 0) {
                 desktopBody.innerHTML = `<tr><td colspan="8" class="no-data"><i class="fas fa-inbox"></i> No rewards found</td></tr>`;
                 mobileContainer.innerHTML = `<div class="no-data"><i class="fas fa-inbox"></i> No rewards found</div>`;
@@ -1198,18 +1212,7 @@
             
             events.sort((a, b) => Number(b.args.timestamp) - Number(a.args.timestamp));
             
-            // Remove duplicates
-            const uniqueEvents = [];
-            const seenHashes = new Set();
-            
-            events.forEach(event => {
-                if (!seenHashes.has(event.transactionHash)) {
-                    seenHashes.add(event.transactionHash);
-                    uniqueEvents.push(event);
-                }
-            });
-            
-            uniqueEvents.forEach((event, index) => {
+            events.forEach((event, index) => {
                 const args = event.args;
                 const timestamp = Number(args.timestamp);
                 const amountBigInt = BigInt(args.amount);
@@ -1389,10 +1392,7 @@
             let totalLapsedSIG6 = 0;
             
             rewardEvents.forEach(event => {
-                const args = event.args;
-                if (args.rewardType === "ICO_REWARD" || args.rewardType === "REFERRAL") {
-                    totalSIG6 += parseFloat(ethers.formatUnits(args.amount, 18));
-                }
+                totalSIG6 += parseFloat(ethers.formatUnits(event.args.amount, 18));
             });
             
             lapsedEvents.forEach(event => {
