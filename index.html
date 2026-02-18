@@ -34,8 +34,10 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            transition: opacity 0.3s ease;
         }
         
+        /* Professional Crypto Background with Criss-Cross Lines */
         .crypto-bg {
             position: fixed;
             top: 0;
@@ -44,8 +46,14 @@
             height: 100%;
             z-index: -2;
             background: 
-                linear-gradient(90deg, rgba(0,255,204,0.03) 1px, transparent 1px) 0 0 / 50px 50px,
-                linear-gradient(0deg, rgba(157,78,221,0.03) 1px, transparent 1px) 0 0 / 50px 50px;
+                linear-gradient(90deg, 
+                    rgba(0, 255, 204, 0.03) 1px, 
+                    transparent 1px
+                ) 0 0 / 50px 50px,
+                linear-gradient(0deg, 
+                    rgba(157, 78, 221, 0.03) 1px, 
+                    transparent 1px
+                ) 0 0 / 50px 50px;
             animation: bgMove 20s linear infinite;
         }
         
@@ -54,6 +62,7 @@
             100% { background-position: 100px 100px, 100px 100px; }
         }
         
+        /* Animated Criss-Cross Lines Overlay */
         .crypto-lines {
             position: fixed;
             top: 0;
@@ -67,26 +76,127 @@
         
         .crypto-line {
             position: absolute;
-            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+            background: linear-gradient(90deg, 
+                transparent, 
+                var(--primary), 
+                var(--secondary), 
+                transparent);
             height: 1px;
             width: 200%;
             animation: lineMove 15s linear infinite;
         }
         
-        .crypto-line:nth-child(1) { top: 10%; left: -100%; transform: rotate(45deg); animation-delay: 0s; }
-        .crypto-line:nth-child(2) { top: 20%; left: -100%; transform: rotate(-45deg); animation-delay: 2s; }
-        .crypto-line:nth-child(3) { top: 30%; left: -100%; transform: rotate(60deg); animation-delay: 4s; }
-        .crypto-line:nth-child(4) { top: 40%; left: -100%; transform: rotate(-60deg); animation-delay: 6s; }
-        .crypto-line:nth-child(5) { top: 50%; left: -100%; transform: rotate(30deg); animation-delay: 8s; }
-        .crypto-line:nth-child(6) { top: 60%; left: -100%; transform: rotate(-30deg); animation-delay: 10s; }
-        .crypto-line:nth-child(7) { top: 70%; left: -100%; transform: rotate(75deg); animation-delay: 12s; }
-        .crypto-line:nth-child(8) { top: 80%; left: -100%; transform: rotate(-75deg); animation-delay: 14s; }
-        
-        @keyframes lineMove {
-            0% { left: -100%; }
-            100% { left: 100%; }
+        /* Create criss-cross pattern */
+        .crypto-line:nth-child(1) { 
+            top: 10%; 
+            left: -100%; 
+            transform: rotate(45deg); 
+            animation-delay: 0s;
+            height: 1px;
         }
         
+        .crypto-line:nth-child(2) { 
+            top: 20%; 
+            left: -100%; 
+            transform: rotate(-45deg); 
+            animation-delay: 2s;
+            height: 1px;
+        }
+        
+        .crypto-line:nth-child(3) { 
+            top: 30%; 
+            left: -100%; 
+            transform: rotate(60deg); 
+            animation-delay: 4s;
+            height: 1px;
+        }
+        
+        .crypto-line:nth-child(4) { 
+            top: 40%; 
+            left: -100%; 
+            transform: rotate(-60deg); 
+            animation-delay: 6s;
+            height: 1px;
+        }
+        
+        .crypto-line:nth-child(5) { 
+            top: 50%; 
+            left: -100%; 
+            transform: rotate(30deg); 
+            animation-delay: 8s;
+            height: 1px;
+        }
+        
+        .crypto-line:nth-child(6) { 
+            top: 60%; 
+            left: -100%; 
+            transform: rotate(-30deg); 
+            animation-delay: 10s;
+            height: 1px;
+        }
+        
+        .crypto-line:nth-child(7) { 
+            top: 70%; 
+            left: -100%; 
+            transform: rotate(75deg); 
+            animation-delay: 12s;
+            height: 1px;
+        }
+        
+        .crypto-line:nth-child(8) { 
+            top: 80%; 
+            left: -100%; 
+            transform: rotate(-75deg); 
+            animation-delay: 14s;
+            height: 1px;
+        }
+        
+        /* Thicker lines for better visibility */
+        .crypto-line:nth-child(9) { 
+            top: 15%; 
+            left: -100%; 
+            transform: rotate(15deg); 
+            animation-delay: 1s;
+            height: 2px;
+            opacity: 0.2;
+        }
+        
+        .crypto-line:nth-child(10) { 
+            top: 25%; 
+            left: -100%; 
+            transform: rotate(-15deg); 
+            animation-delay: 3s;
+            height: 2px;
+            opacity: 0.2;
+        }
+        
+        @keyframes lineMove {
+            0% { 
+                left: -100%; 
+                background: linear-gradient(90deg, 
+                    transparent, 
+                    var(--primary), 
+                    var(--secondary), 
+                    transparent);
+            }
+            50% {
+                background: linear-gradient(90deg, 
+                    transparent, 
+                    var(--secondary), 
+                    var(--primary), 
+                    transparent);
+            }
+            100% { 
+                left: 100%; 
+                background: linear-gradient(90deg, 
+                    transparent, 
+                    var(--primary), 
+                    var(--secondary), 
+                    transparent);
+            }
+        }
+        
+        /* Floating Crypto Particles */
         .crypto-particles {
             position: fixed;
             top: 0;
@@ -108,12 +218,23 @@
         }
         
         @keyframes particleFloat {
-            0% { transform: translateY(0) translateX(0); opacity: 0; }
-            10% { opacity: 0.5; }
-            90% { opacity: 0.5; }
-            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
         }
         
+        /* Rainbow Light Effect */
         .rainbow-border {
             position: fixed;
             top: 0;
@@ -133,7 +254,7 @@
             transform: translate(-50%, -50%);
             width: 800px;
             height: 800px;
-            background: radial-gradient(circle, rgba(157,78,221,0.15) 0%, rgba(0,255,204,0.1) 25%, rgba(0,11,16,0) 70%);
+            background: radial-gradient(circle, rgba(157, 78, 221, 0.15) 0%, rgba(0, 255, 204, 0.1) 25%, rgba(0, 11, 16, 0) 70%);
             border-radius: 50%;
             z-index: -1;
             animation: pulse 6s ease-in-out infinite alternate;
@@ -150,6 +271,12 @@
             100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
         }
         
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Header with Tickers */
         .ticker-container {
             background: rgba(10, 11, 16, 0.9);
             backdrop-filter: blur(10px);
@@ -208,6 +335,7 @@
             background: rgba(255, 77, 77, 0.1);
         }
         
+        /* Main Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -225,12 +353,21 @@
             }
         }
         
-        .left-panel, .right-panel {
+        /* Left Panel - Main DApp */
+        .left-panel {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
         
+        /* Right Panel - Menu */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* Connect Button */
         .connect-btn {
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: #000;
@@ -249,11 +386,6 @@
             animation: float 4s ease-in-out infinite;
         }
         
-        @keyframes float {
-            0%,100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
         .connect-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(0, 255, 204, 0.5);
@@ -265,6 +397,7 @@
             border: 1px solid var(--primary);
         }
         
+        /* Main Card */
         .main-card {
             background: rgba(22, 24, 33, 0.8);
             backdrop-filter: blur(10px);
@@ -288,6 +421,7 @@
             animation: rainbow 8s ease infinite;
         }
         
+        /* Header */
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -312,6 +446,7 @@
             letter-spacing: 1px;
         }
         
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -356,6 +491,7 @@
             margin-top: 5px;
         }
         
+        /* Tabs */
         .tabs {
             display: flex;
             gap: 10px;
@@ -387,6 +523,7 @@
             box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
         }
         
+        /* Input Area */
         .input-area {
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border);
@@ -419,6 +556,7 @@
             font-weight: 600;
         }
         
+        /* Calc Box */
         .calc-box {
             background: rgba(0, 255, 204, 0.05);
             border: 1px dashed var(--primary);
@@ -426,7 +564,6 @@
             padding: 20px;
             font-size: 14px;
             margin-bottom: 20px;
-            min-height: 100px;
         }
         
         .row {
@@ -435,13 +572,7 @@
             margin-bottom: 10px;
         }
         
-        .empty-row {
-            color: #666;
-            text-align: center;
-            padding: 20px;
-            font-style: italic;
-        }
-        
+        /* Action Button */
         .action-btn {
             width: 100%;
             padding: 20px;
@@ -464,12 +595,7 @@
             box-shadow: 0 8px 25px rgba(0, 255, 204, 0.4);
         }
         
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
+        /* Status Message */
         #status-msg {
             font-size: 13px;
             text-align: center;
@@ -479,23 +605,16 @@
             min-height: 20px;
         }
         
+        /* Referral Box */
         .ref-box {
             background: rgba(0, 0, 0, 0.3);
             padding: 20px;
             border-radius: 16px;
             border: 1px solid var(--border);
             margin-top: 25px;
-            transition: all 0.3s;
         }
         
-        .ref-box.hidden {
-            display: none;
-        }
-        
-        .ref-box.visible {
-            display: block;
-        }
-        
+        /* Contract Address Box */
         .contract-box {
             background: rgba(0, 0, 0, 0.3);
             padding: 20px;
@@ -549,6 +668,7 @@
             box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
         }
         
+        /* Balance Footer */
         .balance-footer {
             margin-top: 25px;
             padding-top: 20px;
@@ -583,6 +703,7 @@
             margin-top: 2px;
         }
         
+        /* Menu Card */
         .menu-card {
             background: rgba(22, 24, 33, 0.8);
             backdrop-filter: blur(10px);
@@ -633,6 +754,7 @@
             transform: translateX(5px);
         }
         
+        /* Responsive */
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -718,8 +840,8 @@
             </div>
             <div class="ticker-item">
                 <span class="ticker-symbol">SIG6</span>
-                <span class="ticker-price" id="ticker-sig6-price">--</span>
-                <span class="ticker-change" id="ticker-sig6-change">--</span>
+                <span class="ticker-price" id="ticker-sig6-price">$0.0576</span>
+                <span class="ticker-change positive" id="ticker-sig6-change">+0.89%</span>
             </div>
             <!-- Duplicate for seamless looping -->
             <div class="ticker-item">
@@ -749,8 +871,8 @@
             </div>
             <div class="ticker-item">
                 <span class="ticker-symbol">SIG6</span>
-                <span class="ticker-price" id="ticker-sig6-price-dup">--</span>
-                <span class="ticker-change" id="ticker-sig6-change-dup">--</span>
+                <span class="ticker-price" id="ticker-sig6-price-dup">$0.0576</span>
+                <span class="ticker-change positive" id="ticker-sig6-change-dup">+0.89%</span>
             </div>
         </div>
     </div>
@@ -772,13 +894,13 @@
                 <div class="stats-grid">
                     <div class="stat-box">
                         <div class="stat-label"><i class="fas fa-arrow-up"></i> BUY RATE</div>
-                        <div id="brate" class="stat-value">--</div>
-                        <div id="brate-inr" class="stat-value-inr">--</div>
+                        <div id="brate" class="stat-value">0.0576 USDT</div>
+                        <div id="brate-inr" class="stat-value-inr">≈ ₹5.18 INR</div>
                     </div>
                     <div class="stat-box">
                         <div class="stat-label"><i class="fas fa-arrow-down"></i> SELL RATE</div>
-                        <div id="srate" class="stat-value">--</div>
-                        <div id="srate-inr" class="stat-value-inr">--</div>
+                        <div id="srate" class="stat-value">0.0573 USDT</div>
+                        <div id="srate-inr" class="stat-value-inr">≈ ₹5.16 INR</div>
                     </div>
                 </div>
                 
@@ -798,33 +920,32 @@
                             <i class="fas fa-maximize"></i> MAX
                         </span>
                     </div>
-                    <input type="number" id="amt" placeholder="0" value="" oninput="calc()" onkeyup="calc()">
+                    <input type="number" id="amt" placeholder="0" oninput="calc()">
                 </div>
                 
-                <div class="calc-box" id="calcBox">
-                    <div class="empty-row" id="emptyMessage">
-                        <i class="fas fa-arrow-up"></i> Enter amount to calculate
+                <div class="calc-box">
+                    <div class="row">
+                        <span id="out-label">Total USDT to Pay:</span> 
+                        <span id="out-amt" style="color:var(--primary); font-weight:800">0.0000 USDT</span>
                     </div>
-                    <div id="calcContent" style="display: none;">
-                        <div class="row">
-                            <span id="out-label">Total USDT to Pay:</span> 
-                            <span id="out-amt" style="color:var(--primary); font-weight:800">0.0000 USDT</span>
-                        </div>
-                        <div class="row">
-                            <span>Equivalent INR:</span> 
-                            <span id="inr-amt" style="color:#ffaa00">0.00 INR</span>
-                        </div>
-                        <div class="row" id="upline-display">
-                            <span style="color:#888;">Upline Address:</span> 
-                            <span id="upline-addr" style="font-size:11px; color:#aaa;">None</span>
-                        </div>
+                    <div class="row">
+                        <span id="tax-label">Buy Tax 1%:</span> 
+                        <span id="tax-amt" style="color:#ff4d4d">0.0000 USDT</span>
+                    </div>
+                    <div class="row">
+                        <span>Equivalent INR:</span> 
+                        <span id="inr-amt" style="color:#ffaa00">0.00 INR</span>
+                    </div>
+                    <div class="row" id="upline-display">
+                        <span style="color:#888;">Upline Address:</span> 
+                        <span id="upline-addr" style="font-size:11px; color:#aaa;">None</span>
                     </div>
                 </div>
                 
-                <button class="action-btn" id="mainBtn" onclick="action()" disabled>
-                    <i class="fas fa-lock"></i> CONNECT WALLET FIRST
+                <button class="action-btn" id="mainBtn" onclick="action()">
+                    <i class="fas fa-lock"></i> APPROVE USDT
                 </button>
-                <div id="status-msg">Connect wallet to start trading</div>
+                <div id="status-msg">Ready to trade</div>
                 
                 <!-- Contract Address Box -->
                 <div class="contract-box">
@@ -833,7 +954,7 @@
                             <i class="fas fa-file-contract"></i> SIGMA SIX CONTRACT ADDRESS
                         </div>
                         <div class="contract-address" id="contract-addr">
-                            0xeA0a8150c5B368ec026ffB094FCfCdB3FaBFa479
+                            0x0f77a0d1FC8d04573402398A2ae19f367b4ef4aC
                         </div>
                     </div>
                     <button class="copy-btn" onclick="copyContract()">
@@ -841,8 +962,8 @@
                     </button>
                 </div>
                 
-                <!-- Referral Box - Dynamic show/hide based on user type -->
-                <div class="ref-box hidden" id="ref-ui">
+                <!-- Hidden Referral Box -->
+                <div class="ref-box" id="ref-ui" style="display:none">
                     <div class="row">
                         <span style="font-size:12px; color:#888;">
                             <i class="fas fa-link"></i> YOUR REFERRAL LINK
@@ -851,6 +972,7 @@
                             <i class="fas fa-copy"></i> COPY LINK
                         </button>
                     </div>
+                    <!-- Hidden input field for referral link -->
                     <input type="text" id="ref-link" readonly style="display:none;">
                 </div>
                 
@@ -858,20 +980,20 @@
                     <div class="balance-item">
                         <span><i class="fas fa-wallet"></i> USDT Balance:</span>
                         <div class="balance-info">
-                            <span id="bal-usdt">--</span>
+                            <span id="bal-usdt">0.000</span>
                         </div>
                     </div>
                     <div class="balance-item">
                         <span><i class="fas fa-coins"></i> SIG6 Balance:</span>
                         <div class="balance-info">
-                            <span id="bal-sig">--</span>
-                            <span id="bal-sig-inr" class="balance-inr">--</span>
+                            <span id="bal-sig">0.000</span>
+                            <span id="bal-sig-inr" class="balance-inr">₹0.00 INR</span>
                         </div>
                     </div>
                     <div class="balance-item">
                         <span><i class="fas fa-gas-pump"></i> POL Balance:</span>
                         <div class="balance-info">
-                            <span id="bal-pol">--</span>
+                            <span id="bal-pol">0.000</span>
                         </div>
                     </div>
                 </div>
@@ -924,35 +1046,10 @@
     </div>
 
     <script>
-        // ===== UPDATED CONTRACT CONFIGURATION =====
-        const S_ADDR = "0xeA0a8150c5B368ec026ffB094FCfCdB3FaBFa479";
-        const U_ADDR = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"; // USDT on Polygon
-        const CREATOR_WALLET = "0xb579377DDe2C03b2b46B5b12453F4dbAddB06f2E";
-        
-        // SigmaSix Contract ABI (minimal for speed)
-        const SIGMA_SIX_ABI = [
-            "function balanceOf(address) view returns (uint256)",
-            "function upline(address) view returns (address)",
-            "function buyRate() view returns (uint256)",
-            "function getSellRate() view returns (uint256)",
-            "function hasBoughtBefore(address) view returns (bool)",
-            "function buySigma(uint256,address) returns ()",
-            "function sellSigma(uint256) returns ()",
-            {
-                "anonymous": false,
-                "inputs": [
-                    {"indexed": true, "name": "user", "type": "address"},
-                    {"indexed": true, "name": "referrer", "type": "address"},
-                    {"indexed": false, "name": "timestamp", "type": "uint256"}
-                ],
-                "name": "MemberJoined",
-                "type": "event"
-            }
-        ];
-
-        let mode = 'buy', buyR = 0, sellR = 0, signer, addr, provider;
-        const USDT_TO_INR = 95.0;
-        let isWalletConnected = false;
+        const S_ADDR = "0x0f77a0d1FC8d04573402398A2ae19f367b4ef4aC";
+        const U_ADDR = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+        let mode = 'buy', buyR = 0.0576, sellR = 0.0573, signer, addr, provider;
+        const USDT_TO_INR = 90.0;
         
         // Create floating particles
         function createParticles() {
@@ -970,7 +1067,7 @@
             }
         }
         
-        // Save Referral Upline from URL
+        // Save Referral Upline from URL even if page refreshes
         function handleUpline() {
             const params = new URLSearchParams(window.location.search);
             let ref = params.get('ref');
@@ -982,11 +1079,18 @@
             return currentRef;
         }
 
+        // Update INR values using current rates
         function updateINRValues() {
-            if (!isWalletConnected) return;
+            const buyRateElement = document.getElementById('brate');
+            const sellRateElement = document.getElementById('srate');
             
-            document.getElementById('brate-inr').innerText = `≈ ₹${(buyR * USDT_TO_INR).toFixed(2)} INR`;
-            document.getElementById('srate-inr').innerText = `≈ ₹${(sellR * USDT_TO_INR).toFixed(2)} INR`;
+            if (buyRateElement && sellRateElement) {
+                const buyRate = parseFloat(buyRateElement.innerText) || buyR;
+                const sellRate = parseFloat(sellRateElement.innerText) || sellR;
+                
+                document.getElementById('brate-inr').innerText = `≈ ₹${(buyRate * USDT_TO_INR).toFixed(2)} INR`;
+                document.getElementById('srate-inr').innerText = `≈ ₹${(sellRate * USDT_TO_INR).toFixed(2)} INR`;
+            }
             
             const outAmtElement = document.getElementById('out-amt');
             if (outAmtElement) {
@@ -996,52 +1100,79 @@
             }
         }
 
+        // Update SIG6 balance INR value - USING SELL RATE
         function updateSigmaINRValue() {
-            if (!isWalletConnected) return;
-            
             const sigBalanceElement = document.getElementById('bal-sig');
             const sigINRElement = document.getElementById('bal-sig-inr');
             
             if (sigBalanceElement && sigINRElement) {
                 const sigText = sigBalanceElement.innerText;
                 const sigBalance = parseFloat(sigText) || 0;
+                // Using sell rate for SIG6 balance value in INR
                 const inrValue = (sigBalance * sellR * USDT_TO_INR).toFixed(2);
                 sigINRElement.innerText = `₹${inrValue} INR`;
             }
         }
 
+        // Update all INR values when rates change
         function updateAllINRValues() {
             updateINRValues();
             updateSigmaINRValue();
         }
 
+        // Live ticker data
         function updateTickers() {
-            if (!isWalletConnected || buyR === 0) {
-                document.querySelectorAll('[id^="ticker-sig6-price"]').forEach(el => {
-                    el.innerText = '--';
-                });
-                document.querySelectorAll('[id^="ticker-sig6-change"]').forEach(el => {
-                    el.innerText = '--';
-                });
-                return;
-            }
+            const changePercent = 0.89; // Static change for SIG6
             
-            const changePercent = ((buyR - 0.0316) / 0.0316 * 100).toFixed(2);
+            // Format price to 4 decimals for SIG6
             const sig6Price = buyR.toFixed(4);
             
+            // Update ticker price display
             document.querySelectorAll('[id^="ticker-sig6-price"]').forEach(el => {
                 el.innerText = `$${sig6Price}`;
             });
             
+            // Update ticker change display
             document.querySelectorAll('[id^="ticker-sig6-change"]').forEach(el => {
-                const changeClass = parseFloat(changePercent) >= 0 ? 'positive' : 'negative';
-                el.className = `ticker-change ${changeClass}`;
-                el.innerText = `${parseFloat(changePercent) >= 0 ? '+' : ''}${changePercent}%`;
+                el.innerText = `+${changePercent.toFixed(2)}%`;
             });
+            
+            const tickers = [
+                { symbol: 'BTC', price: 68421.50, change: 2.34 },
+                { symbol: 'ETH', price: 3812.75, change: 1.78 },
+                { symbol: 'USDT', price: 1.00, change: 0.00 },
+                { symbol: 'SOL', price: 142.60, change: -0.85 },
+                { symbol: 'BNB', price: 585.30, change: 0.92 },
+                { symbol: 'SIG6', price: parseFloat(sig6Price), change: changePercent }
+            ];
+            
+            const wrapper = document.querySelector('.ticker-wrapper');
+            if (wrapper) {
+                let tickerHTML = '';
+                
+                for (let i = 0; i < 2; i++) {
+                    tickers.forEach(ticker => {
+                        const changeClass = ticker.change > 0 ? 'positive' : (ticker.change < 0 ? 'negative' : '');
+                        const changeSign = ticker.change > 0 ? '+' : '';
+                        const decimals = ticker.symbol === 'SIG6' ? 4 : 2;
+                        
+                        tickerHTML += `
+                            <div class="ticker-item">
+                                <span class="ticker-symbol">${ticker.symbol}</span>
+                                <span class="ticker-price">$${ticker.price.toFixed(decimals)}</span>
+                                <span class="ticker-change ${changeClass}">${changeSign}${Math.abs(ticker.change).toFixed(2)}%</span>
+                            </div>
+                        `;
+                    });
+                }
+                
+                wrapper.innerHTML = tickerHTML;
+            }
         }
 
+        // Copy Contract Address
         function copyContract() {
-            const contractAddress = "0xeA0a8150c5B368ec026ffB094FCfCdB3FaBFa479";
+            const contractAddress = "0x0f77a0d1FC8d04573402398A2ae19f367b4ef4aC";
             navigator.clipboard.writeText(contractAddress).then(() => {
                 const statusMsg = document.getElementById('status-msg');
                 statusMsg.innerText = "Contract Address Copied!";
@@ -1057,13 +1188,14 @@
                     copyBtn.style.background = 'linear-gradient(90deg, var(--secondary), #7b2cbf)';
                     
                     setTimeout(() => {
-                        statusMsg.innerText = isWalletConnected ? "Ready to trade" : "Connect wallet to start trading";
-                        statusMsg.style.color = isWalletConnected ? "#00ffcc" : "#ffaa00";
+                        statusMsg.innerText = "Ready to trade";
+                        statusMsg.style.color = "#00ffcc";
                     }, 2000);
                 }, 1500);
             });
         }
 
+        // Connect Wallet Function
         async function connectWallet() {
             if (!window.ethereum) {
                 alert("Please install MetaMask to use this DApp!");
@@ -1072,72 +1204,71 @@
             }
             
             try {
+                // Request account access
                 provider = new ethers.BrowserProvider(window.ethereum);
                 const accounts = await provider.send("eth_requestAccounts", []);
                 addr = accounts[0];
                 signer = await provider.getSigner();
                 
-                isWalletConnected = true;
-                
+                // Update connect button
                 const connectBtn = document.getElementById('connectBtn');
                 connectBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${addr.slice(0,6)}...${addr.slice(-4)}`;
                 connectBtn.classList.add('connected');
                 
-                document.getElementById('mainBtn').disabled = false;
-                document.getElementById('mainBtn').innerHTML = '<i class="fas fa-lock"></i> APPROVE USDT';
+                // Show referral UI
+                document.getElementById('ref-ui').style.display = 'block';
+                updateRefLink();
                 
+                // Update status
                 document.getElementById('status-msg').innerText = "Wallet Connected Successfully!";
                 document.getElementById('status-msg').style.color = "#00ff88";
                 
+                // Start syncing data
                 await sync();
                 
+                // Listen for account changes
                 window.ethereum.on('accountsChanged', async (accounts) => {
                     if (accounts.length > 0) {
                         addr = accounts[0];
                         signer = await provider.getSigner();
                         connectBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${addr.slice(0,6)}...${addr.slice(-4)}`;
+                        updateRefLink();
                         await sync();
                     } else {
-                        isWalletConnected = false;
+                        // User disconnected
                         connectBtn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
                         connectBtn.classList.remove('connected');
-                        document.getElementById('ref-ui').classList.add('hidden');
-                        document.getElementById('mainBtn').disabled = true;
-                        document.getElementById('mainBtn').innerHTML = '<i class="fas fa-lock"></i> CONNECT WALLET FIRST';
+                        document.getElementById('ref-ui').style.display = 'none';
                         document.getElementById('status-msg').innerText = "Wallet Disconnected";
                         document.getElementById('status-msg').style.color = "#ffaa00";
-                        
-                        // Reset all displays
-                        document.getElementById('brate').innerText = '--';
-                        document.getElementById('srate').innerText = '--';
-                        document.getElementById('brate-inr').innerText = '--';
-                        document.getElementById('srate-inr').innerText = '--';
-                        document.getElementById('bal-usdt').innerText = '--';
-                        document.getElementById('bal-sig').innerText = '--';
-                        document.getElementById('bal-sig-inr').innerText = '--';
-                        document.getElementById('bal-pol').innerText = '--';
-                        
-                        document.getElementById('amt').value = '';
-                        document.getElementById('calcContent').style.display = 'none';
-                        document.getElementById('emptyMessage').style.display = 'block';
-                        
-                        updateTickers();
                     }
                 });
                 
+                // Listen for chain changes
                 window.ethereum.on('chainChanged', () => {
                     window.location.reload();
                 });
                 
             } catch (error) {
                 console.error("Connection error:", error);
-                document.getElementById('status-msg').innerText = "Connection failed: " + (error.message || "Unknown error");
-                document.getElementById('status-msg').style.color = "#ff4d4d";
+                
+                if (error.code === 4001) {
+                    // User rejected the connection request
+                    document.getElementById('status-msg').innerText = "Connection rejected by user";
+                    document.getElementById('status-msg').style.color = "#ff4d4d";
+                } else if (error.code === -32002) {
+                    // Request already pending
+                    document.getElementById('status-msg').innerText = "Connection request already pending in MetaMask";
+                    document.getElementById('status-msg').style.color = "#ffaa00";
+                } else {
+                    document.getElementById('status-msg').innerText = "Connection failed: " + error.message;
+                    document.getElementById('status-msg').style.color = "#ff4d4d";
+                }
             }
         }
 
         async function sync() {
-            if (!addr || !isWalletConnected) return;
+            if (!addr) return;
             
             try {
                 const uc = new ethers.Contract(U_ADDR, [
@@ -1145,18 +1276,77 @@
                     "function allowance(address,address) view returns (uint256)"
                 ], provider);
                 
-                const sc = new ethers.Contract(S_ADDR, SIGMA_SIX_ABI, provider);
+                const sc = new ethers.Contract(S_ADDR, [
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "account",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "balanceOf",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "buyRate",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getSellRate",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "totalSupply",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    }
+                ], provider);
                 
-                const [pb, ub, sb, br, sr, alw, hasBought] = await Promise.all([
+                const [pb, ub, sb, br, sr, alw] = await Promise.all([
                     provider.getBalance(addr),
                     uc.balanceOf(addr),
                     sc.balanceOf(addr),
                     sc.buyRate(),
                     sc.getSellRate(),
-                    uc.allowance(addr, S_ADDR),
-                    sc.hasBoughtBefore(addr)
+                    uc.allowance(addr, S_ADDR)
                 ]);
 
+                // Update balances
                 const polBalance = parseFloat(ethers.formatEther(pb)).toFixed(3);
                 const usdtBalance = parseFloat(ethers.formatUnits(ub, 6)).toFixed(3);
                 const sigBalance = parseFloat(ethers.formatEther(sb)).toFixed(2);
@@ -1165,63 +1355,44 @@
                 document.getElementById('bal-usdt').innerText = usdtBalance + " USDT";
                 document.getElementById('bal-sig').innerText = sigBalance + " SIG6";
                 
-                // ===== REFERRAL LINK LOGIC =====
-                // Case 1: Migrated User (has balance but never bought)
-                if (sigBalance > 0 && !hasBought) {
-                    console.log("✅ Migrated user - showing referral link");
-                    document.getElementById('ref-ui').classList.remove('hidden');
-                    document.getElementById('ref-ui').classList.add('visible');
-                    updateRefLink();
-                }
-                // Case 2: Joined User (has bought before)
-                else if (hasBought) {
-                    console.log("✅ Joined user - showing referral link");
-                    document.getElementById('ref-ui').classList.remove('hidden');
-                    document.getElementById('ref-ui').classList.add('visible');
-                    updateRefLink();
-                }
-                // Case 3: New User (no balance, never bought)
-                else {
-                    console.log("❌ New user - hiding referral link");
-                    document.getElementById('ref-ui').classList.add('hidden');
-                    document.getElementById('ref-ui').classList.remove('visible');
-                }
-                
-                // Convert rates from contract (6 decimals) to human readable
+                // Update rates FROM CONTRACT (real values)
                 const newBuyR = parseFloat(ethers.formatUnits(br, 6));
                 const newSellR = parseFloat(ethers.formatUnits(sr, 6));
                 
+                // Check if rates changed
+                const ratesChanged = (newBuyR !== buyR) || (newSellR !== sellR);
+                
+                // Update global rate variables
                 buyR = newBuyR;
                 sellR = newSellR;
                 
+                // Update display rates
                 document.getElementById('brate').innerText = buyR.toFixed(4) + " USDT";
                 document.getElementById('srate').innerText = sellR.toFixed(4) + " USDT";
                 
+                // Update all INR values
                 updateAllINRValues();
+                
+                // Update tickers with new price
                 updateTickers();
                 
+                // Update button text based on allowance
                 const v = parseFloat(document.getElementById('amt').value) || 0;
-                if (v > 0) {
-                    const sigmaAmount = ethers.parseEther(v.toString());
-                    const buyRateFromContract = ethers.parseUnits(buyR.toFixed(6), 6);
-                    
-                    // Contract uses: (sigmaAmount * buyRate) / 10**18
-                    const totalCostUsdt = (sigmaAmount * buyRateFromContract) / BigInt("1000000000000000000");
-                    const requiredUsdt = totalCostUsdt + (totalCostUsdt / 100n);
-                    
-                    const currentAlw = ethers.formatUnits(alw, 6);
-                    const requiredUsdtFormatted = ethers.formatUnits(requiredUsdt, 6);
+                const requiredUsdt = (v * buyR) * 1.01;
+                const currentAlw = parseFloat(ethers.formatUnits(alw, 6));
 
-                    if(mode === 'buy') {
-                        document.getElementById('mainBtn').innerHTML = (parseFloat(currentAlw) >= parseFloat(requiredUsdtFormatted) && parseFloat(requiredUsdtFormatted) > 0) 
-                            ? '<i class="fas fa-shopping-cart"></i> BUY SIGMA' 
-                            : '<i class="fas fa-lock"></i> APPROVE USDT';
-                    } else {
-                        document.getElementById('mainBtn').innerHTML = '<i class="fas fa-coins"></i> SELL SIGMA';
-                    }
+                if(mode === 'buy') {
+                    document.getElementById('mainBtn').innerHTML = (currentAlw >= requiredUsdt && requiredUsdt > 0) 
+                        ? '<i class="fas fa-shopping-cart"></i> BUY SIGMA' 
+                        : '<i class="fas fa-lock"></i> APPROVE USDT';
+                } else {
+                    document.getElementById('mainBtn').innerHTML = '<i class="fas fa-coins"></i> SELL SIGMA';
                 }
                 
-                calc();
+                // Re-calc to update values with new rates
+                if (ratesChanged) {
+                    calc();
+                }
             } catch (e) { 
                 console.error(e);
                 document.getElementById('status-msg').innerText = "Sync Error: " + (e.reason || "Check connection");
@@ -1230,47 +1401,26 @@
         }
 
         function calc() {
-            if (!isWalletConnected) {
-                document.getElementById('calcContent').style.display = 'none';
-                document.getElementById('emptyMessage').style.display = 'block';
-                document.getElementById('emptyMessage').innerHTML = '<i class="fas fa-plug"></i> Connect wallet first';
-                return;
-            }
-            
             const v = parseFloat(document.getElementById('amt').value) || 0;
-            
-            if (v <= 0) {
-                document.getElementById('calcContent').style.display = 'none';
-                document.getElementById('emptyMessage').style.display = 'block';
-                document.getElementById('emptyMessage').innerHTML = '<i class="fas fa-arrow-up"></i> Enter amount to calculate';
-                return;
-            }
-            
-            document.getElementById('calcContent').style.display = 'block';
-            document.getElementById('emptyMessage').style.display = 'none';
+            let tax = 0, final = 0;
             
             if (mode === 'buy') {
-                // Contract uses: (sigmaAmount * buyRate) / 10**18
-                const sigmaAmount = ethers.parseEther(v.toString());
-                const buyRateFromContract = ethers.parseUnits(buyR.toFixed(6), 6);
-                const totalCostRaw = (sigmaAmount * buyRateFromContract) / BigInt("1000000000000000000");
-                
-                // Convert to number with 6 decimals (USDT)
-                const totalCostFloat = Number(totalCostRaw) / 1e6;
-                
+                const netUsdt = v * buyR;
+                tax = netUsdt * 0.01;
+                final = netUsdt + tax;
                 document.getElementById('out-label').innerText = "Total USDT to Pay:";
-                document.getElementById('out-amt').innerText = totalCostFloat.toFixed(4) + " USDT";
+                document.getElementById('tax-label').innerText = "Buy Tax 1%:";
+                document.getElementById('out-amt').innerText = final.toFixed(4) + " USDT";
             } else {
-                // For sell
-                const sigmaAmount = ethers.parseEther(v.toString());
-                const sellRateFromContract = ethers.parseUnits(sellR.toFixed(6), 6);
-                const totalUsdtRaw = (sigmaAmount * sellRateFromContract) / BigInt("1000000000000000000");
-                const totalVal = Number(totalUsdtRaw) / 1e6;
-                
-                document.getElementById('out-label').innerText = "Total USDT to Receive:";
-                document.getElementById('out-amt').innerText = totalVal.toFixed(4) + " USDT";
+                const totalVal = v * sellR;
+                tax = totalVal * 0.01;
+                final = totalVal - tax;
+                document.getElementById('out-label').innerText = "Total USDT Receive:";
+                document.getElementById('tax-label').innerText = "Sell Tax 1%:";
+                document.getElementById('out-amt').innerText = final.toFixed(4) + " USDT";
             }
             
+            document.getElementById('tax-amt').innerText = tax.toFixed(4) + " USDT";
             updateINRValues();
         }
 
@@ -1279,12 +1429,11 @@
             document.getElementById('t-buy').className = m === 'buy' ? 'tab active' : 'tab';
             document.getElementById('t-sell').className = m === 'sell' ? 'tab active' : 'tab';
             
-            if (isWalletConnected) {
-                if (m === 'buy') {
-                    document.getElementById('mainBtn').innerHTML = '<i class="fas fa-lock"></i> APPROVE USDT';
-                } else {
-                    document.getElementById('mainBtn').innerHTML = '<i class="fas fa-coins"></i> SELL SIGMA';
-                }
+            // Update button text
+            if (m === 'buy') {
+                document.getElementById('mainBtn').innerHTML = '<i class="fas fa-lock"></i> APPROVE USDT';
+            } else {
+                document.getElementById('mainBtn').innerHTML = '<i class="fas fa-coins"></i> SELL SIGMA';
             }
             
             calc();
@@ -1310,26 +1459,13 @@
                         "function allowance(address,address) view returns (uint256)"
                     ], signer);
                     
-                    // Exact calculation matching contract formula
-                    const sigmaAmount = ethers.parseEther(v);
-                    const buyRateFromContract = ethers.parseUnits(buyR.toFixed(6), 6);
-                    
-                    // Contract uses: (sigmaAmount * buyRate) / 10**18
-                    const totalCostUsdt = (sigmaAmount * buyRateFromContract) / BigInt("1000000000000000000");
-                    const buyTax = totalCostUsdt / 100n;
-                    const requiredUsdt = totalCostUsdt + buyTax;
-                    
+                    const requiredUsdt = (parseFloat(v) * buyR) * 1.01;
                     const alw = await uc.allowance(addr, S_ADDR);
-                    const currentAlw = Number(alw) / 1e6;
-                    const requiredUsdtFormatted = Number(requiredUsdt) / 1e6;
                     
-                    if (currentAlw < requiredUsdtFormatted) {
+                    if (parseFloat(ethers.formatUnits(alw, 6)) < requiredUsdt) {
                         msg.innerText = "Approving USDT...";
-                        
-                        // Approve exact amount
-                        const approveTx = await uc.approve(S_ADDR, requiredUsdt);
-                        await approveTx.wait();
-                        
+                        const tx = await uc.approve(S_ADDR, ethers.MaxUint256);
+                        await tx.wait();
                         msg.innerText = "Approval Success!";
                         msg.style.color = "#00ff88";
                         sync();
@@ -1338,46 +1474,60 @@
                             document.getElementById('mainBtn').innerHTML = '<i class="fas fa-shopping-cart"></i> BUY SIGMA';
                         }, 1000);
                     } else {
-                        const sc = new ethers.Contract(S_ADDR, SIGMA_SIX_ABI, signer);
+                        const buySigmaABI = {
+                            "inputs": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "sigmaAmount",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "address",
+                                    "name": "_upline",
+                                    "type": "address"
+                                }
+                            ],
+                            "name": "buySigma",
+                            "outputs": [],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        };
+                        
+                        const sc = new ethers.Contract(S_ADDR, [buySigmaABI], signer);
                         const upline = handleUpline();
                         msg.innerText = "Buying SIGMA...";
-                        
-                        // Call contract with sigmaAmount
-                        const tx = await sc.buySigma(sigmaAmount, upline, {
-                            gasLimit: 500000
-                        });
+                        const tx = await sc.buySigma(ethers.parseEther(v), upline);
                         await tx.wait();
-                        
                         msg.innerText = "Purchase Successful!";
                         msg.style.color = "#00ff88";
-                        
-                        // After successful buy, check if user now qualifies for referral link
-                        const hasBoughtNow = await sc.hasBoughtBefore(addr);
-                        if (hasBoughtNow) {
-                            document.getElementById('ref-ui').classList.remove('hidden');
-                            document.getElementById('ref-ui').classList.add('visible');
-                            updateRefLink();
-                        }
-                        
                         sync();
                     }
                 } else {
-                    const sc = new ethers.Contract(S_ADDR, SIGMA_SIX_ABI, signer);
+                    const sellSigmaABI = {
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "sigmaAmount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "sellSigma",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    };
+                    
+                    const sc = new ethers.Contract(S_ADDR, [sellSigmaABI], signer);
                     msg.innerText = "Selling SIGMA...";
-                    
-                    const sigmaAmount = ethers.parseEther(v);
-                    const tx = await sc.sellSigma(sigmaAmount, {
-                        gasLimit: 500000
-                    });
+                    const tx = await sc.sellSigma(ethers.parseEther(v));
                     await tx.wait();
-                    
                     msg.innerText = "Sale Successful!";
                     msg.style.color = "#00ff88";
                     sync();
                 }
             } catch (e) { 
                 console.error(e);
-                msg.innerText = "Error: " + (e.reason || e.message || "Check Balance/Gas");
+                msg.innerText = "Error: " + (e.reason || "Check Balance/Gas");
                 msg.style.color = "#ff4d4d";
             }
         }
@@ -1404,53 +1554,62 @@
         }
 
         function max() {
-            if (!isWalletConnected) {
-                connectWallet();
-                return;
-            }
-            
             const u = document.getElementById('bal-usdt').innerText.split(' ')[0];
             const s = document.getElementById('bal-sig').innerText.split(' ')[0];
             
             if (mode === 'buy') {
-                const usdtBalance = parseFloat(u) || 0;
-                // Formula: sigma = usdtBalance / buyR
-                const maxSigma = (usdtBalance / buyR).toFixed(2);
-                document.getElementById('amt').value = maxSigma > 0 ? maxSigma : 0;
+                document.getElementById('amt').value = ((parseFloat(u) / 1.01) / buyR).toFixed(2);
             } else {
                 document.getElementById('amt').value = s;
             }
             calc();
         }
 
+        // Initialize on page load
         window.onload = async function() {
-            document.getElementById('amt').value = '';
-            
+            // Create background particles
             createParticles();
+            
             handleUpline();
+            updateINRValues();
             updateTickers();
+            updateSigmaINRValue();
             
-            // Hide referral link initially
-            document.getElementById('ref-ui').classList.add('hidden');
-            
+            // Check if wallet is already connected
             if (window.ethereum) {
                 try {
                     provider = new ethers.BrowserProvider(window.ethereum);
                     const accounts = await provider.send("eth_accounts", []);
                     
                     if (accounts.length > 0) {
-                        await connectWallet();
+                        addr = accounts[0];
+                        signer = await provider.getSigner();
+                        
+                        // Update UI for already connected wallet
+                        const connectBtn = document.getElementById('connectBtn');
+                        connectBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${addr.slice(0,6)}...${addr.slice(-4)}`;
+                        connectBtn.classList.add('connected');
+                        
+                        document.getElementById('ref-ui').style.display = 'block';
+                        updateRefLink();
+                        
+                        // Sync data
+                        await sync();
                     }
                 } catch (error) {
                     console.error("Auto-connect error:", error);
                 }
             }
             
+            // Auto refresh sync every 30 seconds
             setInterval(() => {
-                if (addr && isWalletConnected) {
+                if (addr) {
                     sync();
                 }
             }, 30000);
+            
+            // Auto refresh tickers every 30 seconds
+            setInterval(updateTickers, 30000);
         };
     </script>
 </body>
