@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGMA SIX | Trade History</title>
+    <title>SIGMA SIX | Buy/Sell Report</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -366,13 +366,13 @@
             letter-spacing: 0.5px;
         }
         
-        .badge-active {
-            background: rgba(0, 255, 204, 0.1);
-            color: var(--primary);
-            border: 1px solid rgba(0, 255, 204, 0.3);
+        .badge-buy {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--profit);
+            border: 1px solid rgba(0, 255, 136, 0.3);
         }
         
-        .badge-closed {
+        .badge-sell {
             background: rgba(255, 77, 77, 0.1);
             color: var(--loss);
             border: 1px solid rgba(255, 77, 77, 0.3);
@@ -466,9 +466,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            flex: 1;
-            justify-content: center;
-            min-width: 150px;
         }
         
         .action-btn:hover {
@@ -478,10 +475,9 @@
         }
         
         .action-btn.active {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-color: transparent;
-            color: #000;
-            font-weight: 700;
+            background: rgba(0, 255, 204, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
         }
         
         /* Navigation */
@@ -599,12 +595,13 @@
                 font-size: 14px;
             }
             
-            .action-buttons {
+            .action-buttons, .nav-container {
                 flex-direction: column;
             }
             
-            .action-btn {
+            .action-btn, .nav-btn {
                 width: 100%;
+                justify-content: center;
             }
             
             th, td {
@@ -649,30 +646,6 @@
         .fade-in {
             animation: fadeIn 0.5s ease-out;
         }
-        
-        /* Copy Button */
-        .copy-address {
-            cursor: pointer;
-            color: var(--primary);
-            background: rgba(0, 255, 204, 0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-        
-        .copy-address:hover {
-            background: rgba(0, 255, 204, 0.2);
-            border-color: var(--primary);
-        }
-        
-        .copy-address i {
-            font-size: 12px;
-        }
     </style>
 </head>
 <body>
@@ -687,7 +660,7 @@
     
     <!-- Connect Button -->
     <button class="connect-btn" id="connectBtn" onclick="connectWallet()">
-        <i class="fas fa-wallet"></i> <span id="btn-text">Connect Wallet</span>
+        <i class="fas fa-wallet"></i> <span id="btn-text">Connect MetaMask</span>
     </button>
     
     <!-- Main Container -->
@@ -707,7 +680,7 @@
         
         <!-- Header -->
         <div class="header">
-            <h1>TRADE HISTORY</h1>
+            <h1>TRADE ANALYTICS</h1>
             <p>Complete Buy & Sell History with Real-time P&L Tracking</p>
         </div>
         
@@ -738,30 +711,33 @@
             </div>
         </div>
         
-        <!-- Action Buttons - Only 2 Options -->
+        <!-- Action Buttons -->
         <div class="action-buttons">
-            <button class="action-btn active" onclick="showTab('active')">
-                <i class="fas fa-chart-bar"></i> Active Positions (Buy History)
+            <button class="action-btn active" onclick="showTab('buy')">
+                <i class="fas fa-arrow-up"></i> Buy History
             </button>
-            <button class="action-btn" onclick="showTab('closed')">
-                <i class="fas fa-history"></i> Closed Positions (Sell History)
+            <button class="action-btn" onclick="showTab('sell')">
+                <i class="fas fa-arrow-down"></i> Sell History
+            </button>
+            <button class="action-btn" onclick="showTab('active')">
+                <i class="fas fa-chart-bar"></i> Active Positions
             </button>
         </div>
         
-        <!-- Active Positions Section (Buy History) -->
-        <div class="main-card fade-in" id="active-section">
+        <!-- Buy History Section -->
+        <div class="main-card fade-in" id="buy-section">
             <div class="card-header">
                 <div class="card-icon">
-                    <i class="fas fa-chart-bar"></i>
+                    <i class="fas fa-arrow-up"></i>
                 </div>
                 <div>
-                    <div class="card-title">ACTIVE POSITIONS</div>
+                    <div class="card-title">SIGMA BUY HISTORY</div>
                     <div class="card-subtitle">All your SIGMA purchases with current valuation</div>
                 </div>
             </div>
             
             <div class="table-responsive">
-                <table id="active-table">
+                <table id="buy-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -774,11 +750,11 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="active-body">
+                    <tbody id="buy-body">
                         <tr>
                             <td colspan="8" class="loading">
                                 <i class="fas fa-spinner fa-spin"></i><br>
-                                Loading active positions... Please connect wallet
+                                Loading buy history... Please connect wallet
                             </td>
                         </tr>
                     </tbody>
@@ -786,20 +762,20 @@
             </div>
         </div>
         
-        <!-- Closed Positions Section (Sell History) -->
-        <div class="main-card fade-in" id="closed-section" style="display: none;">
+        <!-- Sell History Section -->
+        <div class="main-card fade-in" id="sell-section" style="display: none;">
             <div class="card-header">
                 <div class="card-icon">
-                    <i class="fas fa-history"></i>
+                    <i class="fas fa-arrow-down"></i>
                 </div>
                 <div>
-                    <div class="card-title">CLOSED POSITIONS</div>
+                    <div class="card-title">SIGMA SELL HISTORY</div>
                     <div class="card-subtitle">All your SIGMA sales with profit/loss calculation</div>
                 </div>
             </div>
             
             <div class="table-responsive">
-                <table id="closed-table">
+                <table id="sell-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -809,14 +785,52 @@
                             <th>Sell Rate</th>
                             <th>P&L Amount</th>
                             <th>P&L %</th>
-                            <th>Status</th>
+                            <th>Type</th>
                         </tr>
                     </thead>
-                    <tbody id="closed-body">
+                    <tbody id="sell-body">
                         <tr>
                             <td colspan="8" class="loading">
                                 <i class="fas fa-spinner fa-spin"></i><br>
-                                Loading closed positions...
+                                Loading sell history...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Active Positions Section -->
+        <div class="main-card fade-in" id="active-section" style="display: none;">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div>
+                    <div class="card-title">ACTIVE POSITIONS</div>
+                    <div class="card-subtitle">Current SIGMA holdings with unrealized P&L</div>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table id="active-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Purchase Date</th>
+                            <th>Quantity</th>
+                            <th>Avg Buy Price</th>
+                            <th>Current Price</th>
+                            <th>Current Value</th>
+                            <th>Unrealized P&L</th>
+                            <th>ROI %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active-body">
+                        <tr>
+                            <td colspan="8" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i><br>
+                                Loading active positions...
                             </td>
                         </tr>
                     </tbody>
@@ -826,19 +840,107 @@
     </div>
 
     <script>
-        // ===== UPDATED CONTRACT CONFIGURATION =====
-        const SIGMA_CONTRACT_ADDRESS = "0xeA0a8150c5B368ec026ffB094FCfCdB3FaBFa479";
+        const SIGMA_CONTRACT_ADDRESS = "0x0f77a0d1FC8d04573402398A2ae19f367b4ef4aC";
         const USDT_ADDRESS = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         
         let provider, userAddress, sigmaContract;
-        let currentTab = 'active';
+        let currentTab = 'buy';
         let buyTransactions = [];
         let sellTransactions = [];
         let currentBuyRate = 0;
         let currentSellRate = 0;
         
-        // ===== UPDATED ABI =====
-        const sigmaABI = [{"inputs":[{"internalType":"uint256","name":"sigmaAmount","type":"uint256"},{"internalType":"address","name":"_upline","type":"address"}],"name":"buySigma","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"emergencyWithdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_usdt","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"string","name":"reason","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"IncomeLapsed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"referrer","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"MemberJoined","type":"event"},{"inputs":[{"internalType":"address[]","name":"_users","type":"address[]"},{"internalType":"address[]","name":"_ups","type":"address[]"},{"internalType":"uint256[]","name":"_bals","type":"uint256[]"}],"name":"migrateData","outputs":[],"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"level","type":"uint256"},{"indexed":false,"internalType":"string","name":"rewardType","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"RewardReport","type":"event"},{"inputs":[{"internalType":"uint256","name":"sigmaAmount","type":"uint256"}],"name":"sellSigma","outputs":[],"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"string","name":"tradeType","type":"string"},{"indexed":false,"internalType":"uint256","name":"sigmaAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"rate","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"taxUsdt","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"TradeReport","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"_u","type":"address"}],"name":"_checkEligibility","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"creatorWallet","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getSellRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"hasBoughtBefore","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"last30DaysBuyVolume","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastBuyTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"myDirects","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rateStep","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalLapsedReferral","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalReceivedReferral","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"upline","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
+        // Contract ABI for events
+        const sigmaABI = [
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "tradeType",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "rate",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "taxUsdt",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "TradeReport",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "buyRate",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getSellRate",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "balanceOf",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
         
         // Create particles
         function createParticles() {
@@ -886,25 +988,6 @@
             }
             
             try {
-                // Show loading state
-                document.getElementById('active-body').innerHTML = `
-                    <tr>
-                        <td colspan="8" class="loading">
-                            <i class="fas fa-spinner fa-spin"></i><br>
-                            Loading data...
-                        </td>
-                    </tr>
-                `;
-                
-                document.getElementById('closed-body').innerHTML = `
-                    <tr>
-                        <td colspan="8" class="loading">
-                            <i class="fas fa-spinner fa-spin"></i><br>
-                            Loading data...
-                        </td>
-                    </tr>
-                `;
-                
                 // Get current rates
                 const [buyRateBN, sellRateBN, sigmaBalance] = await Promise.all([
                     sigmaContract.buyRate(),
@@ -949,8 +1032,8 @@
                 const tradeData = {
                     hash: txHash,
                     type: args.tradeType,
-                    amount: parseFloat(ethers.formatUnits(args.sigmaAmount, 18)),
-                    rate: parseFloat(ethers.formatUnits(args.rate, 6)),
+                    amount: parseFloat(ethers.formatUnits(args.amount, 18)), // SIG6 has 18 decimals
+                    rate: parseFloat(ethers.formatUnits(args.rate, 6)), // USDT has 6 decimals
                     tax: parseFloat(ethers.formatUnits(args.taxUsdt, 6)),
                     timestamp: Number(args.timestamp),
                     date: new Date(Number(args.timestamp) * 1000),
@@ -960,6 +1043,9 @@
                 if (args.tradeType === "BUY") {
                     buyTransactions.push(tradeData);
                 } else if (args.tradeType === "SELL") {
+                    // Find corresponding buy for this sell
+                    const buyMatch = findMatchingBuy(tradeData);
+                    tradeData.buyRate = buyMatch ? buyMatch.rate : tradeData.rate;
                     sellTransactions.push(tradeData);
                 }
             }
@@ -969,21 +1055,26 @@
             sellTransactions.sort((a, b) => b.timestamp - a.timestamp);
         }
         
-        function findMatchingBuyRate(sellTimestamp) {
-            // Find the most recent buy before this sell
-            const relevantBuys = buyTransactions.filter(buy => buy.timestamp < sellTimestamp);
+        function findMatchingBuy(sellData) {
+            // Simple FIFO matching (First In First Out)
+            const relevantBuys = buyTransactions.filter(buy => 
+                buy.timestamp < sellData.timestamp && 
+                buy.amount > 0
+            );
+            
             if (relevantBuys.length === 0) return null;
             
-            // Sort by timestamp (newest first)
-            relevantBuys.sort((a, b) => b.timestamp - a.timestamp);
-            return relevantBuys[0].rate;
+            // Sort buys by timestamp (oldest first)
+            relevantBuys.sort((a, b) => a.timestamp - b.timestamp);
+            
+            return relevantBuys[0];
         }
         
         function calculatePL(buyRate, sellRate, amount) {
             const buyValue = amount * buyRate;
             const sellValue = amount * sellRate;
             const plAmount = sellValue - buyValue;
-            const plPercentage = buyValue > 0 ? (plAmount / buyValue) * 100 : 0;
+            const plPercentage = (plAmount / buyValue) * 100;
             
             return {
                 amount: plAmount,
@@ -1014,14 +1105,9 @@
             const currentHoldings = totalBought - totalSold;
             const holdingsValue = currentHoldings * currentBuyRate;
             
-            // Calculate average buy rate for holdings
-            let avgBuyRate = 0;
-            if (totalBought > 0) {
-                avgBuyRate = totalBoughtValue / totalBought;
-            }
-            
             // Calculate P&L
-            const netPL = holdingsValue - (currentHoldings * avgBuyRate);
+            const netPL = (totalSoldValue - (totalSold * (buyTransactions[0]?.rate || 0))) + 
+                         (holdingsValue - (currentHoldings * (buyTransactions[0]?.rate || 0)));
             const plPercentage = totalBoughtValue > 0 ? (netPL / totalBoughtValue) * 100 : 0;
             
             // Update stats cards
@@ -1045,19 +1131,20 @@
         }
         
         function updateTables() {
+            updateBuyTable();
+            updateSellTable();
             updateActiveTable();
-            updateClosedTable();
         }
         
-        function updateActiveTable() {
-            const tbody = document.getElementById('active-body');
+        function updateBuyTable() {
+            const tbody = document.getElementById('buy-body');
             
             if (buyTransactions.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="8" class="empty-state">
-                            <i class="fas fa-chart-bar"></i><br>
-                            No active positions found
+                            <i class="fas fa-shopping-cart"></i><br>
+                            No buy transactions found
                         </td>
                     </tr>
                 `;
@@ -1097,25 +1184,25 @@
                         </td>
                         <td>
                             <div>$${tx.rate.toFixed(4)}</div>
-                            <div style="font-size:12px; color:#888">$${(tx.rate * 1).toFixed(2)}</div>
+                            <div style="font-size:12px; color:#888">${(tx.rate * 90).toFixed(2)} INR</div>
                         </td>
                         <td>
                             <div>$${currentBuyRate.toFixed(4)}</div>
-                            <div style="font-size:12px; color:#888">$${(currentBuyRate * 1).toFixed(2)}</div>
+                            <div style="font-size:12px; color:#888">${(currentBuyRate * 90).toFixed(2)} INR</div>
                         </td>
                         <td>
-                            <div class="${difference >= 0 ? 'pnl-positive' : 'pnl-negative'}" style="padding:4px 8px; border-radius:6px; display:inline-block">
+                            <div class="${difference >= 0 ? 'pnl-positive' : 'pnl-negative'}">
                                 <i class="fas fa-${difference >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
                                 $${Math.abs(difference).toFixed(4)}
                             </div>
                         </td>
                         <td>
-                            <div class="${unrealizedPLPercent >= 0 ? 'badge-profit' : 'badge-loss'}" style="display:inline-block">
+                            <div class="${unrealizedPLPercent >= 0 ? 'badge-profit' : 'badge-loss'}">
                                 ${unrealizedPLPercent >= 0 ? '+' : ''}${unrealizedPLPercent.toFixed(2)}%
                             </div>
                         </td>
                         <td>
-                            <span class="badge badge-active">ACTIVE</span>
+                            <span class="badge badge-buy">BUY</span>
                         </td>
                     </tr>
                 `;
@@ -1124,15 +1211,15 @@
             tbody.innerHTML = html;
         }
         
-        function updateClosedTable() {
-            const tbody = document.getElementById('closed-body');
+        function updateSellTable() {
+            const tbody = document.getElementById('sell-body');
             
             if (sellTransactions.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="8" class="empty-state">
-                            <i class="fas fa-history"></i><br>
-                            No closed positions found
+                            <i class="fas fa-coins"></i><br>
+                            No sell transactions found
                         </td>
                     </tr>
                 `;
@@ -1142,9 +1229,7 @@
             let html = '';
             
             sellTransactions.forEach((tx, index) => {
-                // Find matching buy rate (simplified - using average of buys before this sell)
-                const buyRate = findMatchingBuyRate(tx.timestamp) || tx.rate;
-                const pl = calculatePL(buyRate, tx.rate, tx.amount);
+                const pl = calculatePL(tx.buyRate || tx.rate, tx.rate, tx.amount);
                 
                 const dateStr = tx.date.toLocaleDateString('en-GB', {
                     day: '2-digit',
@@ -1168,32 +1253,128 @@
                             ${tx.amount.toFixed(2)} SIG6
                         </td>
                         <td>
-                            <div>$${buyRate.toFixed(4)}</div>
-                            <div style="font-size:12px; color:#888">$${(buyRate * 1).toFixed(2)}</div>
+                            <div>$${tx.buyRate?.toFixed(4) || tx.rate.toFixed(4)}</div>
+                            <div style="font-size:12px; color:#888">Buy Rate</div>
                         </td>
                         <td>
                             <div>$${tx.rate.toFixed(4)}</div>
-                            <div style="font-size:12px; color:#888">$${(tx.rate * 1).toFixed(2)}</div>
+                            <div style="font-size:12px; color:#888">Sell Rate</div>
                         </td>
                         <td>
-                            <div class="${pl.amount >= 0 ? 'pnl-positive' : 'pnl-negative'}" style="padding:4px 8px; border-radius:6px; display:inline-block">
+                            <div class="${pl.amount >= 0 ? 'pnl-positive' : 'pnl-negative'}">
                                 <i class="fas fa-${pl.amount >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
                                 $${Math.abs(pl.amount).toFixed(2)}
                             </div>
                         </td>
                         <td>
-                            <div class="${pl.percentage >= 0 ? 'badge-profit' : 'badge-loss'}" style="display:inline-block">
+                            <div class="${pl.percentage >= 0 ? 'badge-profit' : 'badge-loss'}">
                                 ${pl.percentage >= 0 ? '+' : ''}${pl.percentage.toFixed(2)}%
                             </div>
                         </td>
                         <td>
-                            <span class="badge badge-closed">CLOSED</span>
+                            <span class="badge badge-sell">SELL</span>
                         </td>
                     </tr>
                 `;
             });
             
             tbody.innerHTML = html;
+        }
+        
+        function updateActiveTable() {
+            const tbody = document.getElementById('active-body');
+            
+            // Calculate active positions (FIFO method)
+            const activePositions = calculateActivePositions();
+            
+            if (activePositions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <i class="fas fa-chart-line"></i><br>
+                            No active positions
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            let totalUnrealizedPL = 0;
+            let totalInvestment = 0;
+            
+            activePositions.forEach((position, index) => {
+                const currentValue = position.quantity * currentBuyRate;
+                const unrealizedPL = currentValue - position.investment;
+                const roi = (unrealizedPL / position.investment) * 100;
+                
+                totalUnrealizedPL += unrealizedPL;
+                totalInvestment += position.investment;
+                
+                const dateStr = position.date.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td style="font-weight:600">${dateStr}</td>
+                        <td style="font-weight:700; color:var(--primary)">
+                            ${position.quantity.toFixed(2)} SIG6
+                        </td>
+                        <td>$${position.avgPrice.toFixed(4)}</td>
+                        <td>$${currentBuyRate.toFixed(4)}</td>
+                        <td>$${currentValue.toFixed(2)}</td>
+                        <td>
+                            <div class="${unrealizedPL >= 0 ? 'pnl-positive' : 'pnl-negative'}">
+                                <i class="fas fa-${unrealizedPL >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
+                                $${Math.abs(unrealizedPL).toFixed(2)}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="${roi >= 0 ? 'badge-profit' : 'badge-loss'}">
+                                ${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function calculateActivePositions() {
+            const positions = [];
+            let remainingBuys = [...buyTransactions].reverse(); // Oldest first
+            
+            // Subtract sold quantities from buys (FIFO)
+            for (const sell of sellTransactions) {
+                let remainingSell = sell.amount;
+                
+                for (let i = 0; i < remainingBuys.length && remainingSell > 0; i++) {
+                    if (remainingBuys[i].amount > 0) {
+                        const deduct = Math.min(remainingBuys[i].amount, remainingSell);
+                        remainingBuys[i].amount -= deduct;
+                        remainingSell -= deduct;
+                    }
+                }
+            }
+            
+            // Remaining buys are active positions
+            remainingBuys.forEach(buy => {
+                if (buy.amount > 0) {
+                    positions.push({
+                        date: buy.date,
+                        quantity: buy.amount,
+                        avgPrice: buy.rate,
+                        investment: buy.amount * buy.rate
+                    });
+                }
+            });
+            
+            return positions;
         }
         
         function showTab(tabName) {
@@ -1206,8 +1387,9 @@
             event.target.classList.add('active');
             
             // Show selected tab
+            document.getElementById('buy-section').style.display = tabName === 'buy' ? 'block' : 'none';
+            document.getElementById('sell-section').style.display = tabName === 'sell' ? 'block' : 'none';
             document.getElementById('active-section').style.display = tabName === 'active' ? 'block' : 'none';
-            document.getElementById('closed-section').style.display = tabName === 'closed' ? 'block' : 'none';
         }
         
         function exportData() {
@@ -1218,7 +1400,7 @@
             
             let csvContent = "data:text/csv;charset=utf-8,";
             
-            if (currentTab === 'active') {
+            if (currentTab === 'buy') {
                 csvContent += "Serial No,Date,Time,Sigma Quantity,Buy Rate,Current Rate,Difference,P&L %,Status\n";
                 buyTransactions.forEach((tx, index) => {
                     const difference = currentBuyRate - tx.rate;
@@ -1232,25 +1414,24 @@
                         currentBuyRate.toFixed(4),
                         difference.toFixed(4),
                         differencePercent.toFixed(2) + '%',
-                        'ACTIVE'
+                        'BUY'
                     ].join(',');
                     csvContent += row + "\n";
                 });
-            } else {
-                csvContent += "Serial No,Date,Time,Sigma Quantity,Buy Rate,Sell Rate,P&L Amount,P&L %,Status\n";
+            } else if (currentTab === 'sell') {
+                csvContent += "Serial No,Date,Time,Sigma Quantity,Buy Rate,Sell Rate,P&L Amount,P&L %,Type\n";
                 sellTransactions.forEach((tx, index) => {
-                    const buyRate = findMatchingBuyRate(tx.timestamp) || tx.rate;
-                    const pl = calculatePL(buyRate, tx.rate, tx.amount);
+                    const pl = calculatePL(tx.buyRate || tx.rate, tx.rate, tx.amount);
                     const row = [
                         index + 1,
                         tx.date.toLocaleDateString(),
                         tx.date.toLocaleTimeString(),
                         tx.amount.toFixed(2),
-                        buyRate.toFixed(4),
+                        (tx.buyRate || tx.rate).toFixed(4),
                         tx.rate.toFixed(4),
                         pl.amount.toFixed(2),
                         pl.percentage.toFixed(2) + '%',
-                        'CLOSED'
+                        'SELL'
                     ].join(',');
                     csvContent += row + "\n";
                 });
@@ -1259,7 +1440,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `sigma_${currentTab}_positions.csv`);
+            link.setAttribute("download", `sigma_trades_${currentTab}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
