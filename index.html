@@ -3,1614 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGMA SIX | Premium DApp</title>
+    <title>SIGMA_SIX (SIG6) Exchange</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --primary: #00ffcc;
-            --secondary: #9d4edd;
-            --bg: #0a0b10;
-            --card: #161821;
-            --text: #ffffff;
-            --border: #2d2f3e;
-            --success: #00ff88;
-            --warning: #ffaa00;
-            --danger: #ff4d4d;
-            --gradient: linear-gradient(90deg, #00ffcc, #9d4edd, #ff2a6d, #00ffcc);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-            transition: opacity 0.3s ease;
-        }
-        
-        /* Professional Crypto Background with Criss-Cross Lines */
-        .crypto-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: 
-                linear-gradient(90deg, 
-                    rgba(0, 255, 204, 0.03) 1px, 
-                    transparent 1px
-                ) 0 0 / 50px 50px,
-                linear-gradient(0deg, 
-                    rgba(157, 78, 221, 0.03) 1px, 
-                    transparent 1px
-                ) 0 0 / 50px 50px;
-            animation: bgMove 20s linear infinite;
-        }
-        
-        @keyframes bgMove {
-            0% { background-position: 0 0, 0 0; }
-            100% { background-position: 100px 100px, 100px 100px; }
-        }
-        
-        /* Animated Criss-Cross Lines Overlay */
-        .crypto-lines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-            opacity: 0.15;
-        }
-        
-        .crypto-line {
-            position: absolute;
-            background: linear-gradient(90deg, 
-                transparent, 
-                var(--primary), 
-                var(--secondary), 
-                transparent);
-            height: 1px;
-            width: 200%;
-            animation: lineMove 15s linear infinite;
-        }
-        
-        /* Create criss-cross pattern */
-        .crypto-line:nth-child(1) { 
-            top: 10%; 
-            left: -100%; 
-            transform: rotate(45deg); 
-            animation-delay: 0s;
-            height: 1px;
-        }
-        
-        .crypto-line:nth-child(2) { 
-            top: 20%; 
-            left: -100%; 
-            transform: rotate(-45deg); 
-            animation-delay: 2s;
-            height: 1px;
-        }
-        
-        .crypto-line:nth-child(3) { 
-            top: 30%; 
-            left: -100%; 
-            transform: rotate(60deg); 
-            animation-delay: 4s;
-            height: 1px;
-        }
-        
-        .crypto-line:nth-child(4) { 
-            top: 40%; 
-            left: -100%; 
-            transform: rotate(-60deg); 
-            animation-delay: 6s;
-            height: 1px;
-        }
-        
-        .crypto-line:nth-child(5) { 
-            top: 50%; 
-            left: -100%; 
-            transform: rotate(30deg); 
-            animation-delay: 8s;
-            height: 1px;
-        }
-        
-        .crypto-line:nth-child(6) { 
-            top: 60%; 
-            left: -100%; 
-            transform: rotate(-30deg); 
-            animation-delay: 10s;
-            height: 1px;
-        }
-        
-        .crypto-line:nth-child(7) { 
-            top: 70%; 
-            left: -100%; 
-            transform: rotate(75deg); 
-            animation-delay: 12s;
-            height: 1px;
-        }
-        
-        .crypto-line:nth-child(8) { 
-            top: 80%; 
-            left: -100%; 
-            transform: rotate(-75deg); 
-            animation-delay: 14s;
-            height: 1px;
-        }
-        
-        /* Thicker lines for better visibility */
-        .crypto-line:nth-child(9) { 
-            top: 15%; 
-            left: -100%; 
-            transform: rotate(15deg); 
-            animation-delay: 1s;
-            height: 2px;
-            opacity: 0.2;
-        }
-        
-        .crypto-line:nth-child(10) { 
-            top: 25%; 
-            left: -100%; 
-            transform: rotate(-15deg); 
-            animation-delay: 3s;
-            height: 2px;
-            opacity: 0.2;
-        }
-        
-        @keyframes lineMove {
-            0% { 
-                left: -100%; 
-                background: linear-gradient(90deg, 
-                    transparent, 
-                    var(--primary), 
-                    var(--secondary), 
-                    transparent);
-            }
-            50% {
-                background: linear-gradient(90deg, 
-                    transparent, 
-                    var(--secondary), 
-                    var(--primary), 
-                    transparent);
-            }
-            100% { 
-                left: 100%; 
-                background: linear-gradient(90deg, 
-                    transparent, 
-                    var(--primary), 
-                    var(--secondary), 
-                    transparent);
-            }
-        }
-        
-        /* Floating Crypto Particles */
-        .crypto-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-        
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: var(--primary);
-            border-radius: 50%;
-            animation: particleFloat 20s linear infinite;
-            opacity: 0.3;
-        }
-        
-        @keyframes particleFloat {
-            0% {
-                transform: translateY(0) translateX(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.5;
-            }
-            90% {
-                opacity: 0.5;
-            }
-            100% {
-                transform: translateY(-100vh) translateX(100px);
-                opacity: 0;
-            }
-        }
-        
-        /* Rainbow Light Effect */
-        .rainbow-border {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--gradient);
-            background-size: 400% 400%;
-            animation: rainbow 8s ease infinite;
-            z-index: 1000;
-        }
-        
-        .rainbow-glow {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(157, 78, 221, 0.15) 0%, rgba(0, 255, 204, 0.1) 25%, rgba(0, 11, 16, 0) 70%);
-            border-radius: 50%;
-            z-index: -1;
-            animation: pulse 6s ease-in-out infinite alternate;
-        }
-        
-        @keyframes rainbow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); }
-            100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        /* Header with Tickers */
-        .ticker-container {
-            background: rgba(10, 11, 16, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 255, 204, 0.2);
-            padding: 10px 0;
-            overflow: hidden;
-            position: relative;
-            z-index: 10;
-        }
-        
-        .ticker-wrapper {
-            display: flex;
-            width: max-content;
-            animation: ticker 30s linear infinite;
-        }
-        
-        @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        
-        .ticker-item {
-            display: flex;
-            align-items: center;
-            margin: 0 30px;
-            white-space: nowrap;
-        }
-        
-        .ticker-symbol {
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--primary);
-            margin-right: 8px;
-        }
-        
-        .ticker-price {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .ticker-change {
-            font-weight: 600;
-            font-size: 12px;
-            margin-left: 8px;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-        
-        .positive {
-            color: var(--success);
-            background: rgba(0, 255, 136, 0.1);
-        }
-        
-        .negative {
-            color: var(--danger);
-            background: rgba(255, 77, 77, 0.1);
-        }
-        
-        /* Main Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        @media (max-width: 992px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Left Panel - Main DApp */
-        .left-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        /* Right Panel - Menu */
-        .right-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        /* Connect Button */
-        .connect-btn {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: #000;
-            border: none;
-            border-radius: 15px;
-            padding: 16px 30px;
-            font-weight: 800;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.3);
-            animation: float 4s ease-in-out infinite;
-        }
-        
-        .connect-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 255, 204, 0.5);
-        }
-        
-        .connect-btn.connected {
-            background: rgba(0, 255, 204, 0.1);
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-        
-        /* Main Card */
-        .main-card {
-            background: rgba(22, 24, 33, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .main-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--gradient);
-            background-size: 400% 400%;
-            animation: rainbow 8s ease infinite;
-        }
-        
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            background: var(--gradient);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 42px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            animation: rainbow 8s ease infinite;
-        }
-        
-        .header p {
-            color: #aaa;
-            font-size: 14px;
-            letter-spacing: 1px;
-        }
-        
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .stat-box {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid rgba(45, 47, 62, 0.5);
-            transition: all 0.3s;
-        }
-        
-        .stat-box:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 255, 204, 0.1);
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .stat-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
-        .stat-value-inr {
-            font-size: 14px;
-            color: #aaa;
-            margin-top: 5px;
-        }
-        
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 6px;
-            border-radius: 16px;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 15px;
-            color: #666;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .tab.active {
-            background: var(--primary);
-            color: #000;
-            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
-        }
-        
-        /* Input Area */
-        .input-area {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-        
-        .input-area:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(0, 255, 204, 0.1);
-        }
-        
-        .input-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 12px;
-        }
-        
-        input {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 32px;
-            width: 100%;
-            outline: none;
-            font-weight: 600;
-        }
-        
-        /* Calc Box */
-        .calc-box {
-            background: rgba(0, 255, 204, 0.05);
-            border: 1px dashed var(--primary);
-            border-radius: 16px;
-            padding: 20px;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        
-        .row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        /* Action Button */
-        .action-btn {
-            width: 100%;
-            padding: 20px;
-            border-radius: 16px;
-            border: none;
-            font-weight: 800;
-            font-size: 17px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-            text-transform: uppercase;
-            background: var(--gradient);
-            background-size: 400% 400%;
-            color: #000;
-            animation: rainbow 8s ease infinite;
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 255, 204, 0.4);
-        }
-        
-        /* Status Message */
-        #status-msg {
-            font-size: 13px;
-            text-align: center;
-            margin-top: 15px;
-            color: var(--primary);
-            font-weight: 600;
-            min-height: 20px;
-        }
-        
-        /* Referral Box */
-        .ref-box {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            margin-top: 25px;
-        }
-        
-        /* Contract Address Box */
-        .contract-box {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid var(--secondary);
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .contract-info {
-            flex: 1;
-        }
-        
-        .contract-label {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .contract-address {
-            font-size: 14px;
-            color: var(--secondary);
-            font-family: monospace;
-            word-break: break-all;
-        }
-        
-        .copy-btn {
-            background: linear-gradient(90deg, var(--secondary), #7b2cbf);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 20px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-        
-        .copy-btn:hover {
-            background: linear-gradient(90deg, #7b2cbf, var(--secondary));
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
-        }
-        
-        /* Balance Footer */
-        .balance-footer {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-            font-size: 14px;
-        }
-        
-        .balance-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .balance-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .balance-info {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        
-        .balance-inr {
-            font-size: 12px;
-            color: #ffaa00;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-        
-        /* Menu Card */
-        .menu-card {
-            background: rgba(22, 24, 33, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid rgba(157, 78, 221, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-        
-        .menu-card h2 {
-            color: var(--secondary);
-            font-size: 24px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-        
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-        
-        .menu-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(157, 78, 221, 0.3);
-            border-radius: 16px;
-            padding: 18px;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 15px;
-            text-align: left;
-        }
-        
-        .menu-btn i {
-            font-size: 20px;
-            color: var(--secondary);
-        }
-        
-        .menu-btn:hover {
-            background: rgba(157, 78, 221, 0.1);
-            border-color: var(--secondary);
-            transform: translateX(5px);
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .main-card, .menu-card {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 32px;
-            }
-            
-            .stat-value {
-                font-size: 18px;
-            }
-            
-            input {
-                font-size: 26px;
-            }
-            
-            .contract-box {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-            
-            .copy-btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body>
-    <!-- Professional Crypto Background -->
-    <div class="crypto-bg"></div>
-    <div class="crypto-lines">
-        <div class="crypto-line"></div>
-        <div class="crypto-line"></div>
-        <div class="crypto-line"></div>
-        <div class="crypto-line"></div>
-        <div class="crypto-line"></div>
-        <div class="crypto-line"></div>
-        <div class="crypto-line"></div>
-        <div class="crypto-line"></div>
-        <div class="crypto-line"></div>
-        <div class="crypto-line"></div>
-    </div>
-    <div class="crypto-particles" id="cryptoParticles"></div>
-    
-    <!-- Rainbow Border -->
-    <div class="rainbow-border"></div>
-    <div class="rainbow-glow"></div>
-    
-    <!-- Live Tickers -->
-    <div class="ticker-container">
-        <div class="ticker-wrapper">
-            <div class="ticker-item">
-                <span class="ticker-symbol">BTC</span>
-                <span class="ticker-price">$68,421.50</span>
-                <span class="ticker-change positive">+2.34%</span>
+<body class="bg-slate-950 text-white font-sans min-h-screen">
+
+    <div class="max-w-md mx-auto p-4">
+        <div class="flex flex-col py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">SIG6 PORTAL</h1>
+                <button id="connectBtn" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-full font-bold transition-all shadow-lg shadow-blue-900/20">Connect Wallet</button>
             </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">ETH</span>
-                <span class="ticker-price">$3,812.75</span>
-                <span class="ticker-change positive">+1.78%</span>
+            <p id="walletAddr" class="text-[10px] text-gray-500 text-right mt-2 font-mono"></p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+                <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">Buy Rate</p>
+                <h2 id="buyRateUsdt" class="text-2xl font-bold tracking-tight">$0.0000</h2>
+                <p id="buyRateInr" class="text-sm text-gray-500 font-medium">₹0.00</p>
             </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">USDT</span>
-                <span class="ticker-price">$1.00</span>
-                <span class="ticker-change">0.00%</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">SOL</span>
-                <span class="ticker-price">$142.60</span>
-                <span class="ticker-change negative">-0.85%</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">BNB</span>
-                <span class="ticker-price">$585.30</span>
-                <span class="ticker-change positive">+0.92%</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">SIG6</span>
-                <span class="ticker-price" id="ticker-sig6-price">$0.0576</span>
-                <span class="ticker-change positive" id="ticker-sig6-change">+0.89%</span>
-            </div>
-            <!-- Duplicate for seamless looping -->
-            <div class="ticker-item">
-                <span class="ticker-symbol">BTC</span>
-                <span class="ticker-price">$68,421.50</span>
-                <span class="ticker-change positive">+2.34%</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">ETH</span>
-                <span class="ticker-price">$3,812.75</span>
-                <span class="ticker-change positive">+1.78%</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">USDT</span>
-                <span class="ticker-price">$1.00</span>
-                <span class="ticker-change">0.00%</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">SOL</span>
-                <span class="ticker-price">$142.60</span>
-                <span class="ticker-change negative">-0.85%</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">BNB</span>
-                <span class="ticker-price">$585.30</span>
-                <span class="ticker-change positive">+0.92%</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-symbol">SIG6</span>
-                <span class="ticker-price" id="ticker-sig6-price-dup">$0.0576</span>
-                <span class="ticker-change positive" id="ticker-sig6-change-dup">+0.89%</span>
+            <div class="glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+                <p class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Sell Rate</p>
+                <h2 id="sellRateUsdt" class="text-2xl font-bold tracking-tight">$0.0000</h2>
+                <p id="sellRateInr" class="text-sm text-gray-500 font-medium">₹0.00</p>
             </div>
         </div>
-    </div>
-    
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Left Panel -->
-        <div class="left-panel">
-            <button class="connect-btn" id="connectBtn" onclick="connectWallet()">
-                <i class="fas fa-wallet"></i> Connect Wallet
-            </button>
-            
-            <div class="main-card">
-                <div class="header">
-                    <h1>SIGMA SIX</h1>
-                    <p>Stable Algorithm • 5-Level Rewards</p>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-label"><i class="fas fa-arrow-up"></i> BUY RATE</div>
-                        <div id="brate" class="stat-value">0.0576 USDT</div>
-                        <div id="brate-inr" class="stat-value-inr">≈ ₹5.18 INR</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label"><i class="fas fa-arrow-down"></i> SELL RATE</div>
-                        <div id="srate" class="stat-value">0.0573 USDT</div>
-                        <div id="srate-inr" class="stat-value-inr">≈ ₹5.16 INR</div>
+
+        <div class="glass p-6 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
+            <div class="flex space-x-2 mb-8 p-1 bg-slate-900/50 rounded-xl">
+                <button onclick="setMode('buy')" id="buyTab" class="flex-1 py-2 rounded-lg transition-all font-bold text-sm bg-blue-600 text-white">BUY</button>
+                <button onclick="setMode('sell')" id="sellTab" class="flex-1 py-2 rounded-lg transition-all font-bold text-sm text-gray-400">SELL</button>
+            </div>
+
+            <div class="space-y-5">
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">You Pay</label>
+                    <div class="flex items-center">
+                        <input id="inputAmount" type="number" placeholder="0.0" class="w-full bg-transparent text-2xl font-bold focus:outline-none">
+                        <span id="inputSymbol" class="text-lg font-black text-gray-400 ml-2">USDT</span>
                     </div>
                 </div>
-                
-                <div class="tabs">
-                    <div id="t-buy" class="tab active" onclick="setMode('buy')">
-                        <i class="fas fa-shopping-cart"></i> BUY SIG6
-                    </div>
-                    <div id="t-sell" class="tab" onclick="setMode('sell')">
-                        <i class="fas fa-coins"></i> SELL SIG6
+
+                <div class="flex justify-center -my-3 relative z-10">
+                    <div class="bg-slate-800 p-2 rounded-full border border-slate-700 shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                     </div>
                 </div>
-                
-                <div class="input-area">
-                    <div class="input-header">
-                        <span>Amount in SIG6</span>
-                        <span style="color:var(--primary);cursor:pointer" onclick="max()">
-                            <i class="fas fa-maximize"></i> MAX
-                        </span>
-                    </div>
-                    <input type="number" id="amt" placeholder="0" oninput="calc()">
-                </div>
-                
-                <div class="calc-box">
-                    <div class="row">
-                        <span id="out-label">Total USDT to Pay:</span> 
-                        <span id="out-amt" style="color:var(--primary); font-weight:800">0.0000 USDT</span>
-                    </div>
-                    <div class="row">
-                        <span id="tax-label">Buy Tax 1%:</span> 
-                        <span id="tax-amt" style="color:#ff4d4d">0.0000 USDT</span>
-                    </div>
-                    <div class="row">
-                        <span>Equivalent INR:</span> 
-                        <span id="inr-amt" style="color:#ffaa00">0.00 INR</span>
-                    </div>
-                    <div class="row" id="upline-display">
-                        <span style="color:#888;">Upline Address:</span> 
-                        <span id="upline-addr" style="font-size:11px; color:#aaa;">None</span>
+
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">You Receive (Est.)</label>
+                    <div class="flex items-center">
+                        <input id="outputAmount" type="number" placeholder="0.0" readonly class="w-full bg-transparent text-2xl font-bold text-gray-500 focus:outline-none">
+                        <span id="outputSymbol" class="text-lg font-black text-gray-400 ml-2">SIG6</span>
                     </div>
                 </div>
-                
-                <button class="action-btn" id="mainBtn" onclick="action()">
-                    <i class="fas fa-lock"></i> APPROVE USDT
+
+                <button id="actionBtn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 py-5 rounded-2xl font-black text-lg transition-all transform active:scale-95 shadow-xl shadow-blue-900/30">
+                    CONNECT WALLET
                 </button>
-                <div id="status-msg">Ready to trade</div>
-                
-                <!-- Contract Address Box -->
-                <div class="contract-box">
-                    <div class="contract-info">
-                        <div class="contract-label">
-                            <i class="fas fa-file-contract"></i> SIGMA SIX CONTRACT ADDRESS
-                        </div>
-                        <div class="contract-address" id="contract-addr">
-                            0x0f77a0d1FC8d04573402398A2ae19f367b4ef4aC
-                        </div>
-                    </div>
-                    <button class="copy-btn" onclick="copyContract()">
-                        <i class="fas fa-copy"></i> COPY
-                    </button>
-                </div>
-                
-                <!-- Hidden Referral Box -->
-                <div class="ref-box" id="ref-ui" style="display:none">
-                    <div class="row">
-                        <span style="font-size:12px; color:#888;">
-                            <i class="fas fa-link"></i> YOUR REFERRAL LINK
-                        </span>
-                        <button onclick="copyRef()" style="background:var(--primary); border:none; border-radius:10px; padding:8px 16px; font-weight:800; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:8px">
-                            <i class="fas fa-copy"></i> COPY LINK
-                        </button>
-                    </div>
-                    <!-- Hidden input field for referral link -->
-                    <input type="text" id="ref-link" readonly style="display:none;">
-                </div>
-                
-                <div class="balance-footer">
-                    <div class="balance-item">
-                        <span><i class="fas fa-wallet"></i> USDT Balance:</span>
-                        <div class="balance-info">
-                            <span id="bal-usdt">0.000</span>
-                        </div>
-                    </div>
-                    <div class="balance-item">
-                        <span><i class="fas fa-coins"></i> SIG6 Balance:</span>
-                        <div class="balance-info">
-                            <span id="bal-sig">0.000</span>
-                            <span id="bal-sig-inr" class="balance-inr">₹0.00 INR</span>
-                        </div>
-                    </div>
-                    <div class="balance-item">
-                        <span><i class="fas fa-gas-pump"></i> POL Balance:</span>
-                        <div class="balance-info">
-                            <span id="bal-pol">0.000</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Right Panel -->
-        <div class="right-panel">
-            <div class="menu-card">
-                <h2><i class="fas fa-bars"></i> SIGMA SIX MENU</h2>
-                <div class="menu-grid">
-                    <button class="menu-btn" onclick="window.location.href='team.html'">
-                        <i class="fas fa-users"></i>
-                        <div>
-                            <div>Team</div>
-                            <div style="font-size:12px; color:#aaa;">View referral team & earnings</div>
-                        </div>
-                    </button>
-                    <button class="menu-btn" onclick="window.location.href='income.html'">
-                        <i class="fas fa-chart-line"></i>
-                        <div>
-                            <div>Income Report</div>
-                            <div style="font-size:12px; color:#aaa;">Track your rewards & commissions</div>
-                        </div>
-                    </button>
-                    <button class="menu-btn" onclick="window.location.href='buy_sell.html'">
-                        <i class="fas fa-exchange-alt"></i>
-                        <div>
-                            <div>Buy/Sell Report</div>
-                            <div style="font-size:12px; color:#aaa;">Transaction history & analytics</div>
-                        </div>
-                    </button>
-                    <button class="menu-btn" onclick="window.location.href='tree.html'">
-                        <i class="fas fa-project-diagram"></i>
-                        <div>
-                            <div>Tree View</div>
-                            <div style="font-size:12px; color:#aaa;">Visualize your referral network</div>
-                        </div>
-                    </button>
-                    <button class="menu-btn" onclick="window.location.href='details.html'">
-                        <i class="fas fa-rocket"></i>
-                        <div>
-                            <div>Explore Sigma</div>
-                            <div style="font-size:12px; color:#aaa;">Learn about SIGMA SIX ecosystem</div>
-                        </div>
-                    </button>
-                </div>
+                <p id="statusMsg" class="text-center text-xs font-medium text-yellow-500 animate-pulse"></p>
             </div>
         </div>
     </div>
 
     <script>
-        const S_ADDR = "0x0f77a0d1FC8d04573402398A2ae19f367b4ef4aC";
-        const U_ADDR = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
-        let mode = 'buy', buyR = 0.0576, sellR = 0.0573, signer, addr, provider;
-        const USDT_TO_INR = 90.0;
+        const SIG6_ADDR = "0x52fD2a4da50d34566224DC65Da4Ba6C29c07A3DC";
+        const USDT_ADDR = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"; // Polygon USDT
         
-        // Create floating particles
-        function createParticles() {
-            const particlesContainer = document.getElementById('cryptoParticles');
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 100}%`;
-                particle.style.animationDelay = `${Math.random() * 20}s`;
-                particle.style.backgroundColor = i % 3 === 0 ? 'var(--primary)' : 
-                                                i % 3 === 1 ? 'var(--secondary)' : 
-                                                '#ff2a6d';
-                particlesContainer.appendChild(particle);
-            }
-        }
-        
-        // Save Referral Upline from URL even if page refreshes
-        function handleUpline() {
-            const params = new URLSearchParams(window.location.search);
-            let ref = params.get('ref');
-            if (ref && ethers.isAddress(ref)) {
-                localStorage.setItem('sigma_ref', ref);
-            }
-            let currentRef = localStorage.getItem('sigma_ref') || "0x0000000000000000000000000000000000000000";
-            document.getElementById('upline-addr').innerText = currentRef.slice(0,10) + "..." + currentRef.slice(-8);
-            return currentRef;
+        const ABI = [
+            "function currentRate() view returns (uint256)",
+            "function getSellRate() view returns (uint256)",
+            "function buy(uint256 _usdtAmount, address _upline) external",
+            "function sell(uint256 _sigmaAmount) external"
+        ];
+
+        const USDT_ABI = [
+            "function approve(address spender, uint256 amount) returns (bool)",
+            "function allowance(address owner, address spender) view returns (uint256)"
+        ];
+
+        let provider, signer, mode = 'buy', inrRate = 88.50;
+
+        async function init() {
+            // Fetch INR Price
+            try {
+                const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+                const data = await res.json();
+                inrRate = data.rates.INR;
+            } catch(e) {}
+            
+            refreshRates();
+            setInterval(refreshRates, 10000);
         }
 
-        // Update INR values using current rates
-        function updateINRValues() {
-            const buyRateElement = document.getElementById('brate');
-            const sellRateElement = document.getElementById('srate');
-            
-            if (buyRateElement && sellRateElement) {
-                const buyRate = parseFloat(buyRateElement.innerText) || buyR;
-                const sellRate = parseFloat(sellRateElement.innerText) || sellR;
-                
-                document.getElementById('brate-inr').innerText = `≈ ₹${(buyRate * USDT_TO_INR).toFixed(2)} INR`;
-                document.getElementById('srate-inr').innerText = `≈ ₹${(sellRate * USDT_TO_INR).toFixed(2)} INR`;
-            }
-            
-            const outAmtElement = document.getElementById('out-amt');
-            if (outAmtElement) {
-                const outAmtText = outAmtElement.innerText;
-                const outAmt = parseFloat(outAmtText) || 0;
-                document.getElementById('inr-amt').innerText = `${(outAmt * USDT_TO_INR).toFixed(2)} INR`;
-            }
-        }
+        async function refreshRates() {
+            const rpcs = ["https://polygon-rpc.com", "https://rpc-mainnet.maticvigil.com", "https://1rpc.io/matic"];
+            let loaded = false;
 
-        // Update SIG6 balance INR value - USING SELL RATE
-        function updateSigmaINRValue() {
-            const sigBalanceElement = document.getElementById('bal-sig');
-            const sigINRElement = document.getElementById('bal-sig-inr');
-            
-            if (sigBalanceElement && sigINRElement) {
-                const sigText = sigBalanceElement.innerText;
-                const sigBalance = parseFloat(sigText) || 0;
-                // Using sell rate for SIG6 balance value in INR
-                const inrValue = (sigBalance * sellR * USDT_TO_INR).toFixed(2);
-                sigINRElement.innerText = `₹${inrValue} INR`;
-            }
-        }
-
-        // Update all INR values when rates change
-        function updateAllINRValues() {
-            updateINRValues();
-            updateSigmaINRValue();
-        }
-
-        // Live ticker data
-        function updateTickers() {
-            const changePercent = 0.89; // Static change for SIG6
-            
-            // Format price to 4 decimals for SIG6
-            const sig6Price = buyR.toFixed(4);
-            
-            // Update ticker price display
-            document.querySelectorAll('[id^="ticker-sig6-price"]').forEach(el => {
-                el.innerText = `$${sig6Price}`;
-            });
-            
-            // Update ticker change display
-            document.querySelectorAll('[id^="ticker-sig6-change"]').forEach(el => {
-                el.innerText = `+${changePercent.toFixed(2)}%`;
-            });
-            
-            const tickers = [
-                { symbol: 'BTC', price: 68421.50, change: 2.34 },
-                { symbol: 'ETH', price: 3812.75, change: 1.78 },
-                { symbol: 'USDT', price: 1.00, change: 0.00 },
-                { symbol: 'SOL', price: 142.60, change: -0.85 },
-                { symbol: 'BNB', price: 585.30, change: 0.92 },
-                { symbol: 'SIG6', price: parseFloat(sig6Price), change: changePercent }
-            ];
-            
-            const wrapper = document.querySelector('.ticker-wrapper');
-            if (wrapper) {
-                let tickerHTML = '';
-                
-                for (let i = 0; i < 2; i++) {
-                    tickers.forEach(ticker => {
-                        const changeClass = ticker.change > 0 ? 'positive' : (ticker.change < 0 ? 'negative' : '');
-                        const changeSign = ticker.change > 0 ? '+' : '';
-                        const decimals = ticker.symbol === 'SIG6' ? 4 : 2;
-                        
-                        tickerHTML += `
-                            <div class="ticker-item">
-                                <span class="ticker-symbol">${ticker.symbol}</span>
-                                <span class="ticker-price">$${ticker.price.toFixed(decimals)}</span>
-                                <span class="ticker-change ${changeClass}">${changeSign}${Math.abs(ticker.change).toFixed(2)}%</span>
-                            </div>
-                        `;
-                    });
-                }
-                
-                wrapper.innerHTML = tickerHTML;
-            }
-        }
-
-        // Copy Contract Address
-        function copyContract() {
-            const contractAddress = "0x0f77a0d1FC8d04573402398A2ae19f367b4ef4aC";
-            navigator.clipboard.writeText(contractAddress).then(() => {
-                const statusMsg = document.getElementById('status-msg');
-                statusMsg.innerText = "Contract Address Copied!";
-                statusMsg.style.color = "#9d4edd";
-                
-                const copyBtn = document.querySelector('.copy-btn');
-                const originalHTML = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check"></i> COPIED';
-                copyBtn.style.background = 'linear-gradient(90deg, #00ff88, #00cc66)';
-                
-                setTimeout(() => {
-                    copyBtn.innerHTML = originalHTML;
-                    copyBtn.style.background = 'linear-gradient(90deg, var(--secondary), #7b2cbf)';
+            for(let url of rpcs) {
+                try {
+                    const tempProv = new ethers.JsonRpcProvider(url);
+                    const contract = new ethers.Contract(SIG6_ADDR, ABI, tempProv);
                     
-                    setTimeout(() => {
-                        statusMsg.innerText = "Ready to trade";
-                        statusMsg.style.color = "#00ffcc";
-                    }, 2000);
-                }, 1500);
-            });
-        }
+                    const [bRaw, sRaw] = await Promise.all([
+                        contract.currentRate(),
+                        contract.getSellRate()
+                    ]);
 
-        // Connect Wallet Function
-        async function connectWallet() {
-            if (!window.ethereum) {
-                alert("Please install MetaMask to use this DApp!");
-                window.open("https://metamask.io/download/", "_blank");
-                return;
+                    // Formula fix: Base rate 10500 is actually 0.0105 USDT if scaled by 1e6
+                    // Your contract uses: tokensToMint = (netUsdt * 1e18) / currentRate
+                    // If currentRate is 10500, then for 1 USDT (1e6), it mints ~95 tokens.
+                    const bUsdt = Number(bRaw) / 1e6; 
+                    const sUsdt = Number(sRaw) / 1e6;
+
+                    document.getElementById('buyRateUsdt').innerText = `$${bUsdt.toFixed(4)}`;
+                    document.getElementById('sellRateUsdt').innerText = `$${sUsdt.toFixed(4)}`;
+                    document.getElementById('buyRateInr').innerText = `₹${(bUsdt * inrRate).toFixed(2)}`;
+                    document.getElementById('sellRateInr').innerText = `₹${(sUsdt * inrRate).toFixed(2)}`;
+                    
+                    loaded = true;
+                    break;
+                } catch(e) { console.error("RPC fail:", url); }
             }
-            
-            try {
-                // Request account access
-                provider = new ethers.BrowserProvider(window.ethereum);
-                const accounts = await provider.send("eth_requestAccounts", []);
-                addr = accounts[0];
-                signer = await provider.getSigner();
-                
-                // Update connect button
-                const connectBtn = document.getElementById('connectBtn');
-                connectBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${addr.slice(0,6)}...${addr.slice(-4)}`;
-                connectBtn.classList.add('connected');
-                
-                // Show referral UI
-                document.getElementById('ref-ui').style.display = 'block';
-                updateRefLink();
-                
-                // Update status
-                document.getElementById('status-msg').innerText = "Wallet Connected Successfully!";
-                document.getElementById('status-msg').style.color = "#00ff88";
-                
-                // Start syncing data
-                await sync();
-                
-                // Listen for account changes
-                window.ethereum.on('accountsChanged', async (accounts) => {
-                    if (accounts.length > 0) {
-                        addr = accounts[0];
-                        signer = await provider.getSigner();
-                        connectBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${addr.slice(0,6)}...${addr.slice(-4)}`;
-                        updateRefLink();
-                        await sync();
-                    } else {
-                        // User disconnected
-                        connectBtn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
-                        connectBtn.classList.remove('connected');
-                        document.getElementById('ref-ui').style.display = 'none';
-                        document.getElementById('status-msg').innerText = "Wallet Disconnected";
-                        document.getElementById('status-msg').style.color = "#ffaa00";
-                    }
-                });
-                
-                // Listen for chain changes
-                window.ethereum.on('chainChanged', () => {
-                    window.location.reload();
-                });
-                
-            } catch (error) {
-                console.error("Connection error:", error);
-                
-                if (error.code === 4001) {
-                    // User rejected the connection request
-                    document.getElementById('status-msg').innerText = "Connection rejected by user";
-                    document.getElementById('status-msg').style.color = "#ff4d4d";
-                } else if (error.code === -32002) {
-                    // Request already pending
-                    document.getElementById('status-msg').innerText = "Connection request already pending in MetaMask";
-                    document.getElementById('status-msg').style.color = "#ffaa00";
-                } else {
-                    document.getElementById('status-msg').innerText = "Connection failed: " + error.message;
-                    document.getElementById('status-msg').style.color = "#ff4d4d";
-                }
-            }
-        }
-
-        async function sync() {
-            if (!addr) return;
-            
-            try {
-                const uc = new ethers.Contract(U_ADDR, [
-                    "function balanceOf(address) view returns (uint256)",
-                    "function allowance(address,address) view returns (uint256)"
-                ], provider);
-                
-                const sc = new ethers.Contract(S_ADDR, [
-                    {
-                        "inputs": [
-                            {
-                                "internalType": "address",
-                                "name": "account",
-                                "type": "address"
-                            }
-                        ],
-                        "name": "balanceOf",
-                        "outputs": [
-                            {
-                                "internalType": "uint256",
-                                "name": "",
-                                "type": "uint256"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [],
-                        "name": "buyRate",
-                        "outputs": [
-                            {
-                                "internalType": "uint256",
-                                "name": "",
-                                "type": "uint256"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [],
-                        "name": "getSellRate",
-                        "outputs": [
-                            {
-                                "internalType": "uint256",
-                                "name": "",
-                                "type": "uint256"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [],
-                        "name": "totalSupply",
-                        "outputs": [
-                            {
-                                "internalType": "uint256",
-                                "name": "",
-                                "type": "uint256"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    }
-                ], provider);
-                
-                const [pb, ub, sb, br, sr, alw] = await Promise.all([
-                    provider.getBalance(addr),
-                    uc.balanceOf(addr),
-                    sc.balanceOf(addr),
-                    sc.buyRate(),
-                    sc.getSellRate(),
-                    uc.allowance(addr, S_ADDR)
-                ]);
-
-                // Update balances
-                const polBalance = parseFloat(ethers.formatEther(pb)).toFixed(3);
-                const usdtBalance = parseFloat(ethers.formatUnits(ub, 6)).toFixed(3);
-                const sigBalance = parseFloat(ethers.formatEther(sb)).toFixed(2);
-                
-                document.getElementById('bal-pol').innerText = polBalance + " POL";
-                document.getElementById('bal-usdt').innerText = usdtBalance + " USDT";
-                document.getElementById('bal-sig').innerText = sigBalance + " SIG6";
-                
-                // Update rates FROM CONTRACT (real values)
-                const newBuyR = parseFloat(ethers.formatUnits(br, 6));
-                const newSellR = parseFloat(ethers.formatUnits(sr, 6));
-                
-                // Check if rates changed
-                const ratesChanged = (newBuyR !== buyR) || (newSellR !== sellR);
-                
-                // Update global rate variables
-                buyR = newBuyR;
-                sellR = newSellR;
-                
-                // Update display rates
-                document.getElementById('brate').innerText = buyR.toFixed(4) + " USDT";
-                document.getElementById('srate').innerText = sellR.toFixed(4) + " USDT";
-                
-                // Update all INR values
-                updateAllINRValues();
-                
-                // Update tickers with new price
-                updateTickers();
-                
-                // Update button text based on allowance
-                const v = parseFloat(document.getElementById('amt').value) || 0;
-                const requiredUsdt = (v * buyR) * 1.01;
-                const currentAlw = parseFloat(ethers.formatUnits(alw, 6));
-
-                if(mode === 'buy') {
-                    document.getElementById('mainBtn').innerHTML = (currentAlw >= requiredUsdt && requiredUsdt > 0) 
-                        ? '<i class="fas fa-shopping-cart"></i> BUY SIGMA' 
-                        : '<i class="fas fa-lock"></i> APPROVE USDT';
-                } else {
-                    document.getElementById('mainBtn').innerHTML = '<i class="fas fa-coins"></i> SELL SIGMA';
-                }
-                
-                // Re-calc to update values with new rates
-                if (ratesChanged) {
-                    calc();
-                }
-            } catch (e) { 
-                console.error(e);
-                document.getElementById('status-msg').innerText = "Sync Error: " + (e.reason || "Check connection");
-                document.getElementById('status-msg').style.color = "#ff4d4d";
-            }
-        }
-
-        function calc() {
-            const v = parseFloat(document.getElementById('amt').value) || 0;
-            let tax = 0, final = 0;
-            
-            if (mode === 'buy') {
-                const netUsdt = v * buyR;
-                tax = netUsdt * 0.01;
-                final = netUsdt + tax;
-                document.getElementById('out-label').innerText = "Total USDT to Pay:";
-                document.getElementById('tax-label').innerText = "Buy Tax 1%:";
-                document.getElementById('out-amt').innerText = final.toFixed(4) + " USDT";
-            } else {
-                const totalVal = v * sellR;
-                tax = totalVal * 0.01;
-                final = totalVal - tax;
-                document.getElementById('out-label').innerText = "Total USDT Receive:";
-                document.getElementById('tax-label').innerText = "Sell Tax 1%:";
-                document.getElementById('out-amt').innerText = final.toFixed(4) + " USDT";
-            }
-            
-            document.getElementById('tax-amt').innerText = tax.toFixed(4) + " USDT";
-            updateINRValues();
+            if(!loaded) document.getElementById('statusMsg').innerText = "Network Error: Refresh Page";
         }
 
         function setMode(m) {
             mode = m;
-            document.getElementById('t-buy').className = m === 'buy' ? 'tab active' : 'tab';
-            document.getElementById('t-sell').className = m === 'sell' ? 'tab active' : 'tab';
+            const isBuy = m === 'buy';
+            document.getElementById('buyTab').className = isBuy ? 'flex-1 py-2 rounded-lg transition-all font-bold text-sm bg-blue-600 text-white' : 'flex-1 py-2 rounded-lg transition-all font-bold text-sm text-gray-400';
+            document.getElementById('sellTab').className = !isBuy ? 'flex-1 py-2 rounded-lg transition-all font-bold text-sm bg-blue-600 text-white' : 'flex-1 py-2 rounded-lg transition-all font-bold text-sm text-gray-400';
+            document.getElementById('inputSymbol').innerText = isBuy ? 'USDT' : 'SIG6';
+            document.getElementById('outputSymbol').innerText = isBuy ? 'SIG6' : 'USDT';
+            if(signer) document.getElementById('actionBtn').innerText = isBuy ? 'BUY SIG6' : 'SELL SIG6';
+            document.getElementById('inputAmount').value = '';
+            document.getElementById('outputAmount').value = '';
+        }
+
+        document.getElementById('inputAmount').oninput = (e) => {
+            const val = parseFloat(e.target.value) || 0;
+            const bRate = parseFloat(document.getElementById('buyRateUsdt').innerText.replace('$',''));
+            const sRate = parseFloat(document.getElementById('sellRateUsdt').innerText.replace('$',''));
             
-            // Update button text
-            if (m === 'buy') {
-                document.getElementById('mainBtn').innerHTML = '<i class="fas fa-lock"></i> APPROVE USDT';
+            if(mode === 'buy') {
+                document.getElementById('outputAmount').value = (val / bRate).toFixed(6);
             } else {
-                document.getElementById('mainBtn').innerHTML = '<i class="fas fa-coins"></i> SELL SIGMA';
+                document.getElementById('outputAmount').value = (val * sRate).toFixed(6);
             }
-            
-            calc();
-        }
-
-        async function action() {
-            if (!signer) return connectWallet();
-            
-            const v = document.getElementById('amt').value;
-            if (!v || v <= 0) {
-                document.getElementById('status-msg').innerText = "Please enter a valid amount";
-                document.getElementById('status-msg').style.color = "#ffaa00";
-                return;
-            }
-            
-            const msg = document.getElementById('status-msg');
-            msg.style.color = "#00ffcc";
-            
-            try {
-                if (mode === 'buy') {
-                    const uc = new ethers.Contract(U_ADDR, [
-                        "function approve(address,uint256) returns (bool)",
-                        "function allowance(address,address) view returns (uint256)"
-                    ], signer);
-                    
-                    const requiredUsdt = (parseFloat(v) * buyR) * 1.01;
-                    const alw = await uc.allowance(addr, S_ADDR);
-                    
-                    if (parseFloat(ethers.formatUnits(alw, 6)) < requiredUsdt) {
-                        msg.innerText = "Approving USDT...";
-                        const tx = await uc.approve(S_ADDR, ethers.MaxUint256);
-                        await tx.wait();
-                        msg.innerText = "Approval Success!";
-                        msg.style.color = "#00ff88";
-                        sync();
-                        
-                        setTimeout(() => {
-                            document.getElementById('mainBtn').innerHTML = '<i class="fas fa-shopping-cart"></i> BUY SIGMA';
-                        }, 1000);
-                    } else {
-                        const buySigmaABI = {
-                            "inputs": [
-                                {
-                                    "internalType": "uint256",
-                                    "name": "sigmaAmount",
-                                    "type": "uint256"
-                                },
-                                {
-                                    "internalType": "address",
-                                    "name": "_upline",
-                                    "type": "address"
-                                }
-                            ],
-                            "name": "buySigma",
-                            "outputs": [],
-                            "stateMutability": "nonpayable",
-                            "type": "function"
-                        };
-                        
-                        const sc = new ethers.Contract(S_ADDR, [buySigmaABI], signer);
-                        const upline = handleUpline();
-                        msg.innerText = "Buying SIGMA...";
-                        const tx = await sc.buySigma(ethers.parseEther(v), upline);
-                        await tx.wait();
-                        msg.innerText = "Purchase Successful!";
-                        msg.style.color = "#00ff88";
-                        sync();
-                    }
-                } else {
-                    const sellSigmaABI = {
-                        "inputs": [
-                            {
-                                "internalType": "uint256",
-                                "name": "sigmaAmount",
-                                "type": "uint256"
-                            }
-                        ],
-                        "name": "sellSigma",
-                        "outputs": [],
-                        "stateMutability": "nonpayable",
-                        "type": "function"
-                    };
-                    
-                    const sc = new ethers.Contract(S_ADDR, [sellSigmaABI], signer);
-                    msg.innerText = "Selling SIGMA...";
-                    const tx = await sc.sellSigma(ethers.parseEther(v));
-                    await tx.wait();
-                    msg.innerText = "Sale Successful!";
-                    msg.style.color = "#00ff88";
-                    sync();
-                }
-            } catch (e) { 
-                console.error(e);
-                msg.innerText = "Error: " + (e.reason || "Check Balance/Gas");
-                msg.style.color = "#ff4d4d";
-            }
-        }
-
-        function updateRefLink() {
-            if (!addr) return;
-            const link = window.location.origin + window.location.pathname + "?ref=" + addr;
-            document.getElementById('ref-link').value = link;
-        }
-
-        function copyRef() {
-            const linkInput = document.getElementById('ref-link');
-            linkInput.select();
-            navigator.clipboard.writeText(linkInput.value);
-            
-            const statusMsg = document.getElementById('status-msg');
-            statusMsg.innerText = "Referral Link Copied to Clipboard!";
-            statusMsg.style.color = "#00ff88";
-            
-            setTimeout(() => {
-                statusMsg.innerText = "Ready to trade";
-                statusMsg.style.color = "#00ffcc";
-            }, 3000);
-        }
-
-        function max() {
-            const u = document.getElementById('bal-usdt').innerText.split(' ')[0];
-            const s = document.getElementById('bal-sig').innerText.split(' ')[0];
-            
-            if (mode === 'buy') {
-                document.getElementById('amt').value = ((parseFloat(u) / 1.01) / buyR).toFixed(2);
-            } else {
-                document.getElementById('amt').value = s;
-            }
-            calc();
-        }
-
-        // Initialize on page load
-        window.onload = async function() {
-            // Create background particles
-            createParticles();
-            
-            handleUpline();
-            updateINRValues();
-            updateTickers();
-            updateSigmaINRValue();
-            
-            // Check if wallet is already connected
-            if (window.ethereum) {
-                try {
-                    provider = new ethers.BrowserProvider(window.ethereum);
-                    const accounts = await provider.send("eth_accounts", []);
-                    
-                    if (accounts.length > 0) {
-                        addr = accounts[0];
-                        signer = await provider.getSigner();
-                        
-                        // Update UI for already connected wallet
-                        const connectBtn = document.getElementById('connectBtn');
-                        connectBtn.innerHTML = `<i class="fas fa-check-circle"></i> ${addr.slice(0,6)}...${addr.slice(-4)}`;
-                        connectBtn.classList.add('connected');
-                        
-                        document.getElementById('ref-ui').style.display = 'block';
-                        updateRefLink();
-                        
-                        // Sync data
-                        await sync();
-                    }
-                } catch (error) {
-                    console.error("Auto-connect error:", error);
-                }
-            }
-            
-            // Auto refresh sync every 30 seconds
-            setInterval(() => {
-                if (addr) {
-                    sync();
-                }
-            }, 30000);
-            
-            // Auto refresh tickers every 30 seconds
-            setInterval(updateTickers, 30000);
         };
+
+        document.getElementById('connectBtn').onclick = async () => {
+            if(!window.ethereum) return alert("Install MetaMask");
+            provider = new ethers.BrowserProvider(window.ethereum);
+            const accounts = await provider.send("eth_requestAccounts", []);
+            signer = await provider.getSigner();
+            document.getElementById('connectBtn').innerText = "Connected";
+            document.getElementById('walletAddr').innerText = `Wallet: ${accounts[0]}`;
+            setMode(mode);
+        };
+
+        document.getElementById('actionBtn').onclick = async () => {
+            if(!signer) return document.getElementById('connectBtn').click();
+            
+            const amount = document.getElementById('inputAmount').value;
+            if(!amount || amount <= 0) return alert("Enter amount");
+            
+            const status = document.getElementById('statusMsg');
+            const contract = new ethers.Contract(SIG6_ADDR, ABI, signer);
+
+            try {
+                if(mode === 'buy') {
+                    const usdtContract = new ethers.Contract(USDT_ADDR, USDT_ABI, signer);
+                    const amountWei = ethers.parseUnits(amount, 6); // USDT is 6 decimals
+                    
+                    status.innerText = "Checking Allowance...";
+                    const allow = await usdtContract.allowance(await signer.getAddress(), SIG6_ADDR);
+                    
+                    if(allow < amountWei) {
+                        status.innerText = "Approving USDT...";
+                        const txA = await usdtContract.approve(SIG6_ADDR, amountWei);
+                        await txA.wait();
+                    }
+                    
+                    status.innerText = "Confirming Purchase...";
+                    const txB = await contract.buy(amountWei, "0x0000000000000000000000000000000000000000");
+                    await txB.wait();
+                    status.innerText = "Purchase Successful!";
+                } else {
+                    const amountWei = ethers.parseUnits(amount, 18); // SIG6 is 18 decimals
+                    status.innerText = "Confirming Sale...";
+                    const txS = await contract.sell(amountWei);
+                    await txS.wait();
+                    status.innerText = "Sale Successful!";
+                }
+            } catch(e) {
+                status.innerText = "Transaction Failed!";
+                console.error(e);
+            }
+        };
+
+        init();
     </script>
 </body>
 </html>
