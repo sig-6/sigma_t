@@ -167,28 +167,6 @@
             color: #888;
         }
         
-        .approve-btn {
-            background: #ffaa00;
-            color: #000;
-            border: none;
-            border-radius: 12px;
-            padding: 15px;
-            font-weight: 800;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            margin: 10px 0;
-            transition: all 0.3s;
-        }
-        .approve-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255,170,0,0.3);
-        }
-        .approve-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
         .contract-box { background:rgba(0,0,0,0.3); padding:20px; border-radius:16px; border:1px solid var(--secondary); margin-top:20px; display:flex; align-items:center; gap:15px; }
         .contract-info { flex:1; }
         .contract-label { font-size:12px; color:#888; margin-bottom:5px; display:flex; align-items:center; gap:8px; }
@@ -461,10 +439,9 @@
         // ========== CONTRACT CONFIGURATION ==========
         const SIGMA_ADDRESS = "0xf7a8cd16d672f81dc785bcaBf08502bBB210Aee1";
         const USDT_ADDRESS = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
-        const CREATOR_WALLET = "0xb579377DDe2C03b2b46B5b12453F4dbAddB06f2E";
         
-        // NEW ABI (PROVIDED)
-        const SIGMA_ABI = [ /* ... (full ABI as provided, kept unchanged for brevity) ... */
+        // NEW ABI (PROVIDED) - keeping full ABI as before
+        const SIGMA_ABI = [ /* ... (full ABI as provided, unchanged) ... */
             {
                 "inputs": [
                     {
@@ -1430,6 +1407,8 @@
         let hasUserBought = false; // Track if user has made at least one buy
 
         const INR_RATE = 95;
+        // Default upline if none in localStorage - using a zero address as fallback
+        const DEFAULT_UPLINE = "0x0000000000000000000000000000000000000000";
 
         window.onload = async () => {
             createParticles();
@@ -1496,9 +1475,14 @@
             if (ref && ethers.isAddress(ref)) {
                 localStorage.setItem('sigma_referrer', ref);
             }
-            const storedRef = localStorage.getItem('sigma_referrer') || CREATOR_WALLET;
-            document.getElementById('uplineAddress').textContent = 
-                storedRef.slice(0,8) + '...' + storedRef.slice(-6);
+            // No default creator wallet - use null and contract will handle
+            const storedRef = localStorage.getItem('sigma_referrer');
+            if (storedRef) {
+                document.getElementById('uplineAddress').textContent = 
+                    storedRef.slice(0,8) + '...' + storedRef.slice(-6);
+            } else {
+                document.getElementById('uplineAddress').textContent = 'None (contract default)';
+            }
         }
 
         async function connectWallet() {
@@ -1539,10 +1523,7 @@
                 document.getElementById('walletAddress').textContent = 
                     userAddress.slice(0,8) + '...' + userAddress.slice(-6);
                 
-                if (userAddress === CREATOR_WALLET.toLowerCase()) {
-                    document.getElementById('statusMessage').innerHTML = 
-                        '<i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> ⚠️ Creator Wallet detected! Cannot trade.';
-                }
+                // No creator wallet check anymore
                 
                 const saved = localStorage.getItem(`lastSell_${userAddress}`);
                 if (saved) {
@@ -1566,12 +1547,7 @@
                 document.getElementById('btnText').textContent = 
                     userAddress.slice(0,6) + '...' + userAddress.slice(-4);
                 
-                if (userAddress === CREATOR_WALLET.toLowerCase()) {
-                    document.getElementById('statusMessage').innerHTML = 
-                        '<i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> ⚠️ Creator Wallet detected! Cannot trade.';
-                } else {
-                    document.getElementById('statusMessage').innerHTML = '';
-                }
+                // No creator wallet check
                 
                 const saved = localStorage.getItem(`lastSell_${userAddress}`);
                 if (saved) {
@@ -1725,12 +1701,7 @@
                 document.getElementById('calcValue').textContent = usdtWithTax.toFixed(6) + ' USDT';
                 document.getElementById('calcInr').textContent = '₹' + (usdtWithTax * INR_RATE).toFixed(2);
                 
-                if (userAddress === CREATOR_WALLET.toLowerCase()) {
-                    document.getElementById('actionButton').disabled = true;
-                    document.getElementById('actionButton').innerHTML = '<i class="fas fa-ban"></i> CREATOR WALLET';
-                    document.getElementById('approvalSteps').style.display = 'none';
-                    return;
-                }
+                // No creator wallet check
                 
                 const usdtBal = await usdtContract.balanceOf(userAddress);
                 const usdtBalNum = parseFloat(ethers.formatUnits(usdtBal, 6));
@@ -1752,12 +1723,7 @@
                 document.getElementById('calcValue').textContent = totalUsdt.toFixed(6) + ' USDT';
                 document.getElementById('calcInr').textContent = '₹' + (totalUsdt * INR_RATE).toFixed(2);
                 
-                if (userAddress === CREATOR_WALLET.toLowerCase()) {
-                    document.getElementById('actionButton').disabled = true;
-                    document.getElementById('actionButton').innerHTML = '<i class="fas fa-ban"></i> CREATOR WALLET';
-                    document.getElementById('approvalSteps').style.display = 'none';
-                    return;
-                }
+                // No creator wallet check
                 
                 const sigmaBal = await sigmaContract.balanceOf(userAddress);
                 const sigmaBalNum = parseFloat(ethers.formatEther(sigmaBal));
@@ -1825,11 +1791,7 @@
                 return;
             }
             
-            if (userAddress === CREATOR_WALLET.toLowerCase()) {
-                document.getElementById('statusMessage').innerHTML = 
-                    '<i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> ❌ Creator wallet cannot trade!';
-                return;
-            }
+            // No creator wallet check
             
             const amount = parseFloat(document.getElementById('amount').value);
             if (isNaN(amount) || amount <= 0) {
@@ -1857,7 +1819,7 @@
                     msg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buying SIGMA...';
                     btn.disabled = true;
                     
-                    const upline = localStorage.getItem('sigma_referrer') || CREATOR_WALLET;
+                    const upline = localStorage.getItem('sigma_referrer') || DEFAULT_UPLINE;
                     
                     const tx = await sigmaContract.buy(usdtWei, upline);
                     
