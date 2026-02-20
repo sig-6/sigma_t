@@ -510,6 +510,13 @@
             filter: drop-shadow(0 0 5px rgba(255,215,0,0.5));
         }
         
+        .qualified-badge {
+            font-size: 10px;
+            color: #888;
+            display: block;
+            margin-top: 2px;
+        }
+        
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--gradient); border-radius: 4px; animation: rainbow 8s ease infinite; }
@@ -546,7 +553,7 @@
             <div class="stat-card">
                 <div class="stat-title"><i class="fas fa-sitemap"></i> Direct Referrals</div>
                 <div class="stat-value" id="direct-referrals">0</div>
-                <div class="stat-sub">Level 1 members</div>
+                <div class="stat-sub" id="direct-qualified">Qualified: 0</div>
             </div>
             
             <div class="stat-card">
@@ -1643,7 +1650,7 @@
             }
         }
 
-        // ===== FIXED: Load all addresses including admin added users =====
+        // ===== COMPLETE FIXED: Load all addresses including admin added users =====
         async function loadAllAddresses() {
             try {
                 // 1. Events se addresses collect karo
@@ -1670,31 +1677,41 @@
                 let addresses = Array.from(addressSet);
                 console.log(`📊 Found ${addresses.length} addresses from events`);
                 
-                // 3. ⭐ CRITICAL FIX: Har address ke upline ko bhi add karo
+                // 3. Har address ke upline ko bhi add karo recursively
                 const allUplines = new Set();
+                let previousSize = 0;
+                let currentSize = addresses.length;
                 
-                const batchSize = 50;
-                for (let i = 0; i < addresses.length; i += batchSize) {
-                    const batch = addresses.slice(i, i + batchSize);
-                    const promises = batch.map(async (addr) => {
-                        try {
-                            const userStruct = await sigmaContract.users(addr).catch(() => null);
-                            if (userStruct && userStruct.upline && userStruct.upline !== "0x0000000000000000000000000000000000000000") {
-                                allUplines.add(userStruct.upline.toLowerCase());
-                            }
-                        } catch (e) {}
-                    });
-                    await Promise.all(promises);
+                // Recursive upline discovery - tab tak chalao jab tak naye upline milna band na ho jayein
+                while (previousSize !== currentSize) {
+                    previousSize = currentSize;
+                    
+                    const batchSize = 50;
+                    for (let i = 0; i < addresses.length; i += batchSize) {
+                        const batch = addresses.slice(i, i + batchSize);
+                        const promises = batch.map(async (addr) => {
+                            try {
+                                const userStruct = await sigmaContract.users(addr).catch(() => null);
+                                if (userStruct && userStruct.upline && userStruct.upline !== "0x0000000000000000000000000000000000000000") {
+                                    allUplines.add(userStruct.upline.toLowerCase());
+                                }
+                            } catch (e) {}
+                        });
+                        await Promise.all(promises);
+                    }
+                    
+                    allUplines.forEach(upline => addressSet.add(upline));
+                    addresses = Array.from(addressSet);
+                    currentSize = addresses.length;
+                    
+                    console.log(`📊 After upline discovery: ${currentSize} addresses`);
                 }
                 
-                // 4. Saare uplines ko main list me add karo
-                allUplines.forEach(upline => addressSet.add(upline));
-                addresses = Array.from(addressSet);
-                
-                console.log(`📊 Total unique addresses after including uplines: ${addresses.length}`);
+                console.log(`📊 Total unique addresses after including all uplines: ${addresses.length}`);
                 
                 // 5. Ab sab addresses ka data fetch karo
                 allUsersData = [];
+                const batchSize = 50;
                 
                 for (let i = 0; i < addresses.length; i += batchSize) {
                     const batch = addresses.slice(i, i + batchSize);
@@ -1708,18 +1725,45 @@
                             const balance = parseFloat(ethers.formatEther(balanceBN));
                             
                             let upline = "0x0000000000000000000000000000000000000000";
-                            let directCount = 0;
+                            let qualifiedDirectsCount = 0;
                             let lastBuyTimestamp = 0;
+                            let hasBought = false;
+                            let isInitialized = false;
                             
                             if (userStruct) {
                                 upline = userStruct.upline?.toLowerCase() || "0x0000000000000000000000000000000000000000";
-                                directCount = Number(userStruct.qualifiedDirectsCount);
+                                qualifiedDirectsCount = Number(userStruct.qualifiedDirectsCount);
                                 lastBuyTimestamp = Number(userStruct.lastBuyTimestamp);
+                                hasBought = userStruct.hasBought;
+                                isInitialized = userStruct.isInitialized;
                             }
                             
-                            return { address: addr, balance, upline, directCount, lastBuyTimestamp };
+                            // Calculate total directs count (approximation - we can't get full array length without extra ABI)
+                            // For now, we'll use qualifiedDirectsCount as base and estimate
+                            // In a perfect world, we'd have a getDirectsCount function
+                            const totalDirectsCount = qualifiedDirectsCount; // This will be updated if we can fetch more
+                            
+                            return { 
+                                address: addr, 
+                                balance, 
+                                upline, 
+                                qualifiedDirectsCount,
+                                totalDirectsCount,
+                                lastBuyTimestamp,
+                                hasBought,
+                                isInitialized
+                            };
                         } catch {
-                            return { address: addr, balance: 0, upline: "0x0000000000000000000000000000000000000000", directCount: 0, lastBuyTimestamp: 0 };
+                            return { 
+                                address: addr, 
+                                balance: 0, 
+                                upline: "0x0000000000000000000000000000000000000000", 
+                                qualifiedDirectsCount: 0,
+                                totalDirectsCount: 0,
+                                lastBuyTimestamp: 0,
+                                hasBought: false,
+                                isInitialized: false
+                            };
                         }
                     });
                     
@@ -1731,6 +1775,7 @@
                 
                 console.log(`✅ Final data loaded for ${allUsersData.length} addresses`);
                 console.log(`✅ Users with upline: ${allUsersData.filter(u => u.upline !== "0x0000000000000000000000000000000000000000").length}`);
+                console.log(`✅ Users with balance > 0: ${allUsersData.filter(u => u.balance > 0).length}`);
                 
             } catch (error) {
                 console.error("Error loading addresses:", error);
@@ -1741,10 +1786,16 @@
             if (currentLevel > maxLevel) return [];
             
             const members = [];
+            // Find all users whose upline is startAddress - this includes ALL members
             const directDownline = allUsersData.filter(u => u.upline === startAddress);
             
             for (const member of directDownline) {
-                members.push({ ...member, level: currentLevel });
+                members.push({ 
+                    ...member, 
+                    level: currentLevel,
+                    // Use qualifiedDirectsCount for display, but note that this only counts active directs
+                    directCount: member.qualifiedDirectsCount
+                });
                 const subMembers = getDownline(member.address, currentLevel + 1, maxLevel);
                 members.push(...subMembers);
             }
@@ -1773,10 +1824,12 @@
                     document.getElementById('sell-rate').textContent = `Sell: ${sellRate.toFixed(4)} USDT`;
                 } catch (e) {}
 
+                // Get ALL downline members
                 teamMembers = getDownline(userAddress, 1, 10);
                 
                 console.log(`✅ Found ${teamMembers.length} team members under your wallet`);
                 
+                // Add computed properties
                 teamMembers = teamMembers.map(m => ({
                     ...m,
                     usdtValue: m.balance * sellRate,
@@ -1792,6 +1845,12 @@
                 
             } catch (error) {
                 console.error("Error loading team:", error);
+                document.getElementById('team-body').innerHTML = `
+                    <tr><td colspan="10" class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i><br>
+                        Error: ${error.message}
+                    </td></tr>
+                `;
             } finally {
                 isLoading = false;
             }
@@ -1800,6 +1859,7 @@
         function updateStats() {
             const total = teamMembers.length;
             const direct = teamMembers.filter(m => m.level === 1).length;
+            const qualifiedDirects = teamMembers.filter(m => m.level === 1 && m.isActive).length;
             const totalSigma = teamMembers.reduce((sum, m) => sum + m.balance, 0);
             const totalUsdt = teamMembers.reduce((sum, m) => sum + m.usdtValue, 0);
             const active = teamMembers.filter(m => m.isActive).length;
@@ -1808,6 +1868,7 @@
             document.getElementById('total-members').textContent = total;
             document.getElementById('stats-breakdown').innerHTML = `Active: ${active} | Inactive: ${inactive}`;
             document.getElementById('direct-referrals').textContent = direct;
+            document.getElementById('direct-qualified').innerHTML = `Qualified: ${qualifiedDirects}`;
             document.getElementById('team-sigma').textContent = totalSigma.toFixed(2) + ' SIG6';
             document.getElementById('team-sigma-usdt').innerHTML = '$' + totalUsdt.toFixed(2) + ' USDT';
             
@@ -1875,7 +1936,7 @@
                     });
                 }
                 
-                const crownHtml = member.directCount >= 10 ? 
+                const crownHtml = member.qualifiedDirectsCount >= 10 ? 
                     `<span class="crown-icon"><i class="fas fa-crown"></i></span>` : '';
                 
                 const addressDisplay = `
@@ -1892,6 +1953,11 @@
                 const statusClass = member.isActive ? 'level-1' : 'level-5';
                 const statusText = member.isActive ? 'Active' : 'Inactive';
                 
+                // Directs display with qualified count
+                const directsDisplay = member.qualifiedDirectsCount > 0 ? 
+                    `${member.qualifiedDirectsCount} <span class="qualified-badge">(qualified)</span>` : 
+                    '0';
+                
                 html += `<tr>
                     <td>${i+1}</td>
                     <td>${addressDisplay}<div style="font-size:11px; margin-top:3px">
@@ -1903,8 +1969,9 @@
                     <td>$${member.usdtValue.toFixed(2)}</td>
                     <td>${dateDisplay}</td>
                     <td><span class="wallet-address" style="font-size:12px">${uplineShort}</span></td>
-                    <td style="text-align: center; font-weight: ${member.directCount >= 10 ? 'bold' : 'normal'}; color: ${member.directCount >= 10 ? 'gold' : 'inherit'}">
-                        ${member.directCount} ${member.directCount >= 10 ? '<i class="fas fa-crown" style="color:gold;"></i>' : ''}
+                    <td style="text-align: center;">
+                        ${member.qualifiedDirectsCount} 
+                        ${member.qualifiedDirectsCount >= 10 ? '<i class="fas fa-crown" style="color:gold; margin-left:5px;"></i>' : ''}
                     </td>
                     <td><span class="level-badge ${statusClass}">${statusText}</span></td>
                     <td><button class="action-btn" style="padding:6px 12px" onclick="viewMember('${member.address}')"><i class="fas fa-eye"></i></button></td>
@@ -1974,15 +2041,15 @@
         
         function viewMember(addr) { 
             const m = teamMembers.find(m => m.address === addr);
-            if(m) alert(`Member: ${addr}\nLevel: ${m.level}\nBalance: ${m.balance.toFixed(2)} SIG6\nValue: $${m.usdtValue.toFixed(2)}\nDirects: ${m.directCount}\nStatus: ${m.isActive ? 'Active' : 'Inactive'}`);
+            if(m) alert(`Member: ${addr}\nLevel: ${m.level}\nBalance: ${m.balance.toFixed(2)} SIG6\nValue: $${m.usdtValue.toFixed(2)}\nQualified Directs: ${m.qualifiedDirectsCount}\nStatus: ${m.isActive ? 'Active' : 'Inactive'}`);
         }
 
         function exportData() {
             if (!teamMembers.length) return;
-            let csv = "Level,Address,Balance (SIG6),USDT Value,Status,Join Date,Upline,Direct Count\n";
+            let csv = "Level,Address,Balance (SIG6),USDT Value,Status,Join Date,Upline,Qualified Directs\n";
             teamMembers.forEach(m => {
                 const joinDate = m.lastBuyTimestamp > 0 ? new Date(m.lastBuyTimestamp * 1000).toLocaleString() : '';
-                csv += `${m.level},${m.address},${m.balance.toFixed(2)},${m.usdtValue.toFixed(2)},${m.isActive ? 'Active' : 'Inactive'},${joinDate},${m.upline},${m.directCount}\n`;
+                csv += `${m.level},${m.address},${m.balance.toFixed(2)},${m.usdtValue.toFixed(2)},${m.isActive ? 'Active' : 'Inactive'},${joinDate},${m.upline},${m.qualifiedDirectsCount}\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
