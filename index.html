@@ -319,7 +319,7 @@
                     <span id="buyCooldownBadge" class="cooldown-badge"><i class="fas fa-calendar-alt"></i> 30-day: --</span>
                 </div>
                 
-                <!-- Approval Steps -->
+                <!-- Approval Steps (Hidden by default, shown only when needed) -->
                 <div class="approval-steps" id="approvalSteps" style="display: none;">
                     <div class="step" id="step1">
                         <div class="step-number">1</div>
@@ -332,11 +332,6 @@
                         <div class="step-status" id="step2Status">Locked</div>
                     </div>
                 </div>
-                
-                <!-- Approve Button -->
-                <button class="approve-btn" id="approveBtn" onclick="approveUSDT()" style="display: none;">
-                    <i class="fas fa-check-circle"></i> APPROVE USDT
-                </button>
                 
                 <div class="tabs">
                     <div class="tab active" onclick="setMode('buy')" id="buyTab">
@@ -372,7 +367,7 @@
                     </div>
                 </div>
                 
-                <!-- MAIN ACTION BUTTON -->
+                <!-- MAIN ACTION BUTTON (Single button: changes text based on state) -->
                 <button class="action-btn" id="actionButton" onclick="executeAction()" disabled>
                     <i class="fas fa-lock"></i> CONNECT WALLET
                 </button>
@@ -382,13 +377,12 @@
                 <div class="contract-box">
                     <div class="contract-info">
                         <div class="contract-label"><i class="fas fa-file-contract"></i> CONTRACT (NEW)</div>
-                        <!-- NEW CONTRACT ADDRESS -->
                         <div class="contract-address">0xf7a8cd16d672f81dc785bcaBf08502bBB210Aee1</div>
                     </div>
                     <button class="copy-btn" onclick="copyContract()"><i class="fas fa-copy"></i> COPY</button>
                 </div>
                 
-                <!-- ONLY ONE REFERRAL BOX - Contract ke neeche wala -->
+                <!-- REFERRAL BOX - Only visible after first buy -->
                 <div class="referral-mini-box" id="referralMiniBox" style="display: none;">
                     <div class="referral-mini-info">
                         <div class="referral-mini-label"><i class="fas fa-link"></i> YOUR REFERRAL LINK</div>
@@ -426,7 +420,7 @@
             </div>
         </div>
         
-        <!-- RIGHT PANEL -->
+        <!-- RIGHT PANEL (unchanged) -->
         <div class="right-panel">
             <div class="menu-card">
                 <h2><i class="fas fa-bars"></i> MENU</h2>
@@ -438,7 +432,7 @@
                 </div>
             </div>
             
-            <!-- WALLET TRANSFER PANEL -->
+            <!-- WALLET TRANSFER PANEL (unchanged) -->
             <div class="transfer-panel">
                 <h3><i class="fas fa-exchange-alt"></i> WALLET TRANSFER</h3>
                 <div class="token-selector">
@@ -464,14 +458,13 @@
     </div>
 
     <script>
-        // ========== CONTRACT CONFIGURATION (UPDATED) ==========
-        // NEW CONTRACT ADDRESS
+        // ========== CONTRACT CONFIGURATION ==========
         const SIGMA_ADDRESS = "0xf7a8cd16d672f81dc785bcaBf08502bBB210Aee1";
         const USDT_ADDRESS = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const CREATOR_WALLET = "0xb579377DDe2C03b2b46B5b12453F4dbAddB06f2E";
         
         // NEW ABI (PROVIDED)
-        const SIGMA_ABI = [
+        const SIGMA_ABI = [ /* ... (full ABI as provided, kept unchanged for brevity) ... */
             {
                 "inputs": [
                     {
@@ -1434,6 +1427,7 @@
         let cooldownInterval;
         let currentUSDTNeeded = 0;
         let isApproved = false;
+        let hasUserBought = false; // Track if user has made at least one buy
 
         const INR_RATE = 95;
 
@@ -1598,7 +1592,6 @@
             document.getElementById('btnText').textContent = 'Connect Wallet';
             document.getElementById('actionButton').disabled = true;
             document.getElementById('actionButton').innerHTML = '<i class="fas fa-lock"></i> CONNECT WALLET';
-            document.getElementById('approveBtn').style.display = 'none';
             document.getElementById('approvalSteps').style.display = 'none';
             document.getElementById('referralMiniBox').style.display = 'none';
             
@@ -1629,6 +1622,10 @@
                 
                 if (userStruct) {
                     lastBuyTimestamp = Number(userStruct.lastBuyTimestamp);
+                    // Check if user has bought (hasBought flag or lastBuyTimestamp > 0)
+                    hasUserBought = userStruct.hasBought || lastBuyTimestamp > 0;
+                } else {
+                    hasUserBought = false;
                 }
                 
                 document.getElementById('buyRate').textContent = buyRate.toFixed(6) + ' USDT';
@@ -1648,13 +1645,14 @@
                 
                 document.getElementById('polBalance').textContent = polBalanceNum.toFixed(4) + ' POL';
                 
-                // ✅ SIRF EK REFERRAL BOX - Contract ke neeche wala
-                if (userAddress) {
+                // ✅ Show referral box only if user has bought at least once
+                if (hasUserBought && userAddress) {
                     document.getElementById('referralMiniBox').style.display = 'flex';
                     const link = window.location.origin + window.location.pathname + '?ref=' + userAddress;
                     document.getElementById('referralMiniAddress').textContent = userAddress.slice(0,10) + '...' + userAddress.slice(-8);
-                    // Store link for copy function
                     window.referralLink = link;
+                } else {
+                    document.getElementById('referralMiniBox').style.display = 'none';
                 }
                 
                 updateCooldownUI();
@@ -1708,7 +1706,6 @@
                 document.getElementById('calcValue').textContent = '0.00 USDT';
                 document.getElementById('calcInr').textContent = '0.00 INR';
                 document.getElementById('actionButton').disabled = true;
-                document.getElementById('approveBtn').style.display = 'none';
                 document.getElementById('approvalSteps').style.display = 'none';
                 
                 if (currentMode === 'buy') {
@@ -1731,7 +1728,6 @@
                 if (userAddress === CREATOR_WALLET.toLowerCase()) {
                     document.getElementById('actionButton').disabled = true;
                     document.getElementById('actionButton').innerHTML = '<i class="fas fa-ban"></i> CREATOR WALLET';
-                    document.getElementById('approveBtn').style.display = 'none';
                     document.getElementById('approvalSteps').style.display = 'none';
                     return;
                 }
@@ -1742,7 +1738,6 @@
                 if (usdtBalNum < usdtWithTax) {
                     document.getElementById('actionButton').disabled = true;
                     document.getElementById('actionButton').innerHTML = '<i class="fas fa-exclamation-triangle"></i> INSUFFICIENT USDT';
-                    document.getElementById('approveBtn').style.display = 'none';
                     document.getElementById('approvalSteps').style.display = 'none';
                     document.getElementById('statusMessage').innerHTML = `Need ${usdtWithTax.toFixed(2)} USDT, you have ${usdtBalNum.toFixed(2)} USDT`;
                     return;
@@ -1750,7 +1745,7 @@
                 
                 await checkAllowance(usdtWithTax);
                 
-            } else {
+            } else { // SELL mode
                 const totalUsdt = amount * sellRate;
                 
                 document.getElementById('calcLabel').textContent = 'Total USDT to Receive:';
@@ -1760,7 +1755,6 @@
                 if (userAddress === CREATOR_WALLET.toLowerCase()) {
                     document.getElementById('actionButton').disabled = true;
                     document.getElementById('actionButton').innerHTML = '<i class="fas fa-ban"></i> CREATOR WALLET';
-                    document.getElementById('approveBtn').style.display = 'none';
                     document.getElementById('approvalSteps').style.display = 'none';
                     return;
                 }
@@ -1771,7 +1765,6 @@
                 if (sigmaBalNum < amount) {
                     document.getElementById('actionButton').disabled = true;
                     document.getElementById('actionButton').innerHTML = '<i class="fas fa-exclamation-triangle"></i> INSUFFICIENT SIG6';
-                    document.getElementById('approveBtn').style.display = 'none';
                     document.getElementById('approvalSteps').style.display = 'none';
                     return;
                 }
@@ -1786,7 +1779,6 @@
                     document.getElementById('actionButton').disabled = false;
                     document.getElementById('actionButton').innerHTML = '<i class="fas fa-coins"></i> SELL SIGMA';
                 }
-                document.getElementById('approveBtn').style.display = 'none';
                 document.getElementById('approvalSteps').style.display = 'none';
                 document.getElementById('statusMessage').innerHTML = '';
             }
@@ -1799,22 +1791,20 @@
                 
                 if (allowanceNum < usdtNeeded - 0.000001) {
                     isApproved = false;
+                    // Show approval steps and set button to APPROVE USDT
                     document.getElementById('approvalSteps').style.display = 'block';
-                    document.getElementById('approveBtn').style.display = 'block';
-                    document.getElementById('actionButton').disabled = true;
-                    
                     document.getElementById('step1').className = 'step active';
                     document.getElementById('step1Status').innerHTML = 'Required: ' + usdtNeeded.toFixed(2) + ' USDT';
                     document.getElementById('step2').className = 'step';
                     document.getElementById('step2Status').innerHTML = 'Locked';
                     
-                    document.getElementById('actionButton').innerHTML = '<i class="fas fa-lock"></i> APPROVE FIRST';
+                    document.getElementById('actionButton').disabled = false;
+                    document.getElementById('actionButton').innerHTML = '<i class="fas fa-check-circle"></i> APPROVE USDT';
                     document.getElementById('statusMessage').innerHTML = '';
                 } else {
                     isApproved = true;
+                    // Show approval steps with step1 completed, step2 active, button = BUY SIGMA
                     document.getElementById('approvalSteps').style.display = 'block';
-                    document.getElementById('approveBtn').style.display = 'none';
-                    
                     document.getElementById('step1').className = 'step completed';
                     document.getElementById('step1Status').innerHTML = 'Approved: ' + allowanceNum.toFixed(2) + ' USDT';
                     document.getElementById('step2').className = 'step active';
@@ -1827,64 +1817,6 @@
             } catch (error) {
                 console.error("Allowance check error:", error);
             }
-        }
-
-        async function approveUSDT() {
-            if (!isConnected) return;
-            
-            const btn = document.getElementById('approveBtn');
-            const msg = document.getElementById('statusMessage');
-            
-            try {
-                const usdtWei = ethers.parseUnits(currentUSDTNeeded.toFixed(6), 6);
-                
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> APPROVING...';
-                msg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please confirm in MetaMask...';
-                
-                const tx = await usdtContract.approve(SIGMA_ADDRESS, usdtWei);
-                
-                msg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Waiting for confirmation...';
-                const receipt = await tx.wait();
-                
-                msg.innerHTML = '<i class="fas fa-check-circle" style="color:var(--success)"></i> USDT Approved Successfully!';
-                
-                document.getElementById('step1').className = 'step completed';
-                document.getElementById('step1Status').innerHTML = 'Approved: ' + currentUSDTNeeded.toFixed(2) + ' USDT';
-                document.getElementById('step2').className = 'step active';
-                document.getElementById('step2Status').innerHTML = 'Ready to buy';
-                
-                document.getElementById('approveBtn').style.display = 'none';
-                document.getElementById('actionButton').disabled = false;
-                document.getElementById('actionButton').innerHTML = '<i class="fas fa-shopping-cart"></i> BUY SIGMA';
-                
-                isApproved = true;
-                
-            } catch (error) {
-                console.error("Approve error:", error);
-                
-                let errorMsg = "Approval failed";
-                if (error.message.includes("user rejected")) {
-                    errorMsg = "Approval rejected";
-                }
-                
-                msg.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> ❌ ' + errorMsg;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = 'APPROVE USDT';
-            }
-        }
-
-        function setMode(mode) {
-            currentMode = mode;
-            document.getElementById('buyTab').className = mode === 'buy' ? 'tab active' : 'tab';
-            document.getElementById('sellTab').className = mode === 'sell' ? 'tab active' : 'tab';
-            
-            document.getElementById('amount').value = '';
-            document.getElementById('approveBtn').style.display = 'none';
-            document.getElementById('approvalSteps').style.display = 'none';
-            document.getElementById('statusMessage').innerHTML = '';
-            calculate();
         }
 
         async function executeAction() {
@@ -1908,13 +1840,17 @@
             const btn = document.getElementById('actionButton');
             const msg = document.getElementById('statusMessage');
             
+            // If in buy mode and not approved, we are in APPROVE USDT state
+            if (currentMode === 'buy' && !isApproved) {
+                // Call approve function
+                await approveUSDT();
+                return;
+            }
+            
+            // Otherwise proceed with buy or sell
             try {
                 if (currentMode === 'buy') {
-                    if (!isApproved) {
-                        msg.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> Please approve USDT first';
-                        return;
-                    }
-                    
+                    // isApproved must be true here
                     const usdtWithTax = amount * buyRate * 1.01;
                     const usdtWei = ethers.parseUnits(usdtWithTax.toFixed(6), 6);
                     
@@ -1933,6 +1869,15 @@
                     document.getElementById('step2').className = 'step completed';
                     document.getElementById('step2Status').innerHTML = 'Completed';
                     
+                    // After successful buy, set hasUserBought to true and show referral box
+                    hasUserBought = true;
+                    if (userAddress) {
+                        document.getElementById('referralMiniBox').style.display = 'flex';
+                        const link = window.location.origin + window.location.pathname + '?ref=' + userAddress;
+                        document.getElementById('referralMiniAddress').textContent = userAddress.slice(0,10) + '...' + userAddress.slice(-8);
+                        window.referralLink = link;
+                    }
+                    
                     setTimeout(async () => {
                         await loadData();
                         document.getElementById('amount').value = '';
@@ -1940,7 +1885,7 @@
                         calculate();
                     }, 2000);
                     
-                } else {
+                } else { // SELL
                     const now = Math.floor(Date.now() / 1000);
                     if ((now - lastSellTimestamp) < 180) {
                         alert(`Please wait ${180 - (now - lastSellTimestamp)} seconds before selling again`);
@@ -1983,6 +1928,62 @@
                 msg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> ❌ ${errorMsg}`;
                 btn.disabled = false;
             }
+        }
+
+        async function approveUSDT() {
+            if (!isConnected) return;
+            
+            const btn = document.getElementById('actionButton'); // Single button
+            const msg = document.getElementById('statusMessage');
+            
+            try {
+                const usdtWei = ethers.parseUnits(currentUSDTNeeded.toFixed(6), 6);
+                
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> APPROVING...';
+                msg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please confirm in MetaMask...';
+                
+                const tx = await usdtContract.approve(SIGMA_ADDRESS, usdtWei);
+                
+                msg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Waiting for confirmation...';
+                const receipt = await tx.wait();
+                
+                msg.innerHTML = '<i class="fas fa-check-circle" style="color:var(--success)"></i> USDT Approved Successfully!';
+                
+                // Update UI to show approval complete and change button to BUY
+                document.getElementById('step1').className = 'step completed';
+                document.getElementById('step1Status').innerHTML = 'Approved: ' + currentUSDTNeeded.toFixed(2) + ' USDT';
+                document.getElementById('step2').className = 'step active';
+                document.getElementById('step2Status').innerHTML = 'Ready to buy';
+                
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-shopping-cart"></i> BUY SIGMA';
+                
+                isApproved = true;
+                
+            } catch (error) {
+                console.error("Approve error:", error);
+                
+                let errorMsg = "Approval failed";
+                if (error.message.includes("user rejected")) {
+                    errorMsg = "Approval rejected";
+                }
+                
+                msg.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> ❌ ' + errorMsg;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> APPROVE USDT'; // revert
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('buyTab').className = mode === 'buy' ? 'tab active' : 'tab';
+            document.getElementById('sellTab').className = mode === 'sell' ? 'tab active' : 'tab';
+            
+            document.getElementById('amount').value = '';
+            document.getElementById('approvalSteps').style.display = 'none';
+            document.getElementById('statusMessage').innerHTML = '';
+            calculate();
         }
 
         async function maxAmount() {
@@ -2070,7 +2071,6 @@
                 if (transferToken === 'SIG6') {
                     const wei = ethers.parseEther(amount.toString());
                     
-                    // ✅ Using p2pTransfer function
                     const tx = await sigmaContract.p2pTransfer(to, wei);
                     await tx.wait();
                     
@@ -2111,7 +2111,6 @@
             alert("New contract address copied!");
         }
 
-        // ✅ Single referral copy function
         function copyReferralMini() {
             if (window.referralLink) {
                 navigator.clipboard.writeText(window.referralLink);
